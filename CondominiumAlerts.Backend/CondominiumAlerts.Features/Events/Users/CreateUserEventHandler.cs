@@ -1,4 +1,5 @@
 ﻿using CondominiumAlerts.CrossCutting.CQRS.Interfaces.Handlers;
+using CondominiumAlerts.Domain.Events.Interfaces;
 
 namespace CondominiumAlerts.Features.Events.Users;
 

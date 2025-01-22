@@ -10,6 +10,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CondominiumAlerts.CrossCutt
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CondominiumAlerts.Domain", "CondominiumAlerts.Domain\CondominiumAlerts.Domain.csproj", "{1287F8E0-4C28-47D5-A8D5-22CB09E9B717}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CondominiumAlerts.Tests", "CondominiumAlerts.Tests\CondominiumAlerts.Tests.csproj", "{30ED6814-D1B7-43A4-85E4-53D71F1CAE36}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,5 +38,9 @@ Global
 		{1287F8E0-4C28-47D5-A8D5-22CB09E9B717}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1287F8E0-4C28-47D5-A8D5-22CB09E9B717}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1287F8E0-4C28-47D5-A8D5-22CB09E9B717}.Release|Any CPU.Build.0 = Release|Any CPU
+		{30ED6814-D1B7-43A4-85E4-53D71F1CAE36}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{30ED6814-D1B7-43A4-85E4-53D71F1CAE36}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{30ED6814-D1B7-43A4-85E4-53D71F1CAE36}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{30ED6814-D1B7-43A4-85E4-53D71F1CAE36}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
