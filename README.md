@@ -37,6 +37,7 @@
     - [State](#state)
   - [Paquetes usados en el frontend](#paquetes-usados-en-el-frontend)
   - [Más sobre la arquitectura del frontend](#más-sobre-la-arquitectura-del-frontend)
+- [Branching](#branching)
     
 ## ¿De que trata?
 El proyecto trata, a grandes rasgos, de una app que permitirá a los miembros de una comunidad comunicarse por canales en tiempo real, similar a Discord.
@@ -320,3 +321,15 @@ En esta carpeta se centralizará lo relacionado a la gestión del estado de la a
 
 #### Más sobre la arquitectura del frontend
 https://www.gerome.dev/blog/standalone-angular-folder-structure/
+
+### Branching
+El manejo de las ramas (branches) será muy simple, lo manejaremos por *features*, de la siguiente manera:
+
+- Tendremos una rama principal (main) que contendrá todos los cambios integrados previamente en la rama *develop*, siendo esta la rama que mostraremos ante el ITLA.
+- Tendremos una rama de desarrollo (develop), que será la rama donde integraremos todos los cambios de las *features* que cada uno trabaje.
+- Por cada feature a trabajar, se abrira una rama con el formato *feature/name-of-feature*, en la que se trabajará la *feature* respectiva, por ejemplo, para trabajar la feature de autenticación, podemos crear una rama *feature/auth*. Todos los integrantes involucrados en una *feature* específica trabajarán en base a esa rama u opcionalmente, pueden segmentar la rama aún más, usando el siguiente formato *feature/name-of-feature/name-of-developer* en caso de que varios integrantes esten involucrados en una misma *feature*, por ejemplo, *feature/auth/adrian* en caso de que yo quiera mantener mi propia branch para desarrollar mi parte de la funcionalidad.
+- Al acabar una *feature*, se integran esos cambios a la rama *develop*. Pudiendo preservar la rama de la *feature* o borrarla despues de ello.
+- Las *features* solo se podrán integrar a la rama *develop*, **no se puede integrar cambios de las *features* directamentea la rama *main*. Solo la rama *develop* puede integrarse a la rama *main*.
+- Solo integraremos la rama *develop* a la rama *main* cuando tengamos que mostrar avances al ITLA y en la presentación final.
+
+![image](https://github.com/user-attachments/assets/560d86a2-49a3-46b6-bfaa-28ce857ba867)
