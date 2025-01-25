@@ -336,4 +336,6 @@ El manejo de las ramas (branches) será muy simple, lo manejaremos por *features
 
 #### Crear y cambiar a rama develop
 ```git fetch
-git checkout -b develop origin/develop´´´
+git checkout -b develop origin/develop
+
+Ya
