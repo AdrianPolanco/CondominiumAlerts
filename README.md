@@ -26,7 +26,7 @@
     - [Tests](#tests)
       - [Paquetes usados en Tests](#paquetes-usados-en-tests)
       - [Dependencias en Tests](#dependencias-en-tests)
-    - [Más sobre la arquitectura del backend](#más-sobre-la-arquitectura-del-backend)
+    - [Más sobre la arquitectura del backend](#mas-sobre-la-arquitectura-del-backend)
 - [Frontend](#frontend)
   - [Patrones del frontend](#patrones-del-frontend)
   - [Diagrama del frontend](#diagrama-del-frontend)
