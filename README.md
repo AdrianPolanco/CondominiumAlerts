@@ -256,6 +256,8 @@ También colocaremos aquí los llamados *Smart Components*.
 
 - **Shared**: En esta capa se colocará todo el código que es reutilizable en varias *features* de las capas **Core** y **Features**, por ejemplo, directivas, pipes, o también los llamados *Dumb Components*.
 
+- **State**: En esta carpeta se centralizará lo relacionado a la gestión del estado de la aplicación, independientemente de que decidamos utilizar después para gestionar el estado (BehaviorSubjects, Services, NgRx, etc.)
+
 ![image](https://github.com/user-attachments/assets/24915c8c-a94d-4a84-aa68-f878036f5ae4)
 
 ### Librerías
