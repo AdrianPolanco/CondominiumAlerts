@@ -264,7 +264,7 @@ Es la capa que utilizaremos para hacer las pruebas unitarias y de integración, 
 - CrossCutting
 - API
 
-#### Más sobre la arquitectura del frontend
+#### Más sobre la arquitectura del backend
 https://antondevtips.com/blog/the-best-way-to-structure-your-dotnet-projects-with-clean-architecture-and-vertical-slices
 
 ### Frontend
