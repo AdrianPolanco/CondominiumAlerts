@@ -54,9 +54,9 @@ Para ahorrarnos tiempos y complicaciones, y que podamos desarrollar el proyecto 
 - Docker(opcional): No requerido pero recomendado, para las pruebas de integración y para montar contenedores de bases de datos de diversos ambientes tanto de desarrollo como la que usaremos al presentar el proyecto. Manteniendo una coherencia garantizada entre las versiones que usaremos al compartir todos un ambiente identico, evitando problemas y ahorrandonos tiempo debido a que alguno descargo la versión de SQL que no era, etc.
 - Cloudinary: Servicio que usaremos para la gestión de subida, recuperación y borrado de imágenes.
   
-## Backend
+### Backend
 
-### Patrones del backend
+#### Patrones del backend
 Dado que se evaluarán estos aspectos, es necesario clarificar que patrones estaremos utilizando.
 **Repository**: Patrón usado para abstraer el acceso a los datos.
 
@@ -70,14 +70,14 @@ Dado que se evaluarán estos aspectos, es necesario clarificar que patrones esta
 
 **Inyección de dependencias**: Patrón usado para proveer las dependencias necesarias a una clase sin que esta se tenga que preocupar por eso.
 
-### Diagrama del backend
+#### Diagrama del backend
 
 Para desarrollar el backend utilizaremos C# con su framework ASP.NET Core para desarrollar la Web API que soportará la aplicación. A continuación, hablaremos más a detalle de que hara cada una de las capas que sale en la imagen:
 ![Imagen de WhatsApp 2025-01-21 a las 13 28 18_11211e3b](https://github.com/user-attachments/assets/b80c1c45-6f55-48bb-89d2-1b0240ff2cd3)
 
-### Capas del backend
+#### Capas del backend
 
-#### **Domain**
+##### **Domain**
 Aquí residirá el dominio y lo relacionado a la lógica de negocio de la aplicación, componiendose, pero no limitandose a los siguientes elementos:
 
 **Entities**: Son los modelos que representan objetos clave del dominio, por ejemplo, en nuestro caso serían *Users*, *Comments* o *Condominiums*. Estos objetos se identifican de forma única a través de un *Id* en lugar de por sus atributos, dígase, un *User* que se llame Pepito y tenga el *Id 1* es diferente de otro *User* que se llame también Pepito y tengo el *Id 2*.
@@ -98,15 +98,15 @@ Aquí residirá el dominio y lo relacionado a la lógica de negocio de la aplica
 
 **Interfaces**: Abstracciones de servicios relevantes que serán implementados en la capa **infrastructure**, similares a los *repositories* pero orientados a aspectos no relacionados directamente a la persistencia en la base de datos.
 
-##### Paquetes usados en Domain
+###### Paquetes usados en Domain
 
 **MediatR**: Usaremos la librería **MediatR**, que es la única dependencia que tiene esta capa para disparar los *Domain Events*.
 
-##### Dependencias en Domain
+###### Dependencias en Domain
 
 - Ninguna
 
-#### **Infrastructure**
+##### **Infrastructure**
 Es la capa que proveerá todo el acceso a la infrastructura y librerías necesarias para que la aplicación realmente sea funcional. Contendrá los siguientes elementos:
 
 **DbContext**: Es la clase personalizada que haremos heredar de la clase *DbContext* que nos ofrece la librería **Entity Framework Core**. Esta clase se encargará del acceso a la base de datos.
@@ -117,7 +117,7 @@ Es la capa que proveerá todo el acceso a la infrastructura y librerías necesar
 
 **Extension Methods**: Métodos de extensión relevantes a esta capa.
 
-##### Paquetes usados en Infrastructure
+###### Paquetes usados en Infrastructure
 
 **Entity Framework Core**: Usaremos este ORM para conectarnos a la base de datos.
 
@@ -127,12 +127,12 @@ Es la capa que proveerá todo el acceso a la infrastructura y librerías necesar
 
 **CloudinaryDotnet**: Usaremos este paquete para conectarnos con Cloudinary.
 
-##### Dependencias en Infrastructure
+###### Dependencias en Infrastructure
 
 - Domain
 - CrossCutting
 
-#### **Features**
+##### **Features**
 Es la capa que hará uso de los elementos de la capa **domain** e **infrastructure** para hacer funcionalidades concretas, como registrar usuario o iniciar sesión.
 
 Por cada **feature** en esta capa se creará una carpeta donde se agruparán todas las *features* relacionadas, por ejemplo, crearemos una carpeta **Users** que contendrá, por ejemplo, las **features** **Create y Login**. Notése que los nombres de las carpetas que agrupan las *features* debe de ser en **plural** y las *features* deben tener nombres signficativos, que ayuden a identificar rápidamente el código que estará almacenado dentro de ellas. 
@@ -153,7 +153,7 @@ Comentado esto, veamos los demás elementos que compondrán esta capa:
 
 **Extension Methods**: Métodos de extensión relevantes a esta capa.
 
-##### Paquetes usados en Features
+###### Paquetes usados en Features
 
 **MediatR**: Usaremos esta librería para la gestión de CQRS y todo lo que tiene que ver con los events.
 
@@ -161,13 +161,13 @@ Comentado esto, veamos los demás elementos que compondrán esta capa:
 
 **Mapster**: Usaremos esta librería para mapear las distintas clases **sin necesidad de configuración como en AutoMapper de seguir ciertos estándares (como que las propiedades clases tengan los mismos nombres)**.
 
-##### Dependencias en Features
+###### Dependencias en Features
 
 - Domain
 - CrossCutting
 - Infrastructure
   
-#### **API**
+##### **API**
 Esta es la capa que expondrá los endpoints correspondientes, utilizaremos las **Minimal APIs** de ASP.NET Core. Contiene los siguientes elementos:
 
 **Endpoint**: Son los módulos o endpoints que expondrán el punto de entrada a todas las demás capas que comentamos anteriormente.
@@ -176,7 +176,7 @@ Esta es la capa que expondrá los endpoints correspondientes, utilizaremos las *
 
 **Extension Methods**: Métodos de extensión relevantes a esta capa.
 
-##### Paquetes usados en API
+###### Paquetes usados en API
 
 **MediatR**: Utilizado aquí para proveer las configuraciones e inyección de dependencias necesaria.
 
@@ -200,14 +200,14 @@ Esta es la capa que expondrá los endpoints correspondientes, utilizaremos las *
 
 **Carter**: Paquete para poder crear los endpoints de la minimal API en archivos separados, de forma modular y escalable.
 
-##### Dependencias en API
+###### Dependencias en API
 
 - Domain
 - CrossCutting
 - Infrastructure
 - Features
 
-#### **Cross Cutting**
+##### **Cross Cutting**
 Es una capa que utilizaremos para colocar código transversal a las distintas capas. Se compone, pero no se limita a los siguientes elementos:
 
 **Logging**: Las clases relevantes para proveer logs al backend de la app.
@@ -226,7 +226,7 @@ Es una capa que utilizaremos para colocar código transversal a las distintas ca
 
 **Cualquier otro elemento que sea reutilizable y transversal a varias capas**
 
-##### Paquetes usados en Cross Cutting
+###### Paquetes usados en Cross Cutting
 
 **MediatR**
 
@@ -240,23 +240,23 @@ Es una capa que utilizaremos para colocar código transversal a las distintas ca
 
 **Extension Methods**: Métodos de extensión relevantes a esta capa.
 
-##### Dependencias en Cross Cutting
+###### Dependencias en Cross Cutting
 
 - Domain
   
-#### **Tests**
+##### **Tests**
 Es la capa que utilizaremos para hacer las pruebas unitarias y de integración, requeridas en el proyecto final TDS. Se compone de estos elementos:
 
 **Extension Methods**: Métodos de extensión relevantes a esta capa.
 
-##### Paquetes usados en Tests
+###### Paquetes usados en Tests
 **xUnit**: Librería para hacer pruebas unitarias en C#.
 
 **Moq**: Librería para mockear las dependencias en pruebas unitarias.
 
 **TestContainers**: Librería para hacer tests de integración en C# usando contenedores. Debes tener **Docker** instalado para que funcioné.
 
-##### Dependencias en Tests
+###### Dependencias en Tests
 
 - Domain
 - Features
@@ -264,12 +264,12 @@ Es la capa que utilizaremos para hacer las pruebas unitarias y de integración, 
 - CrossCutting
 - API
 
-### Más recursos al respecto
+#### Más recursos al respecto
 https://antondevtips.com/blog/the-best-way-to-structure-your-dotnet-projects-with-clean-architecture-and-vertical-slices
 
-## Frontend
+### Frontend
 
-### Patrones del frontend
+#### Patrones del frontend
 
 **Smart Components**: Son componentes que tienen conocimiento o contienen alguna lógica de negocio, como un componente que sirva de card para mostrar datos de un condominio, etc.
 
@@ -291,32 +291,32 @@ https://antondevtips.com/blog/the-best-way-to-structure-your-dotnet-projects-wit
 
 **Facade**: Consiste en una interfaz o clase que centraliza y abstrae la complejidad de los distintos servicios, de modo que si tenemos varios servicios relacionados (caso que pasa muy típicamente en Angular) como un UserService, un EventService y un RoleService, podemos centralizar, integrar y llamar a todos esos servicios desde una sola clase que servirá de Facade para los demás servicios.
 
-### Diagrama del frontend
+#### Diagrama del frontend
 
 ![image](https://github.com/user-attachments/assets/24915c8c-a94d-4a84-aa68-f878036f5ae4)
 
-### Capas del frontend
+#### Capas del frontend
 En el frontend, la arquitectura se dividirá en cuatro grandes capas:
 
-#### Core 
+##### Core 
 
 En esta capa se trabajarán las características o *features* no específicas de la lógica de negocio de la aplicación, como la autenticación, la página para registro de usuario, los servicios para la autenticación, la moderación, el resumen diario del chat, etc.
 
-#### Features 
+##### Features 
 
 En esta capa se trabajarán características o *features* propias de la lógica de negocio de la aplicación, como las relacionadas a los condominios, la página para crear condominios, los servicios para conectarse al endpoint que creé el condominio, etc.
 También colocaremos aquí los llamados *Smart Components*.
 
-#### Shared
+##### Shared
 
 En esta capa se colocará todo el código que es reutilizable en varias *features* de las capas **Core** y **Features**, por ejemplo, directivas, pipes, o también los llamados *Dumb Components*.
 
-#### State
+##### State
 En esta carpeta se centralizará lo relacionado a la gestión del estado de la aplicación, independientemente de que decidamos utilizar después para gestionar el estado (BehaviorSubjects, Services, NgRx, etc.)
 
-### Librerías
+#### Librerías
 - **PrimeNG**: Es una librería UI moderna que proveé componentes y piezas UI ya hechas con interactividad y lógica ya implementadas
 - **NgxPermissions**: Librería de Angular para gestionar permisos.
 
-### Más recursos al respecto (Frontend)
+#### Más recursos al respecto (Frontend)
 https://www.gerome.dev/blog/standalone-angular-folder-structure/
