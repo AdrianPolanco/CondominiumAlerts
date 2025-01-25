@@ -1,7 +1,7 @@
 # Documentación
 ## Índice
 - [¿De que tratá?](## ¿De que tratá?)
-- [Frontend](##Frontend)
+- [Frontend](##frontend)
 ## ¿De que tratá?
 El proyecto trata, a grandes rasgos, de una app que permitirá a los miembros de una comunidad comunicarse por canales en tiempo real, similar a Discord.
 ## ¿Por qué?
@@ -227,7 +227,7 @@ Es la capa que utilizaremos para hacer las pruebas unitarias y de integración, 
 ### Más recursos al respecto
 https://antondevtips.com/blog/the-best-way-to-structure-your-dotnet-projects-with-clean-architecture-and-vertical-slices
 
-##Frontend
+## Frontend
 
 ### Patrones
 
