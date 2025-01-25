@@ -338,5 +338,5 @@ El manejo de las ramas (branches) será muy simple, lo manejaremos por *features
 ```
 git fetch
 git checkout -b develop origin/develop
-´´´
+```
 Ya
