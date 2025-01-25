@@ -38,6 +38,17 @@
   - [Paquetes usados en el frontend](#paquetes-usados-en-el-frontend)
   - [Más sobre la arquitectura del frontend](#más-sobre-la-arquitectura-del-frontend)
 - [Branching](#branching)
+  - [Crear y cambiar a rama develop](#crear-y-cambiar-a-rama-develop)
+  - [Crear ramas para features](#crear-ramas-para-features)
+  - [Confirmar cambios](#confirmar-cambios)
+  - [Subir cambios](#subir-cambios)
+  - [Finalizar feature e integrarla a develop](#finalizar-feature-e-integrarla-a-develop)
+- [Commits](#commits)
+  - [Tipos de commits](#tipos-de-commits)
+  - [Formato de los commits](#formato-de-los-commits)
+  - [Ejemplos de commits](#ejemplos-de-commits)
+    - [Buen commit](#buen-commit)
+    - [Mal commit](#mal-commit)
     
 ## ¿De que trata?
 El proyecto trata, a grandes rasgos, de una app que permitirá a los miembros de una comunidad comunicarse por canales en tiempo real, similar a Discord.
@@ -339,4 +350,105 @@ El manejo de las ramas (branches) será muy simple, lo manejaremos por *features
 git fetch
 git checkout -b develop origin/develop
 ```
-Ya
+#### Crear ramas para features
+```
+git checkout develop
+git pull origin develop
+git checkout -b feature/name-of-feature
+```
+Alternativamente, en caso de querer segmentar la *feature* y la rama por integrante, tambien se puede usar:
+
+```
+git checkout feature/name-of-feature
+git checkout -b feature/name-of-feature/name-of-developer
+```
+
+#### Confirmar cambios
+```
+git add .
+git commit
+```
+Se escribe un mensaje **DESCRIPTIVO** que dé la suficiente información acerca de que se hizo en el commit en el formato que enseñaremos más tarde. Le damos Ctrl + X para confirmar el commit y subimos el cambio.
+
+#### Subir cambios
+```
+git push -u origin feature/name-of-feature
+```
+O, si la rama local ya esta sincronizada con la rama remota:
+```
+git push origin feature/name-of-feature
+```
+
+#### Finalizar feature e integrarla a develop
+```
+git checkout develop
+git merge feature_branch
+git push origin develop
+```
+### Commits
+Los commits deben ser lo más pequeños posible, por favor, evitar commits en los que se hagan demasiadas cosas.
+
+#### Tipos de commits
+Utilizaremos los llamados *conventional commits* para cada *commit* que se haga en el proyecto, de manera que brinden la mayor cantidad de información posible sobre que se hizo con solo verlos:
+
+**feat**: Añadir una nueva funcionalidad.
+Ejemplo: feat: add authentication module
+
+**fix**: Corregir un error.
+Ejemplo: fix: resolve issue with login timeout
+
+**docs**: Cambios en la documentación.
+Ejemplo: docs: update README with setup instructions
+
+**style**: Cambios que no afectan la lógica del código (formateo, espacios, etc.).
+Ejemplo: style: format code using Prettier
+
+**refactor**: Mejorar el código sin cambiar su funcionalidad.
+Ejemplo: refactor: simplify user validation logic
+
+**test**: Agregar o corregir pruebas.
+Ejemplo: test: add unit tests for login service
+
+**chore**: Cambios menores o tareas rutinarias (actualización de dependencias, configuración).
+Ejemplo: chore: update dependencies
+
+**perf**: Cambios que mejoran el rendimiento.
+Ejemplo: perf: optimize database queries
+
+##### Formato de los commits
+Los commits deberán de tener el siguiente formato:
+```
+**type(module)**: Title
+Description
+
+- Task1
+- Task2
+- Task3
+````
+
+**type**: Es el tipo de commit relacionado al cambio que se hizo, por ejemplo si es un *feat*, *refactor*, *test*, etc. Es **requerido**.
+
+**module**: Información sobre el módulo o característica que se esta trabajando, ej: *feat(authentication*, *feat(mute-user)* o *feat(comment)*. Es **opcional** pero **recomendado**.
+
+**Description**: Descripción detallada del cambio que se hizo en ese commit. Es **requerido**.
+
+**Tasks**: Una lista de tareas o cosas que se hicieron en ese commit, que da más información a la descripción principal. Es **opcional** pero **recomendado**.
+
+##### Ejemplos de commits
+###### Buen commit
+```
+feat(auth): add JWT authentication
+
+- Implemented JWT token generation and validation
+- Created login endpoint for user authentication
+- Updated authentication middleware to validate JWT tokens
+```
+###### Mal commit
+```
+feat: add authentication, improve login, update UI, and fix bugs
+
+- Added authentication system
+- Updated login page with new design
+- Fixed issues in the user dashboard
+- Improved UI responsiveness
+```
