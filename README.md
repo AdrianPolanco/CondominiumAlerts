@@ -333,3 +333,7 @@ El manejo de las ramas (branches) será muy simple, lo manejaremos por *features
 - **Solo integraremos la rama *develop* a la rama *master* cuando tengamos que mostrar avances al ITLA y en la presentación final**.
 
 ![image](https://github.com/user-attachments/assets/560d86a2-49a3-46b6-bfaa-28ce857ba867)
+
+#### Crear y cambiar a rama develop
+```git fetch
+git checkout -b develop origin/develop´´´
