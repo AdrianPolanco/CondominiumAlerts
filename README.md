@@ -14,11 +14,11 @@ Para ahorrarnos tiempos y complicaciones, y que podamos desarrollar el proyecto 
 - Docker(opcional): No requerido pero recomendado, para las pruebas de integración y para montar contenedores de bases de datos de diversos ambientes tanto de desarrollo como la que usaremos al presentar el proyecto. Manteniendo una coherencia garantizada entre las versiones que usaremos al compartir todos un ambiente identico, evitando problemas y ahorrandonos tiempo debido a que alguno descargo la versión de SQL que no era, etc.
 - Cloudinary: Servicio que usaremos para la gestión de subida, recuperación y borrado de imágenes.
   
-### Backend
+## Backend
 ![Imagen de WhatsApp 2025-01-21 a las 13 28 18_11211e3b](https://github.com/user-attachments/assets/b80c1c45-6f55-48bb-89d2-1b0240ff2cd3)
 Para desarrollar el backend utilizaremos C# con su framework ASP.NET Core para desarrollar la Web API que soportará la aplicación. A continuación, hablaremos más a detalle de que hara cada una de las capas que sale en la imagen:.
 
-#### Patrones
+### Patrones
 Dado que se evaluarán estos aspectos, es necesario clarificar que patrones estaremos utilizando.
 **Repository**: Patrón usado para abstraer el acceso a los datos.
 
@@ -31,6 +31,8 @@ Dado que se evaluarán estos aspectos, es necesario clarificar que patrones esta
 **Strategy**: Patrón usado para tomar diferentes "estrategias" o "implementaciones" dependiendo de una elección tomada por el usuario. Lo podemos usar, por ejemplo, para diferenciar la publicación un comentario sin ninguna foto adjunta de un comentario con una foto adjunta.
 
 **Inyección de dependencias**: Patrón usado para proveer las dependencias necesarias a una clase sin que esta se tenga que preocupar por eso.
+
+### Capas
 
 #### **Domain**
 Aquí residirá el dominio y lo relacionado a la lógica de negocio de la aplicación, componiendose, pero no limitandose a los siguientes elementos:
@@ -222,9 +224,9 @@ Es la capa que utilizaremos para hacer las pruebas unitarias y de integración, 
 ### Más recursos al respecto
 https://antondevtips.com/blog/the-best-way-to-structure-your-dotnet-projects-with-clean-architecture-and-vertical-slices
 
-### Frontend
+## Frontend
 
-#### Patrones
+### Patrones
 
 **Smart Components**: Son componentes que tienen conocimiento o contienen alguna lógica de negocio, como un componente que sirva de card para mostrar datos de un condominio, etc.
 
@@ -246,12 +248,12 @@ https://antondevtips.com/blog/the-best-way-to-structure-your-dotnet-projects-wit
 
 **Facade**: Consiste en una interfaz o clase que centraliza y abstrae la complejidad de los distintos servicios, de modo que si tenemos varios servicios relacionados (caso que pasa muy típicamente en Angular) como un UserService, un EventService y un RoleService, podemos centralizar, integrar y llamar a todos esos servicios desde una sola clase que servirá de Facade para los demás servicios.
 
+## Capas
 En el frontend, la arquitectura se dividirá en tres grandes capas:
 
 - **Core**: En esta capa se trabajarán las características o *features* no específicas de la lógica de negocio de la aplicación, como la autenticación, la página para registro de usuario, los servicios para la autenticación, la moderación, el resumen diario del chat, etc.
 
 - **Features**: En esta capa se trabajarán características o *features* propias de la lógica de negocio de la aplicación, como las relacionadas a los condominios, la página para crear condominios, los servicios para conectarse al endpoint que creé el condominio, etc.
-
 También colocaremos aquí los llamados *Smart Components*.
 
 - **Shared**: En esta capa se colocará todo el código que es reutilizable en varias *features* de las capas **Core** y **Features**, por ejemplo, directivas, pipes, o también los llamados *Dumb Components*.
