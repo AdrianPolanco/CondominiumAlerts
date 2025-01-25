@@ -26,7 +26,7 @@
     - [Tests](#tests)
       - [Paquetes usados en Tests](#paquetes-usados-en-tests)
       - [Dependencias en Tests](#dependencias-en-tests)
-    - [Más recursos al respecto (Backend)](#más-recursos-al-respecto-(backend))
+    - [Más sobre la arquitectura del backend](#más-sobre-la-arquitectura-del-backend)
 - [Frontend](#frontend)
   - [Patrones del frontend](#patrones-del-frontend)
   - [Diagrama del frontend](#diagrama-del-frontend)
@@ -35,8 +35,8 @@
     - [Features (Frontend)](#features-(frontend))
     - [Shared](#shared)
     - [State](#state)
-  - [Librerías](#líbrerias)
-  - [Más recursos al respecto (Frontend)](#más-recursos-al-respecto-(frontend))
+  - [Paquetes usados en el frontend](#paquetes-usados-en-el-frontend)
+  - [Más sobre la arquitectura del frontend](#más-sobre-la-arquitectura-del-frontend)
     
 ## ¿De que trata?
 El proyecto trata, a grandes rasgos, de una app que permitirá a los miembros de una comunidad comunicarse por canales en tiempo real, similar a Discord.
@@ -264,7 +264,7 @@ Es la capa que utilizaremos para hacer las pruebas unitarias y de integración, 
 - CrossCutting
 - API
 
-#### Más recursos al respecto
+#### Más sobre la arquitectura del frontend
 https://antondevtips.com/blog/the-best-way-to-structure-your-dotnet-projects-with-clean-architecture-and-vertical-slices
 
 ### Frontend
@@ -314,9 +314,9 @@ En esta capa se colocará todo el código que es reutilizable en varias *feature
 ##### State
 En esta carpeta se centralizará lo relacionado a la gestión del estado de la aplicación, independientemente de que decidamos utilizar después para gestionar el estado (BehaviorSubjects, Services, NgRx, etc.)
 
-#### Librerías
+#### Paquetes usados en el frontend
 - **PrimeNG**: Es una librería UI moderna que proveé componentes y piezas UI ya hechas con interactividad y lógica ya implementadas
 - **NgxPermissions**: Librería de Angular para gestionar permisos.
 
-#### Más recursos al respecto (Frontend)
+#### Más sobre la arquitectura del frontend
 https://www.gerome.dev/blog/standalone-angular-folder-structure/
