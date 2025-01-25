@@ -1,7 +1,7 @@
 # Documentación
 ## Índice
 - [¿De que tratá?](## ¿De que tratá?)
-- [Frontend](# Frontend)
+- [Frontend](##Frontend)
 ## ¿De que tratá?
 El proyecto trata, a grandes rasgos, de una app que permitirá a los miembros de una comunidad comunicarse por canales en tiempo real, similar a Discord.
 ## ¿Por qué?
