@@ -218,3 +218,49 @@ Es la capa que utilizaremos para hacer las pruebas unitarias y de integración, 
 - Infrastructure
 - CrossCutting
 - API
+
+### Más recursos al respecto
+https://antondevtips.com/blog/the-best-way-to-structure-your-dotnet-projects-with-clean-architecture-and-vertical-slices
+
+### Frontend
+
+#### Patrones
+
+**Smart Components**: Son componentes que tienen conocimiento o contienen alguna lógica de negocio, como un componente que sirva de card para mostrar datos de un condominio, etc.
+
+**Dumb components**: Son componentes agnósticos a la lógica de negocio, como por ejemplo un componente que sea una campanita para mostrar y manejar las notificaciones, en principio debería de funcionar independientemente del tipo de la notificación, sea por un mensaje, un evento de un condominio, etc.
+
+**Singleton**: Este patrón consiste en siempre proveer una misma instancia de una clase, es provisto por el sistema de inyección de dependencias de Angular, usando *providedIn: 'root'*.
+
+**Inyección de dependencias**: Ya descrito antes, Angular también provee inyección de dependencias a través del decorador *@Injectable*.
+
+**Observer**: Es un patrón que permite a los *suscriptores* reaccionar automáticamente a cambios hechos en el observable al que estan suscritos. Angular se basa mucho en este patrón, usando paquetes incluidos como RxJs y sus distintos operadores, así como las nuevas signals.
+
+**Directives**: Permite crear clases reutilizables que alterán el comportamiento de un componente sin necesidad de cambiar su código interno. Angular permite crear *directivas* a través del decorador *@Directive*
+
+**Interceptor**: Consiste en interceptar (usualmente solicitudes HTTP o cargas de páginas) y cambiar su comportamiento. Angular proveé este patrón a través de los *Interceptors* (para modificar solicitudes HTTP) y los *Guards* (usualmente para controlar el acceso a las vistas).
+
+**Lazy Loading**: Consiste en cargar los componentes solamente cuando sean necesarios, de modo que si por ejemplo tienes un componente LoginPage, este nunca se cargará si el usuario nunca entra a una página que utilicé este componente, aumentando el rendimiento y reduciendo el tamaño de la compilación y las descargas.
+
+**Pipes**: Son clases reutilizables que alteran el *formato* de la vista de los datos sin alterar los datos en sí, por ejemplo, pueden alterar una variable money que tiene 750 como valor para que el usuario vea por ejemplo "$750" pero el valor de la variable siga siendo el número 750, evitando la necesidad de pasar el valor a string, concatenarlo, etc.
+
+**Facade**: Consiste en una interfaz o clase que centraliza y abstrae la complejidad de los distintos servicios, de modo que si tenemos varios servicios relacionados (caso que pasa muy típicamente en Angular) como un UserService, un EventService y un RoleService, podemos centralizar, integrar y llamar a todos esos servicios desde una sola clase que servirá de Facade para los demás servicios.
+
+En el frontend, la arquitectura se dividirá en tres grandes capas:
+
+- **Core**: En esta capa se trabajarán las características o *features* no específicas de la lógica de negocio de la aplicación, como la autenticación, la página para registro de usuario, los servicios para la autenticación, la moderación, el resumen diario del chat, etc.
+
+- **Features**: En esta capa se trabajarán características o *features* propias de la lógica de negocio de la aplicación, como las relacionadas a los condominios, la página para crear condominios, los servicios para conectarse al endpoint que creé el condominio, etc.
+
+También colocaremos aquí los llamados *Smart Components*.
+
+- **Shared**: En esta capa se colocará todo el código que es reutilizable en varias *features* de las capas **Core** y **Features**, por ejemplo, directivas, pipes, o también los llamados *Dumb Components*.
+
+![image](https://github.com/user-attachments/assets/24915c8c-a94d-4a84-aa68-f878036f5ae4)
+
+### Librerías
+- **PrimeNG**: Es una librería UI moderna que proveé componentes y piezas UI ya hechas con interactividad y lógica ya implementadas
+- **NgxPermissions**: Librería de Angular para gestionar permisos.
+
+### Más recursos al respecto
+https://www.gerome.dev/blog/standalone-angular-folder-structure/
