@@ -443,6 +443,9 @@ feat(auth): add JWT authentication
 - Created login endpoint for user authentication
 - Updated authentication middleware to validate JWT tokens
 ```
+
+Este commit es buena práctica y debería de ser así los commits que haremos todos, porque es pequeño, específico, y proporciona información clara sobre lo que se hizo.
+
 ###### Mal commit
 ```
 feat: add authentication, improve login, update UI, and fix bugs
@@ -452,3 +455,8 @@ feat: add authentication, improve login, update UI, and fix bugs
 - Fixed issues in the user dashboard
 - Improved UI responsiveness
 ```
+Este commit es pésimo, porque está haciendo demasiados cambios en un solo commit:
+
+- Está cubriendo más de una característica.
+- Mezcla funcionalidad nueva con corrección de errores y mejoras en el diseño de la UI
+- Debería dividirse en commits más pequeños y específicos.
