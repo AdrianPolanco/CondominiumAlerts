@@ -7,6 +7,7 @@ namespace CondominiumAlerts.Features.Commands;
 public class RegisterUserCommandHandler : ICommandHandler<RegisterUserCommand, CustomResult<object>>
 {
     
+    
     private readonly IAuthenticationProvider _authenticationProvider;
 
     public RegisterUserCommandHandler(IAuthenticationProvider authenticationProvider)
