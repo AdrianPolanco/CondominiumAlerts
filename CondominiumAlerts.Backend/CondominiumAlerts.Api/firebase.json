@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "condominium-alerts-c12cd",
+  "private_key_id": "38c0ca8b5df893d774835d9bb666dcda09884e70",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCy5g3U2RqTne4H\n92XjQ7f5OA4vz6CP2RLmHm0/kZI0meWwC1oOpY+hYvbJ0nYpqMfNx9a7I1NSM5X/\nvftEqmo1d6MAmjdIHD8FT4w1AkGuxfhYEE+o/SyT807SsrcV2l/hPMDY2stg2kkr\neuM+CDeNit0sQfIcuNRMcM0beXzms8GYWru5h6BiX2vy1H8OpyNA8KCPfsr5glsz\ns4hpxtyhjPbyFBFNmYz4W/NSUXzZ7kpXxDnjxbUTKel3kJUoLLEX6mSYz8Hdakbm\njcMbScaAlr7ImYiBsi49izXyttUwTqMeU4kvBg919xVwBcCuxJo3QgqhJ+TjDDbp\nbvxy9xEFAgMBAAECggEAMMxQ5IjN14tCNPkWWT4NDlVshT0g4mwHXC7bhPX7yA5c\nmT8XcxxVB+QbRiT651UrHyYOHCDAJxF8LnTPd8T2UJxQIadvQeO2iwfOSl1Rtk84\n9SiJ2iIpCThafV2TVEorUiCEyAIybLpOMCaGmtKZ+KlyuBJK7Ou7uRgh0oc6eyEC\nWrdpdJ48bvoNM1BuEEpdnUdf4XN8uCF27kunxmLk/g+GVzjll4+13v2jFqRBq69H\nJ3O2jxLXTQnoevThz+72+5ZcUakvqc0xBkEY+W/Ly1wIu0i+bJzMmfLLyxCgydn8\nMAhXQk1MMDgHXc+vMhaWvPSq9qSQStt2yQIKaqKtFwKBgQD2WiNiE5AaZoY7vomH\nGNuodkTqOixjz3wEDfEiRDRBpcl2aMSMv1DDiZyLFr8UsHM1e+BAjOE/HqezUCm8\nmivwMw4OMFV08gpL8Z7ZpUHmmsAGqlO1xuqZCBfZt70Gq665AF1tEZcWGmpsJMX5\nRM1dSAfCKEt9AyPhNs5SWT/JTwKBgQC556UmZRemj1BPhms91XBRHfV0CC/AjQbZ\nEPjSrlovOPZFBFWdIzLZTdFQU+0UZS7/xMz3zZMmoOjsxUP27IVyvxQPUiqWioq8\nkC/b9NPaJy9/aWmivJEEzgIU88LeSQMC+/p82ttWVUROTc37L4qTpPLeN4X9Ya0R\nQrcvOm4DawKBgCPfNj3GyXn+qdczRIVmij26kwhkVihmgxF4Ej/CHLXedTqHwO8Z\nwKHofOIH+uUBWJVWJ25e1UHCrfq/VoR/EpzUYlyQjzELOZKbaV0Z4kG5EPMnhC74\n+xozgn2ScrTw9O09b109bXmreQmsRSOp8BmALpkIEw3uEiBuQZbeJhqjAoGBAKkT\n8lNCPEljLKK3WU/qkHVmLvgx/eQ9H05KrlNG+YTbZLgOoiMBgVy79rP9MLGM+Trr\n7ZMu6DeIv2+gVhj8sr5S5NauX0d9h4LKDI0bVZaibwONhuLYZ3icOK5/qOrsMo4D\nSKVHk5cog7BH+SAL9BgmPDE5BGcX8ASzzdFpbeczAoGBANY+qiIJT4Ppf4+o88X9\n/Hij6mtMgLDS6km5UNygqdkdKoWSSmQ4aasDkaiDp9qbAq9DMhEMtpn3z/ECxx6m\n2jz/GhULs+JLwOIRVeUXMfH69K2yxGXQgXmS5wPZCvQ/andW/2rykhrSPqMkkHt8\n67453m8QhYYPtEw1aAdYS6+0\n-----END PRIVATE KEY-----\n",
+  "client_email": "firebase-adminsdk-fbsvc@condominium-alerts-c12cd.iam.gserviceaccount.com",
+  "client_id": "102941394450074586767",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-fbsvc%40condominium-alerts-c12cd.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

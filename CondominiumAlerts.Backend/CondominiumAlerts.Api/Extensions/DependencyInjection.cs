@@ -3,6 +3,8 @@ using System.Threading.RateLimiting;
 using Carter;
 using CondominiumAlerts.CrossCutting.ErrorHandler;
 using CondominiumAlerts.Infrastructure.Persistence.Context;
+using FirebaseAdmin;
+using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 
@@ -13,6 +15,10 @@ public static class DependencyInjection
     public static IServiceCollection AddApiServices(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddOpenApi();
+        FirebaseApp.Create(new AppOptions()
+        {
+            Credential = GoogleCredential.FromFile("./firebase.json")
+        });
         services.AddResponseCompression(options =>
         {
             options.EnableForHttps = true;
@@ -30,7 +36,7 @@ public static class DependencyInjection
             options.Level = System.IO.Compression.CompressionLevel.Fastest;
         });
 
-        services.AddRateLimiter(options =>
+       /* services.AddRateLimiter(options =>
         {
             options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, IPAddress>(context =>
             {
@@ -44,9 +50,9 @@ public static class DependencyInjection
                         QueueLimit = 0
                     })!;
             });
-        });
+        });*/
         services.AddCarter();
-        services.AddExceptionHandler<ErrorHandler>();
+        //services.AddExceptionHandler<ErrorHandler>();
         
         return services;
     }
@@ -72,9 +78,9 @@ public static class DependencyInjection
     public static WebApplication UseApiServices(this WebApplication app)
     {
         app.UseResponseCompression();
-        app.UseRateLimiter();
-        app.MapCarter();
-        app.UseExceptionHandler(options => { });
+       // app.UseRateLimiter();
+        app.MapGroup("/api").MapCarter();
+        //app.UseExceptionHandler(options => { });
 
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
