@@ -23,4 +23,12 @@
         <Using Include="Xunit"/>
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\CondominiumAlerts.Api\CondominiumAlerts.Api.csproj" />
+      <ProjectReference Include="..\CondominiumAlerts.CrossCutting\CondominiumAlerts.CrossCutting.csproj" />
+      <ProjectReference Include="..\CondominiumAlerts.Domain\CondominiumAlerts.Domain.csproj" />
+      <ProjectReference Include="..\CondominiumAlerts.Features\CondominiumAlerts.Features.csproj" />
+      <ProjectReference Include="..\CondominiumAlerts.Infrastructure\CondominiumAlerts.Infrastructure.csproj" />
+    </ItemGroup>
+
 </Project>

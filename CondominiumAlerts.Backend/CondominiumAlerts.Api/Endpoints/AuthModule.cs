@@ -2,6 +2,7 @@
 using CondominiumAlerts.CrossCutting.Results;
 using CondominiumAlerts.Features.Commands;
 using MediatR;
+using Microsoft.AspNetCore.Mvc;
 
 namespace CondominiumAlerts.Api.Endpoints;
 
@@ -12,8 +13,14 @@ public class AuthModule : ICarterModule
         app.MapPost("/users/register",
             async (ISender sender, RegisterUserCommand registerUserCommand, CancellationToken cancellationToken) =>
             {
-               CustomResult<object> result = await sender.Send(registerUserCommand, cancellationToken);
-               return result.ToHttpResult();
+               var result = await sender.Send(registerUserCommand, cancellationToken);
+               if(result.IsFailed) return Results.BadRequest(result);
+               var response = new
+               {
+                   IsSuccess = result.IsSuccess,
+                   Data = result.Value
+               };
+               return Results.Ok(response);
             });
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using CondominiumAlerts.CrossCutting.Behaviors;
-using Microsoft.Extensions.Configuration;
+using CondominiumAlerts.Features.Commands;
+using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CondominiumAlerts.Features.Extensions;
@@ -12,10 +13,11 @@ public static class DependencyInjection
         services.AddMediatR(config =>
         {
             config.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
-           // config.AddOpenBehavior(typeof(LoggingBehavior<,>));
-            //config.AddOpenBehavior(typeof(ValidationBehavior<,>));
+            config.AddOpenBehavior(typeof(LoggingBehavior<,>));
+            config.AddOpenBehavior(typeof(ValidationBehavior<,>));
         });
         
+        services.AddScoped<IValidator<RegisterUserCommand>, RegisterUserValidator>();
         return services;
     }
 }

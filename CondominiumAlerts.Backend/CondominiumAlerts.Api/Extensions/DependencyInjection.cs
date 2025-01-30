@@ -5,6 +5,7 @@ using CondominiumAlerts.CrossCutting.ErrorHandler;
 using CondominiumAlerts.Infrastructure.Persistence.Context;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
+using LightResults.Extensions.Json;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 
@@ -15,6 +16,10 @@ public static class DependencyInjection
     public static IServiceCollection AddApiServices(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddOpenApi();
+        services.ConfigureHttpJsonOptions(options =>
+        {
+            options.SerializerOptions.Converters.Add(new ResultJsonConverterFactory());
+        });
         FirebaseApp.Create(new AppOptions()
         {
             Credential = GoogleCredential.FromFile("./firebase.json")
@@ -36,7 +41,7 @@ public static class DependencyInjection
             options.Level = System.IO.Compression.CompressionLevel.Fastest;
         });
 
-       /* services.AddRateLimiter(options =>
+        services.AddRateLimiter(options =>
         {
             options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, IPAddress>(context =>
             {
@@ -50,9 +55,9 @@ public static class DependencyInjection
                         QueueLimit = 0
                     })!;
             });
-        });*/
+        });
         services.AddCarter();
-        //services.AddExceptionHandler<ErrorHandler>();
+        services.AddExceptionHandler<ErrorHandler>();
         
         return services;
     }
@@ -77,18 +82,17 @@ public static class DependencyInjection
 
     public static WebApplication UseApiServices(this WebApplication app)
     {
+        app.UseHttpsRedirection();
+        app.UseExceptionHandler("/error");
         app.UseResponseCompression();
-       // app.UseRateLimiter();
+        app.UseRateLimiter();
+        app.UseRouting();
         app.MapGroup("/api").MapCarter();
-        //app.UseExceptionHandler(options => { });
-
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
         {
             app.MapOpenApi();
         }
-
-        app.UseHttpsRedirection();
         
         return app;
     }

@@ -21,7 +21,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Users\Auth\" />
+      <Folder Include="Features\" />
     </ItemGroup>
 
 </Project>
