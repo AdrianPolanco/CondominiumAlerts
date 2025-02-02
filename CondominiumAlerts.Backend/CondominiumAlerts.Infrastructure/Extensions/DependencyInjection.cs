@@ -12,8 +12,7 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        //services.AddNpgsql<ApplicationDbContext>(configuration.GetConnectionString("Database")!);
-        
+        services.AddNpgsql<ApplicationDbContext>(configuration.GetConnectionString("DefaultConnection")!);
         services.AddSingleton<IAuthenticationProvider, AuthenticationProvider>();
         return services;
     }
