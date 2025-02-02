@@ -9,7 +9,7 @@ using LightResults;
 
 namespace CondominiumAlerts.Features.Commands;
 
-public class RegisterUserCommandHandler : ICommandHandler<RegisterUserCommand, Result<object>>
+public class RegisterUserCommandHandler : ICommandHandler<RegisterUserCommand, Result<User>>
 {
     private readonly IAuthenticationProvider _authenticationProvider;
     private readonly IRepository<User, string> _userRepository;
@@ -19,7 +19,7 @@ public class RegisterUserCommandHandler : ICommandHandler<RegisterUserCommand, R
         _authenticationProvider = authenticationProvider;
         _userRepository = userRepository;
     }
-    public async Task<Result<object>> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
+    public async Task<Result<User>> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
     {
         string? identityId = null;
     
@@ -30,7 +30,7 @@ public class RegisterUserCommandHandler : ICommandHandler<RegisterUserCommand, R
             //Si falla el registro en Firebase, no seguir el proceso
             if (string.IsNullOrEmpty(identityId))
             {
-                return Result.Fail<object>("Error al registrar el usuario en Firebase.");
+                return Result.Fail<User>("Error al registrar el usuario en Firebase.");
             }
 
             // 📌 Crear el usuario en la base de datos
@@ -39,23 +39,24 @@ public class RegisterUserCommandHandler : ICommandHandler<RegisterUserCommand, R
                 Id = identityId, // Relacionar Firebase con la BD
                 Name = request.Username,
                 LastName = request.Lastname,
-                Phone = request.PhoneNumber
+                Phone = request.PhoneNumber,
+                Email = request.Email,
             };
 
             user = await _userRepository.CreateAsync(user, cancellationToken);
             
-            return Result.Ok(user);
+            return Result.Ok<User>(user);
         }
         catch (FirebaseAuthException ex)
         {
             // Comparar el ErrorCode con el string "email-already-exists"
            if (ex.ErrorCode == ErrorCode.AlreadyExists)
             {
-                return Result.Fail<object>("El correo electrónico ya está registrado en Firebase.");
+                return Result.Fail<User>("El correo electrónico ya está registrado en Firebase.");
             }
 
             // Si es otro error de Firebase, devolver un mensaje genérico
-            return Result.Fail<object>($"Error al registrar el usuario en Firebase: {ex.Message}");
+            return Result.Fail<User>($"Error al registrar el usuario en Firebase: {ex.Message}");
         }
         catch (Exception ex)
         {
@@ -66,7 +67,7 @@ public class RegisterUserCommandHandler : ICommandHandler<RegisterUserCommand, R
                 await _userRepository.DeleteAsync(identityId, cancellationToken);
             }
 
-            return Result.Fail<object>($"Error durante el registro: {ex.Message}");
+            return Result.Fail<User>($"Error durante el registro: {ex.Message}");
         }
     }
 }

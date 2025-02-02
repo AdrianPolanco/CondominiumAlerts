@@ -9,6 +9,7 @@ public sealed class User : IAggregateRoot<string>
     public string? ProfilePictureUrl { get; set; }
     public string Name { get; set; } = string.Empty!;
     public string LastName { get; set; } = string.Empty!;
+    public string Email { get; set; } = string.Empty!;
     public Phone Phone { get; set; } = null!;
     public Address? Address { get; set; }
     public DateTime CreatedAt { get; init; }

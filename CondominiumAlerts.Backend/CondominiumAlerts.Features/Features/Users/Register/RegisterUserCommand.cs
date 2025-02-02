@@ -5,7 +5,7 @@ using LightResults;
 
 namespace CondominiumAlerts.Features.Commands;
 
-public class RegisterUserCommand : ICommand<Result<object>>
+public class RegisterUserCommand : ICommand<Result<User>>
 {
     public string Username { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;

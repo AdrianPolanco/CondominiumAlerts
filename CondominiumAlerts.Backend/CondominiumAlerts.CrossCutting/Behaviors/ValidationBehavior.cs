@@ -42,7 +42,7 @@ public class ValidationBehavior<TRequest, TResponse>
                 {
                     { "PropertyName", f.PropertyName },
                     { "Code", f.ErrorCode },
-                    {"AttemptedValue", f.AttemptedValue}
+                    {"AttemptedValue", f.AttemptedValue ?? "null"} 
                 })
             ).ToList();
 

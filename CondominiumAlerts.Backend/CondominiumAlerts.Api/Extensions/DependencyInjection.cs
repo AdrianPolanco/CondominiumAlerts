@@ -22,8 +22,6 @@ public static class DependencyInjection
         services.ConfigureHttpJsonOptions(options =>
         {
             options.SerializerOptions.Converters.Add(new ResultJsonConverterFactory());
-            options.SerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
-            options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
         });
         FirebaseApp.Create(new AppOptions()
         {
