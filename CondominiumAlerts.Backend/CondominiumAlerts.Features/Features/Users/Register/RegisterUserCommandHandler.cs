@@ -43,7 +43,7 @@ public class RegisterUserCommandHandler : ICommandHandler<RegisterUserCommand, R
                 Email = request.Email,
             };
 
-            user = await _userRepository.CreateAsync(user, cancellationToken);
+            await _userRepository.CreateAsync(user, cancellationToken);
             
             return Result.Ok<User>(user);
         }
