@@ -25,6 +25,7 @@ public class RegisterUserCommandHandler : ICommandHandler<RegisterUserCommand, R
         {
             // 📌 Registrar usuario en Firebase
             identityId = await _authenticationProvider.RegisterUserAsync(request.Username, request.Email, request.Password, cancellationToken);
+            //Si falla el registro en Firebase, no seguir el proceso
             if (string.IsNullOrEmpty(identityId))
             {
                 return Result.Fail<object>("Error al registrar el usuario en Firebase.");
@@ -42,12 +43,7 @@ public class RegisterUserCommandHandler : ICommandHandler<RegisterUserCommand, R
 
             user = await _userRepository.CreateAsync(user, cancellationToken);
 
-            return Result.Ok<object>(new
-            {
-                IdentityId = identityId,
-                Username = request.Username,
-                Email = request.Email
-            });
+            return Result.Ok(user);
         }
         catch (Exception ex)
         {

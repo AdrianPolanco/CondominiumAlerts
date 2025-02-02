@@ -1,4 +1,5 @@
 ﻿using CondominiumAlerts.CrossCutting.CQRS.Interfaces;
+using CondominiumAlerts.Domain.Aggregates.Entities;
 using CondominiumAlerts.Domain.Aggregates.ValueObjects;
 using LightResults;
 
