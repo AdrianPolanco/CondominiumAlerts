@@ -5,4 +5,13 @@ using LightResults;
 
 namespace CondominiumAlerts.Features.Commands;
 
-public record RegisterUserCommand(string Username, string Email, string Password, string Name, string Lastname, Phone PhoneNumber, Address Address): ICommand<Result<object>>;
+public class RegisterUserCommand : ICommand<Result<object>>
+{
+    public string Username { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+    public string Password { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
+    public string Lastname { get; set; } = string.Empty;
+    public Phone PhoneNumber { get; set; } = new();
+    
+}

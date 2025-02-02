@@ -19,6 +19,6 @@ public class AuthenticationProvider : IAuthenticationProvider
 
     public async Task DeleteUserAsync(string userId, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        await FirebaseAuth.DefaultInstance.DeleteUserAsync(userId, cancellationToken);
     }
 }
