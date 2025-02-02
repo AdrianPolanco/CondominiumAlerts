@@ -9,9 +9,9 @@ namespace CondominiumAlerts.Domain.Aggregates.Entities;
         public Guid Id { get; set; }
         public string Text{ get; set; } = string.Empty!;
         public string? MediaUrl { get; set; }
-        public Guid CreatorUserId { get; set; }
+        public string CreatorUserId { get; set; }
         // if receiver user id is null means that the message is for the global chat
-        public Guid? ReceiverUserId { get; set; }
+        public string? ReceiverUserId { get; set; }
         public Guid CondominiumId { get; set; }
         public Guid? MessageBeingRepliedToId { get; set; }
         public DateTime CreatedAt { get; init; }

@@ -9,7 +9,7 @@ namespace CondominiumAlerts.Domain.Aggregates.Entities;
         public string Description { get; set; } = string.Empty!;
         public string ImageUrl { get; set; } = string.Empty!;
         public Guid CondominiumId { get; set; }
-        public Guid UserId { get; set; }
+        public string UserId { get; init; }
         public Guid LevelOfPriorityId { get; set; }
         public DateTime CreatedAt { get; init; }
         public DateTime UpdatedAt { get; set; }

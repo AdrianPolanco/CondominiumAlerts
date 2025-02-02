@@ -3,14 +3,14 @@ using CondominiumAlerts.Domain.Aggregates.ValueObjects;
 
 namespace CondominiumAlerts.Domain.Aggregates.Entities;
 
-public sealed class User : IAggregateRoot
+public sealed class User : IAggregateRoot<string>
 {
-    public Guid Id { get; set; }
+    public string Id { get; set; }
     public string? ProfilePictureUrl { get; set; }
     public string Name { get; set; } = string.Empty!;
     public string LastName { get; set; } = string.Empty!;
     public Phone Phone { get; set; } = null!;
-    public Address Address { get; set; } = null!;
+    public Address? Address { get; set; }
     public DateTime CreatedAt { get; init; }
     public DateTime UpdatedAt { get; set; }
 

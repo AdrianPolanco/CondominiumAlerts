@@ -10,7 +10,7 @@ namespace CondominiumAlerts.Domain.Aggregates.Entities;
         public string Title { get; set; } = string.Empty!;
         public string? Description { get; set; } 
         // if receiver user id is null means that the notification is global 
-        public Guid? ReceiverUserId { get; set; }
+        public string? ReceiverUserId { get; set; }
         public Guid CondominiumId { get; set; }
         public Guid LevelOfPriorityId { get; set; }
         public DateTime CreatedAt { get; init; }

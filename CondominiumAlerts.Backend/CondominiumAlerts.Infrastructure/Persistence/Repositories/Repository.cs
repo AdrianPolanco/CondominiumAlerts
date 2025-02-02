@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Storage;
 
 namespace CondominiumAlerts.Infrastructure.Persistence.Repositories;
 
-public class Repository<TEntity> : IRepository<TEntity> where TEntity : class, IEntity<Guid>
+public class Repository<TEntity, TId> : IRepository<TEntity, TId> where TEntity : class, IEntity<TId>
 {
     private readonly ApplicationDbContext _context;
     private readonly DbSet<TEntity> _dbSet;
@@ -18,7 +18,7 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : class, I
         _context = context;
         _dbSet = _context.Set<TEntity>();
     }
-    public virtual async Task<TEntity?> GetByIdAsync(Guid id, CancellationToken cancellationToken, bool readOnly = false, bool ignoreQueryFilters = false, params Expression<Func<TEntity, object>>[] includes)
+    public virtual async Task<TEntity?> GetByIdAsync(TId id, CancellationToken cancellationToken, bool readOnly = false, bool ignoreQueryFilters = false, params Expression<Func<TEntity, object>>[] includes)
     {
         try
         {
@@ -33,7 +33,7 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : class, I
             if (readOnly) query = query.AsNoTracking();
 
 
-            TEntity? entity = await query.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
+            TEntity? entity = await query.FirstOrDefaultAsync(e => e.Id .Equals(id), cancellationToken);
             return entity;
         }
         catch
@@ -94,7 +94,7 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : class, I
         }
     }
 
-    public async Task<TEntity?> DeleteAsync(Guid id, CancellationToken cancellationToken = default)
+    public async Task<TEntity?> DeleteAsync(TId id, CancellationToken cancellationToken = default)
     {
         using (await BeginTransactionAsync())
         {

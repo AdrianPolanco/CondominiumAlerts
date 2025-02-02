@@ -54,7 +54,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
 
             address.Property(a => a.PostalCode).HasColumnName("PostalCode")
                 .HasMaxLength(10)
-                .IsRequired();
+                .IsRequired();;
         });
     }
 }

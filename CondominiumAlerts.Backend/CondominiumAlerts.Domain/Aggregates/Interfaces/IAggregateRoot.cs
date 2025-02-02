@@ -1,6 +1,6 @@
 ﻿namespace CondominiumAlerts.Domain.Aggregates.Interfaces;
 
-public interface IAggregateRoot : IEntity<Guid>
+public interface IAggregateRoot<T> : IEntity<T>
 {
-   // public Guid Id { get; init; }
+
 }

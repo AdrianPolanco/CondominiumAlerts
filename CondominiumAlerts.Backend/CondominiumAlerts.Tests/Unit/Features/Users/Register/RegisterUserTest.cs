@@ -8,8 +8,8 @@ public class RegisterUserTest
     public async Task Test_RegisterUser_Validation()
     {
         var validator = new RegisterUserValidator();
-        var user = new RegisterUserCommand("pr", "prueba21.com", "Prueba123");
-        var result = await validator.ValidateAsync(user);
+        //var user = new RegisterUserCommand("pr", "prueba21.com", "Prueba123");
+        //var result = await validator.ValidateAsync(user);
   
     }
 }

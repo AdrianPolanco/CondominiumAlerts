@@ -18,6 +18,9 @@ public class CommentConfiguration : IEntityTypeConfiguration<Comment>
             .WithMany(c => c.Replies)
             .HasForeignKey(c => c.ParentCommentId)
             .OnDelete(DeleteBehavior.Restrict);
+        builder.HasOne(c => c.User)
+            .WithMany(u => u.Comments)
+            .HasForeignKey(c => c.UserId);
         
         builder.Property(b => b.CreatedAt)
             .HasDefaultValueSql("CURRENT_TIMESTAMP")

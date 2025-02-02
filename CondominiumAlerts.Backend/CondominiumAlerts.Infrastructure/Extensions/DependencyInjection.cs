@@ -16,7 +16,7 @@ public static class DependencyInjection
     {
         services.AddNpgsql<ApplicationDbContext>(configuration.GetConnectionString("DefaultConnection")!);
         services.AddSingleton<IAuthenticationProvider, AuthenticationProvider>();
-        services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+        services.AddScoped(typeof(IRepository<,>), typeof(Repository<,>));
         return services;
     }
 }
