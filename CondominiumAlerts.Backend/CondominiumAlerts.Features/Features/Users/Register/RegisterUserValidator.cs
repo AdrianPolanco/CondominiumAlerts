@@ -1,8 +1,7 @@
-﻿
-using FluentValidation;
+﻿using FluentValidation;
 using PhoneNumbers;
 
-namespace CondominiumAlerts.Features.Commands;
+namespace CondominiumAlerts.Features.Features.Users.Register;
 
 //RegisterUserCommand(string Username, string Email, string Password, string Name, string Lastname, Phone PhoneNumber, Address Address)
 public class RegisterUserValidator : AbstractValidator<RegisterUserCommand>

@@ -1,25 +1,33 @@
-﻿
-using CondominiumAlerts.CrossCutting.CQRS.Interfaces.Handlers;
+﻿using CondominiumAlerts.CrossCutting.CQRS.Interfaces.Handlers;
 using CondominiumAlerts.Domain.Aggregates.Entities;
 using CondominiumAlerts.Domain.Repositories;
 using CondominiumAlerts.Infrastructure.Auth.Interfaces;
+using Coravel.Queuing.Interfaces;
 using FirebaseAdmin;
 using FirebaseAdmin.Auth;
 using LightResults;
+using Mapster;
+using MediatR;
+using Microsoft.Extensions.Logging;
 
-namespace CondominiumAlerts.Features.Commands;
+namespace CondominiumAlerts.Features.Features.Users.Register;
 
-public class RegisterUserCommandHandler : ICommandHandler<RegisterUserCommand, Result<User>>
+public class RegisterUserCommandHandler : ICommandHandler<RegisterUserCommand, Result<RegisterUserResponse>>
 {
     private readonly IAuthenticationProvider _authenticationProvider;
     private readonly IRepository<User, string> _userRepository;
-    
-    public RegisterUserCommandHandler(IAuthenticationProvider authenticationProvider, IRepository<User, string> userRepository)
+    private readonly IQueue _queue;
+    private readonly ILogger<RegisterUserCommandHandler> _logger;
+    private readonly IPublisher _publisher;
+    public RegisterUserCommandHandler(IAuthenticationProvider authenticationProvider, IRepository<User, string> userRepository, IQueue queue, IPublisher publisher, ILogger<RegisterUserCommandHandler> logger)
     {
         _authenticationProvider = authenticationProvider;
         _userRepository = userRepository;
+        _queue = queue;
+        _logger = logger;
+        _publisher = publisher;
     }
-    public async Task<Result<User>> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
+    public async Task<Result<RegisterUserResponse>> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
     {
         string? identityId = null;
     
@@ -30,7 +38,7 @@ public class RegisterUserCommandHandler : ICommandHandler<RegisterUserCommand, R
             //Si falla el registro en Firebase, no seguir el proceso
             if (string.IsNullOrEmpty(identityId))
             {
-                return Result.Fail<User>("Error al registrar el usuario en Firebase.");
+                return Result.Fail<RegisterUserResponse>("Error al registrar el usuario en Firebase.");
             }
 
             // 📌 Crear el usuario en la base de datos
@@ -44,19 +52,23 @@ public class RegisterUserCommandHandler : ICommandHandler<RegisterUserCommand, R
             };
 
             await _userRepository.CreateAsync(user, cancellationToken);
-            
-            return Result.Ok<User>(user);
+
+            var registerUserResponse = user.Adapt<RegisterUserResponse>();
+
+            _logger.LogInformation($"Encolando EmailConfirmationJob para {registerUserResponse.Email}");
+            _queue.QueueInvocableWithPayload<EmailConfirmationJob, RegisterUserResponse>(registerUserResponse);
+            return Result.Ok<RegisterUserResponse>(registerUserResponse);
         }
         catch (FirebaseAuthException ex)
         {
             // Comparar el ErrorCode con el string "email-already-exists"
            if (ex.ErrorCode == ErrorCode.AlreadyExists)
             {
-                return Result.Fail<User>("El correo electrónico ya está registrado en Firebase.");
+                return Result.Fail<RegisterUserResponse>("El correo electrónico ya está registrado en Firebase.");
             }
 
             // Si es otro error de Firebase, devolver un mensaje genérico
-            return Result.Fail<User>($"Error al registrar el usuario en Firebase: {ex.Message}");
+            return Result.Fail<RegisterUserResponse>($"Error al registrar el usuario en Firebase: {ex.Message}");
         }
         catch (Exception ex)
         {
@@ -67,7 +79,7 @@ public class RegisterUserCommandHandler : ICommandHandler<RegisterUserCommand, R
                 await _userRepository.DeleteAsync(identityId, cancellationToken);
             }
 
-            return Result.Fail<User>($"Error durante el registro: {ex.Message}");
+            return Result.Fail<RegisterUserResponse>($"Error durante el registro: {ex.Message}");
         }
     }
 }

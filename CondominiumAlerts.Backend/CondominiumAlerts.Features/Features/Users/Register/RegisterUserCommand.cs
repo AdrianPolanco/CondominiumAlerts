@@ -3,9 +3,9 @@ using CondominiumAlerts.Domain.Aggregates.Entities;
 using CondominiumAlerts.Domain.Aggregates.ValueObjects;
 using LightResults;
 
-namespace CondominiumAlerts.Features.Commands;
+namespace CondominiumAlerts.Features.Features.Users.Register;
 
-public class RegisterUserCommand : ICommand<Result<User>>
+public class RegisterUserCommand : ICommand<Result<RegisterUserResponse>>
 {
     public string Username { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;

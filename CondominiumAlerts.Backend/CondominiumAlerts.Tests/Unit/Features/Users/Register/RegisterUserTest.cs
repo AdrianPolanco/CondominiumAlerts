@@ -1,4 +1,5 @@
-﻿using CondominiumAlerts.Features.Commands;
+﻿
+using CondominiumAlerts.Features.Features.Users.Register;
 
 namespace CondominiumAlerts.Tests.Unit.Features.Users.Register;
 

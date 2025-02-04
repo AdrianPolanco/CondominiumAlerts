@@ -1,6 +1,6 @@
 ﻿using Carter;
-using CondominiumAlerts.CrossCutting.Results;
-using CondominiumAlerts.Features.Commands;
+
+using CondominiumAlerts.Features.Features.Users.Register;
 using Mapster;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
