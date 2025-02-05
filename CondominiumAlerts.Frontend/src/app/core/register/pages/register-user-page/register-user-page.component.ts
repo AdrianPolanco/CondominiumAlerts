@@ -11,7 +11,7 @@ import {SharedForm} from '../../../../shared/components/form/shared-form.interfa
   templateUrl: './register-user-page.component.html',
   styles: ``
 })
-export class RegisterUserPageComponent implements OnInit{
+export class RegisterUserPageComponent {
 
   private readonly formGroup = signal<FormGroup>(new FormGroup({}));
 
@@ -79,9 +79,11 @@ export class RegisterUserPageComponent implements OnInit{
       type: "password",
       validators: [Validators.required],
       errorMessages: {
-        required: "Este campo es requerido"
+        required: "Este campo es requerido",
+        passwordMismatch: "Las contraseñas no coinciden"
       },
-      icon: "pi-lock"
+      icon: "pi-lock",
+      showFormErrors: true
     },
     {
       name: "cellphone",
@@ -101,14 +103,8 @@ export class RegisterUserPageComponent implements OnInit{
     fields: this.registerFormFields(),
     baseButtonLabel: "Registrarse",
     submittedButtonLabel: "Registrando exitosamente",
+    formValidators: [passwordsMatchValidator("password", "confirmPassword")]
   })
-
-  ngOnInit(): void {
-    // Agregamos el validador después de que el form se haya creado
-    this.formGroup().addValidators(
-      passwordsMatchValidator('password', 'confirmPassword')
-    );
-  }
 
   // Handler para recibir el FormGroup del componente hijo
   onFormCreated(form: FormGroup) {

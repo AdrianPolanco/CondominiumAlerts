@@ -8,7 +8,7 @@ import {RegisterUserPageComponent} from './core/register/pages/register-user-pag
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, ButtonModule, RegisterUserPageComponent],
+  imports: [RouterOutlet, ButtonModule],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
 })

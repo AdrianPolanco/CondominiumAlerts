@@ -30,9 +30,8 @@ export class FormComponent {
 
   showValidationErrors(fieldName: string) {
     const control = this.form().get(fieldName);
-    if (control && control.invalid && control.touched) {
-      console.log(`Errores en el campo "${fieldName}":`, control.errors);
-    }
+    console.log(`Errores en el campo "${fieldName}":`, control?.errors);
+    
   }
 
   formSettings = input.required<SharedForm>();
@@ -55,20 +54,22 @@ export class FormComponent {
 
   createForm() {
     const group: any = {};
-    //Itera sobre los campos y los agrega al FormGroup, junto con sus validadores si los tiene
+    
+    // Crear los controles básicos
     this.fields().forEach(field => {
       group[field.name] = ['', field.validators || []];
     });
-    //Si el formulario tiene validación de contraseñas, agrega el validador
-    this.form.set(this.fb.group(group));
-    //Emite el evento onFormCreated con el FormGroup creado
-    this.onFormCreated.emit(this.fb.group(group));
-    // Suscribirse a los cambios de todos los campos del formulario
-      this.form().get("confirmPassword")?.valueChanges.subscribe(() => {
-        this.showValidationErrors("confirmPassword");
-      });
 
+    // Crear el formGroup
+    const formGroup = this.fb.group(group);
 
+    // Agregar validadores personalizados a nivel de formulario si existen
+    if (this.formSettings().formValidators?.length) {
+      formGroup.addValidators(this.formSettings().formValidators!);
+    }
+
+    this.form.set(formGroup);
+    this.onFormCreated.emit(formGroup);
   }
 
   onSubmit() {
@@ -82,11 +83,25 @@ export class FormComponent {
     const control = this.form().get(field.name);
     if (!control) return '';
 
-    for (const error in control.errors) {
-      if (field.errorMessages?.[error]) {
-        return field.errorMessages[error];
+    // Verificar errores del control
+    if (control.errors) {
+      for (const error in control.errors) {
+        if (field.errorMessages?.[error]) {
+          return field.errorMessages[error];
+        }
       }
     }
+
+    // Verificar errores a nivel de formulario
+    const formErrors = this.form().errors;
+    if (formErrors) {
+      for (const error in formErrors) {
+        if (field.errorMessages?.[error]) {
+          return field.errorMessages[error];
+        }
+      }
+    }
+
     return 'Error desconocido';
   }
 }

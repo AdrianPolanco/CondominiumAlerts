@@ -22,7 +22,8 @@
                 [formControlName]="field.name"
                 [toggleMask]="true"
                 styleClass="w-full"
-                [inputStyleClass]="'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all'"
+                (onBlur)="showValidationErrors('confirmPassword')"
+                [inputStyleClass]="'w-full px-4 py-2 border border-gray-300 rounded-l-none rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all'"
               />
             </div>
           }
@@ -42,7 +43,7 @@
               [formControlName]="field.name"
               [toggleMask]="true"
               styleClass="w-full"
-              [inputStyleClass]="'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all'"
+              [inputStyleClass]="'w-full px-4 py-2 border border-gray-300 rounded-l-none rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all'"
             />
           </div>
         }
@@ -70,11 +71,12 @@
           binary="true"></p-checkbox>
       }
 
-      @if (form().get(field.name)?.invalid && form().get(field.name)?.touched) {
+      @if ((form().get(field.name)?.invalid && form().get(field.name)?.touched) || 
+     (field.showFormErrors && form().errors && form().get(field.name)?.touched)) {
         <small class="text-red-500">
           {{ getErrorMessage(field) }}
         </small>
-      }
+    }
     </div>
   }
 

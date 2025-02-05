@@ -6,4 +6,5 @@ export interface SharedFormField {
     validators?: any[];
     errorMessages?: { [key: string]: string };
     icon?: string;
+    showFormErrors?: boolean;
   }
