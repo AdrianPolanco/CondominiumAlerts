@@ -1,0 +1,12 @@
+:host ::ng-deep .p-password {
+  @apply w-full;
+}
+
+:host ::ng-deep .p-password-input {
+  @apply w-full;
+}
+
+/* Para mejorar el estilo del icono del ojo */
+:host ::ng-deep .p-password i {
+  @apply right-3 top-1/2 -translate-y-1/2;
+}

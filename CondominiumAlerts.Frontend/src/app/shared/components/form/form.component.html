@@ -1,0 +1,115 @@
+<form [formGroup]="form()" (ngSubmit)="onSubmit()" class="space-y-4 p-4">
+  @for(field of fields(); track field;){
+    <div class="flex flex-col">
+      <label [for]="field.name" class="font-medium">{{ field.label }}</label>
+
+      @if (field.icon) {
+        <p-inputgroup>
+          <p-inputgroup-addon>
+            <i class="pi" [ngClass]="field.icon"></i>
+          </p-inputgroup-addon>
+          @if(field.type === 'text' || field.type === 'number'){
+            <input
+              pInputText
+              [type]="field.type"
+              [id]="field.name"
+              [formControlName]="field.name"
+              class="p-inputtext w-full" />
+          }@else if(field.type === 'password'){
+            <div class="w-full">
+              <p-password
+                [id]="field.name"
+                [formControlName]="field.name"
+                [toggleMask]="true"
+                styleClass="w-full"
+                [inputStyleClass]="'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all'"
+              />
+            </div>
+          }
+        </p-inputgroup>
+      } @else {
+        @if(field.type === 'text' || field.type === 'number'){
+          <input
+            pInputText
+            [type]="field.type"
+            [id]="field.name"
+            [formControlName]="field.name"
+            class="p-inputtext w-full" />
+        }@else if(field.type === 'password'){
+          <div class="w-full">
+            <p-password
+              [id]="field.name"
+              [formControlName]="field.name"
+              [toggleMask]="true"
+              styleClass="w-full"
+              [inputStyleClass]="'w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all'"
+            />
+          </div>
+        }
+      }
+
+      @if (field.type === 'textarea') {
+        <textarea pTextarea
+                  [id]="field.name"
+                  [formControlName]="field.name"
+                  class="p-inputtextarea w-full"></textarea>
+      }
+
+      @if (field.type === 'select') {
+        <p-dropdown
+          [options]="field.options"
+          [formControlName]="field.name"
+          [id]="field.name"
+          placeholder="Selecciona una opción" class="w-full"></p-dropdown>
+      }
+
+      @if (field.type === 'checkbox') {
+        <p-checkbox
+          [formControlName]="field.name"
+          [id]="field.name"
+          binary="true"></p-checkbox>
+      }
+
+      @if (form().get(field.name)?.invalid && form().get(field.name)?.touched) {
+        <small class="text-red-500">
+          {{ getErrorMessage(field) }}
+        </small>
+      }
+    </div>
+  }
+
+  <button
+    pButton
+    type="submit"
+    [class]="(form().invalid || isLoading()) ?
+    'p-button w-full flex justify-center items-center !bg-gray-400 hover:!bg-gray-400 !border-gray-400' :
+    'p-button w-full flex justify-center items-center !bg-blue-600 hover:!bg-blue-700 !border-blue-600'"
+    [disabled]="form().invalid || isLoading()"
+  >
+    @if(isLoading()) {
+      <div class="flex items-center gap-2">
+        <p-progress-spinner
+          [style]="{width: '20px', height: '20px'}"
+          styleClass="custom-spinner"
+          strokeWidth="4"
+          fill="var(--surface-ground)"
+          animationDuration=".5s"
+        />
+        <span>{{formSettings().submittedButtonLabel}}</span>
+      </div>
+    } @else {
+      <span>{{formSettings().baseButtonLabel}}</span>
+    }
+  </button>
+
+  @if(feedback() && feedback()?.status !== 'none'){
+    <div class="flex justify-center items-center gap-2">
+      @if(feedback()?.status === 'success'){
+        <i class="pi pi-check-circle text-green-500"></i>
+      }@else if(feedback()?.status === 'error'){
+        <i class="pi pi-times-circle text-red-500"></i>
+      }
+      <span>{{ feedback()?.message }}</span>
+    </div>
+  }
+</form>

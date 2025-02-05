@@ -19,9 +19,16 @@ export const appConfig: ApplicationConfig = {
     provideAuth(() => getAuth()),
     provideAnimationsAsync(),
     providePrimeNG({
+      ripple: true,
       theme: {
-        preset: Aura,
-      },
-    }),
+          preset: Aura,
+          options: {
+              prefix: 'p',
+              darkModeSelector: 'system',
+              cssLayer: true
+          }
+      }
+  }),
   ],
 };
+
