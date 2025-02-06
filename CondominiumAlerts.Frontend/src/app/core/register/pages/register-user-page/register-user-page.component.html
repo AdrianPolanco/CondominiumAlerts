@@ -42,9 +42,12 @@
         <p-divider align="center" type="solid" class="max-w-96">
           <p>o</p>
         </p-divider>
-        <p-button styleClass="w-full flex justify-center bg-white text-black border-red-200 shadow-md active:shadow-none">
+        <p-button styleClass="w-full flex justify-center bg-white text-black border-red-200 shadow-md active:shadow-none"
+          (onClick)="loginWithGoogle()"
+        >
           <img ngSrc="images/icons8-google.svg" alt="Google Logo" height="40" width="40" />
         </p-button>
+        <p-button label="Cerrar sesión" (onClick)="logOut()"/>
         <p-button label="Si ya tienes una cuenta, inicia sesión aquí" [link]="true" routerLink="/login" styleClass="text-red-400"/>
       </div>
     </article>

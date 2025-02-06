@@ -1,4 +1,4 @@
-import {Component, OnInit, signal, viewChild} from '@angular/core';
+import {Component, signal, viewChild} from '@angular/core';
 import {FormComponent} from '../../../../shared/components/form/form.component';
 import {SharedFormField} from '../../../../shared/components/form/shared-form-field.interface';
 import {FormGroup, Validators} from '@angular/forms';
@@ -140,5 +140,21 @@ export class RegisterUserPageComponent {
         formComponent?.resetForm(feedback);
       }
     });
+  }
+
+  async loginWithGoogle() {
+    try{
+      await this.userService.loginWithGoogle();
+    }catch (e) {
+      console.log(e)
+    }
+  }
+
+  async logOut() {
+    try {
+      await this.userService.logOut();
+    } catch (e) {
+      console.log(e);
+    }
   }
 }
