@@ -4,10 +4,16 @@ import {SharedFormField} from '../../../../shared/components/form/shared-form-fi
 import {FormGroup, Validators} from '@angular/forms';
 import {passwordsMatchValidator} from './passwordsMatch.validator';
 import {SharedForm} from '../../../../shared/components/form/shared-form.interface';
+import {Button} from 'primeng/button';
+import {Toolbar} from 'primeng/toolbar';
+import {RouterLink} from '@angular/router';
+import {Divider} from 'primeng/divider';
+import {Card} from 'primeng/card';
+import {NgOptimizedImage} from '@angular/common';
 
 @Component({
   selector: 'core-register-user-page',
-  imports: [FormComponent],
+  imports: [FormComponent, Button, Toolbar, RouterLink, Divider, NgOptimizedImage],
   templateUrl: './register-user-page.component.html',
   styles: ``
 })
@@ -105,6 +111,14 @@ export class RegisterUserPageComponent {
     submittedButtonLabel: "Registrando exitosamente",
     formValidators: [passwordsMatchValidator("password", "confirmPassword")]
   })
+
+  features: { title: string, details: string}[] = [
+    { title: "Registra tu cuenta", details: "Crea tu cuenta en unos pocos pasos" },
+    { title: "Accede a tu cuenta", details: "Inicia sesión con tu cuenta y disfruta de nuestros servicios" },
+    { title: "Invita a tus amigos", details: "Invita a tus amigos y vecinos a unirse a tu comunidad"},
+    { title: "Solicita servicios", details: "Solicita servicios y ayuda a tus vecinos a través de nuestra plataforma"},
+    { title: "Administra tu comunidad desde tu dispositivo", details: "¡Administra tu comunidad a solo un click de distancia!"}
+  ]
 
   // Handler para recibir el FormGroup del componente hijo
   onFormCreated(form: FormGroup) {

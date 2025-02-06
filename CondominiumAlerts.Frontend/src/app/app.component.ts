@@ -4,7 +4,6 @@ import { FilterMatchMode } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { PrimeNG } from 'primeng/config';
 import Aura from '@primeng/themes/aura';
-import {RegisterUserPageComponent} from './core/register/pages/register-user-page/register-user-page.component';
 
 @Component({
   selector: 'app-root',

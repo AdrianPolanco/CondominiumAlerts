@@ -71,7 +71,7 @@
           binary="true"></p-checkbox>
       }
 
-      @if ((form().get(field.name)?.invalid && form().get(field.name)?.touched) || 
+      @if ((form().get(field.name)?.invalid && form().get(field.name)?.touched) ||
      (field.showFormErrors && form().errors && form().get(field.name)?.touched)) {
         <small class="text-red-500">
           {{ getErrorMessage(field) }}
@@ -85,7 +85,7 @@
     type="submit"
     [class]="(form().invalid || isLoading()) ?
     'p-button w-full flex justify-center items-center !bg-gray-400 hover:!bg-gray-400 !border-gray-400' :
-    'p-button w-full flex justify-center items-center !bg-blue-600 hover:!bg-blue-700 !border-blue-600'"
+    'p-button w-full flex justify-center items-center'"
     [disabled]="form().invalid || isLoading()"
   >
     @if(isLoading()) {
