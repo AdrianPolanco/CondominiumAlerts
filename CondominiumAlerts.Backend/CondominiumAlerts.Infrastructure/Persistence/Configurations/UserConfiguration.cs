@@ -35,12 +35,6 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .ValueGeneratedOnAddOrUpdate();
         
         // Configuración de Phone como un Value Object dentro de User
-        builder.OwnsOne(u => u.Phone, phone =>
-        {
-            phone.Property(p => p.Number).HasColumnName("PhoneNumber")
-                .HasMaxLength(20)
-                .IsRequired();
-        });
         
         builder.OwnsOne(u => u.Address, address =>
         {

@@ -47,7 +47,6 @@ public class RegisterUserCommandHandler : ICommandHandler<RegisterUserCommand, R
                 Id = identityId, // Relacionar Firebase con la BD
                 Name = request.Username,
                 LastName = request.Lastname,
-                Phone = request.PhoneNumber,
                 Email = request.Email,
             };
 

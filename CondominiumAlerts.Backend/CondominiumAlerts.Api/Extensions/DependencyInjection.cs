@@ -27,6 +27,18 @@ public static class DependencyInjection
         {
             Credential = GoogleCredential.FromFile("./firebase.json")
         });
+        
+        // Configura la política CORS
+        services.AddCors(options =>
+        {
+            options.AddPolicy("AllowSpecificOrigin", policy =>
+            {
+                policy.WithOrigins("http://localhost:4200")  // Origen permitido
+                    .AllowAnyHeader()                   // Permitir cualquier encabezado
+                    .AllowAnyMethod()                  // Permitir cualquier método (GET, POST, etc.)
+                    .AllowCredentials();
+            });
+        });
         services.AddResponseCompression(options =>
         {
             options.EnableForHttps = true;
@@ -91,6 +103,7 @@ public static class DependencyInjection
         app.UseRateLimiter();
         app.UseRouting();
         app.MapGroup("/api").MapCarter();
+        app.UseCors("AllowSpecificOrigin");
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
         {

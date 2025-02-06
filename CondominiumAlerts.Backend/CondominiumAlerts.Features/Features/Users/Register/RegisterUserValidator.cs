@@ -22,32 +22,7 @@ public class RegisterUserValidator : AbstractValidator<RegisterUserCommand>
         RuleFor(u => u.Name).NotEmpty().WithMessage("El nombre es requerido.");         
         RuleFor(u => u.Lastname).NotEmpty().WithMessage("El apellido es requerido.");         
         RuleFor(u => u.Lastname).MinimumLength(3).MaximumLength(200).WithMessage("El apellido debe tener entre 3 y 200 caracteres.");         
-
-        // Validación de PhoneNumber en una sola regla
-        RuleFor(u => u.PhoneNumber)
-            .NotNull().WithMessage("El teléfono es requerido")
-            .DependentRules(() => {
-                RuleFor(u => u.PhoneNumber.Number)
-                    .NotEmpty().WithMessage("El número de teléfono no puede estar vacío")
-                    .Must(BeAValidPhoneNumber)
-                    .WithMessage("El formato del número de teléfono no es válido. Debe incluir el código de país (ejemplo: +34123456789)");
-            });
+        
     }
     
-    private bool BeAValidPhoneNumber(string phoneNumber)
-    {
-        if (string.IsNullOrWhiteSpace(phoneNumber))
-            return false;
-
-        try         
-        {             
-            var phoneNumberUtil = PhoneNumberUtil.GetInstance();             
-            var number = phoneNumberUtil.Parse(phoneNumber, "ZZ");
-            return phoneNumberUtil.IsValidNumber(number);         
-        }         
-        catch (NumberParseException)         
-        {             
-            return false;         
-        }     
-    }
 }

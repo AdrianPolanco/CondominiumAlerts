@@ -2,4 +2,4 @@
 
 namespace CondominiumAlerts.Features.Features.Users.Register;
 
-public record RegisterUserResponse(string Id, string Name, string LastName, string Email, DateTime CreatedAt, Phone Phone);
+public record RegisterUserResponse(string Id, string Name, string LastName, string Email, DateTime CreatedAt);
