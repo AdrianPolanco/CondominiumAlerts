@@ -32,7 +32,7 @@
       <div class="flex flex-col items-center justify-center">
         <h1 class="text-4xl font-bold text-red-500">Crear nuevo usuario</h1>
         <shared-form
-          [formSettings]="registerFormSettings()"
+          [formSettingsInput]="registerFormSettings()"
           (onFormCreated)="onFormCreated($event)"
           (onFormSubmitted)="onSubmit($event)">
         </shared-form>
@@ -42,8 +42,10 @@
         <p-divider align="center" type="solid" class="max-w-96">
           <p>o</p>
         </p-divider>
-        <p-button label="Crear cuenta con Google" icon="pi pi-google" class="w-full flex justify-center" />
-        <p-button label="Si ya tienes una cuenta, inicia sesión aquí" [link]="true" routerLink="/login" />
+        <p-button styleClass="w-full flex justify-center bg-white text-black border-red-200 shadow-md active:shadow-none">
+          <img ngSrc="images/icons8-google.svg" alt="Google Logo" height="40" width="40" />
+        </p-button>
+        <p-button label="Si ya tienes una cuenta, inicia sesión aquí" [link]="true" routerLink="/login" styleClass="text-red-400"/>
       </div>
     </article>
   </section>

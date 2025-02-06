@@ -14,21 +14,18 @@ export class UserService {
   baseUrl = environment.backBaseUrl;
 
   registerUser(registerUserRequest: RegisterUserRequest) {
-    return this.httpClient.post<RegisterUserResponse>(`${this.baseUrl}/users/register`, registerUserRequest);
+    return this.httpClient.post<RegisterUserResponse>("/api/users/register", registerUserRequest);
   }
 
-  convertToRegisterUserRequest(user: any) {
+  convertToRegisterUserRequest(user: any): RegisterUserRequest {
     return {
       username: user.username,
       name: user.name,
       lastname: user.lastname,
       email: user.email,
       password: user.password,
-      confirmPassword: user.confirmPassword,
-      phoneNumber: {
-        number: user.cellphone
-      }
     };
+
   }
 
 }

@@ -1,9 +1,6 @@
-import {Component, computed, EventEmitter, input, OnChanges, output, signal, SimpleChanges,
-  WritableSignal
-} from '@angular/core';
+import {Component, computed, input, OnInit, output, signal, WritableSignal} from '@angular/core';
 import {SharedFormField} from './shared-form-field.interface';
-import {FormBuilder, FormGroup, ReactiveFormsModule} from '@angular/forms';
-import {Select} from 'primeng/select';
+import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {Checkbox} from 'primeng/checkbox';
 import {Textarea} from 'primeng/textarea';
 import {InputGroupAddon} from 'primeng/inputgroupaddon';
@@ -11,7 +8,7 @@ import {InputGroup} from 'primeng/inputgroup';
 import {NgClass} from '@angular/common';
 import {DropdownModule} from 'primeng/dropdown';
 import {InputText} from 'primeng/inputtext';
-import {ButtonDirective, ButtonLabel} from 'primeng/button';
+import {ButtonDirective} from 'primeng/button';
 import {Password} from 'primeng/password';
 import {SharedForm} from './shared-form.interface';
 import {ProgressSpinner} from 'primeng/progressspinner';
@@ -19,22 +16,30 @@ import {Feedback} from './feedback.interface';
 
 @Component({
   selector: 'shared-form',
-  imports: [ReactiveFormsModule, Checkbox, Textarea, InputGroupAddon, InputGroup, NgClass, DropdownModule, InputText, ButtonDirective, Password, ProgressSpinner],
+  imports: [
+    ReactiveFormsModule,
+    Checkbox,
+    Textarea,
+    InputGroupAddon,
+    InputGroup,
+    NgClass,
+    DropdownModule,
+    InputText,
+    ButtonDirective,
+    Password,
+    ProgressSpinner
+  ],
   templateUrl: './form.component.html'
 })
-export class FormComponent {
+export class FormComponent implements OnInit{
   constructor(private fb: FormBuilder) {
     //Inicializa el FormGroup
     this.form = signal<FormGroup>(this.fb.group({}));
+    //this.formSettings = signal<SharedForm>(this.formSettingsInput());
   }
 
-  showValidationErrors(fieldName: string) {
-    const control = this.form().get(fieldName);
-    console.log(`Errores en el campo "${fieldName}":`, control?.errors);
-    
-  }
-
-  formSettings = input.required<SharedForm>();
+  formSettingsInput = input.required<SharedForm>();
+  formSettings!: WritableSignal<SharedForm>;
   fields = computed<SharedFormField[]>(() => this.formSettings().fields);
 
   form: WritableSignal<FormGroup<any>>;
@@ -49,12 +54,22 @@ export class FormComponent {
 
   //Crea el formulario al inicializar el componente
   ngOnInit() {
+    this.formSettings = signal(this.formSettingsInput());
     this.createForm();
+
+    this.form().valueChanges.subscribe(() => {
+      if (this.feedback()?.status === 'success') {
+        this.formSettings.set({
+          ...this.formSettings(),
+          feedback: { status: 'none', message: '' }
+        });
+      }
+    });
   }
 
   createForm() {
     const group: any = {};
-    
+
     // Crear los controles básicos
     this.fields().forEach(field => {
       group[field.name] = ['', field.validators || []];
@@ -75,9 +90,23 @@ export class FormComponent {
   onSubmit() {
     //Si el formulario es válido, emite el evento formSubmitted con el valor del formulario
     if (this.form().valid) {
+      this.isLoading.set(true);
       this.onFormSubmitted.emit(this.form().value);
     }
   }
+
+  resetForm(feedback: Feedback) {
+    if(feedback.status === "success") this.form().reset();
+    this.isLoading.set(false);
+    const updatedSettings = {
+      ...this.formSettings(),
+      feedback: feedback
+    };
+
+    // Use the input method to update form settings
+    this.formSettings.set(updatedSettings);
+  }
+
 
   getErrorMessage(field: SharedFormField): string {
     const control = this.form().get(field.name);

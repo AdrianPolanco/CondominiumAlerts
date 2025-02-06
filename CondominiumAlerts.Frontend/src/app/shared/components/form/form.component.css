@@ -10,3 +10,62 @@
 :host ::ng-deep .p-password i {
   @apply right-3 top-1/2 -translate-y-1/2;
 }
+
+.custom-phone-input {
+  @apply
+  w-full
+  border
+  border-gray-300
+  rounded-md
+  focus:ring-2
+  focus:ring-blue-500
+  focus:border-blue-500
+  outline-none
+  transition-all
+  px-3
+  py-2;
+}
+
+.custom-phone-input .iti {
+  @apply w-full;
+}
+
+.custom-phone-input .iti__selected-flag {
+  @apply border-r border-gray-300;
+}
+
+.custom-phone-input {
+  @apply
+  w-full
+  rounded-lg
+  border-2
+  border-gray-200
+  focus-within:border-blue-500
+  focus-within:ring-1
+  focus-within:ring-blue-500
+  transition-all
+  duration-300
+  ease-in-out;
+}
+
+.custom-phone-input .iti {
+  @apply w-full;
+}
+
+.custom-phone-input .iti__selected-flag {
+  @apply
+  rounded-l-lg
+  border-r
+  border-gray-200
+  hover:bg-gray-100
+  transition-colors;
+}
+
+.custom-phone-input input {
+  @apply
+  w-full
+  px-3
+  py-2
+  bg-transparent
+  outline-none;
+}

@@ -1,4 +1,4 @@
-import {Component, OnInit, signal} from '@angular/core';
+import {Component, OnInit, signal, viewChild} from '@angular/core';
 import {FormComponent} from '../../../../shared/components/form/form.component';
 import {SharedFormField} from '../../../../shared/components/form/shared-form-field.interface';
 import {FormGroup, Validators} from '@angular/forms';
@@ -11,6 +11,7 @@ import {Divider} from 'primeng/divider';
 import {NgOptimizedImage} from '@angular/common';
 import {UserService} from '../../../services/user.service';
 import {RegisterUserRequest} from '../../models/RegisterUserRequest';
+import {Feedback} from '../../../../shared/components/form/feedback.interface';
 
 @Component({
   selector: 'core-register-user-page',
@@ -23,6 +24,7 @@ export class RegisterUserPageComponent {
   constructor(private userService: UserService) { }
 
   private readonly formGroup = signal<FormGroup>(new FormGroup({}));
+  formComponent = viewChild(FormComponent);
 
   registerFormFields = signal<SharedFormField[]>([
     {
@@ -93,25 +95,13 @@ export class RegisterUserPageComponent {
       },
       icon: "pi-lock",
       showFormErrors: true
-    },
-    {
-      name: "cellphone",
-      label: "Celular",
-      type: "text",
-      validators: [Validators.required, Validators.minLength(10), Validators.maxLength(25)],
-      errorMessages: {
-        required: "Este campo es requerido",
-        minlength: "El celular debe tener al menos 10 dígitos",
-        maxlength: "El celular debe tener máximo 25 dígitos"
-      },
-      icon: "pi-mobile"
     }
   ]);
 
   registerFormSettings = signal<SharedForm>({
     fields: this.registerFormFields(),
     baseButtonLabel: "Registrarse",
-    submittedButtonLabel: "Registrando exitosamente",
+    submittedButtonLabel: "Registrado exitosamente",
     formValidators: [passwordsMatchValidator("password", "confirmPassword")]
   })
 
@@ -130,8 +120,25 @@ export class RegisterUserPageComponent {
 
   onSubmit(value: any) {
     const request: RegisterUserRequest = this.userService.convertToRegisterUserRequest(value);
-    this.userService.registerUser(request).subscribe(response => {
-      console.log(response);
+    console.log("Request: ", request);
+    const formComponent = this.formComponent();
+    this.userService.registerUser(request).subscribe({
+      next(response) {
+        const status = response.isSuccess ? "success" : "error";
+
+        const message = "Usuario registrado exitosamente";
+
+        const feedback: Feedback = { status, message };
+        formComponent?.resetForm(feedback);
+      },
+      error(err) {
+        const status = "error";
+        console.log(err)
+        const message = err.error.Errors[0].Message;
+        console.log("Message: ", message);
+        const feedback: Feedback = { status, message };
+        formComponent?.resetForm(feedback);
+      }
     });
   }
 }

@@ -1,6 +1,6 @@
 export type RegisterUserResponse = {
   isSuccess: boolean;
-  data: {
+  data?: {
     id: string;
     name: string;
     lastname: string;
@@ -9,5 +9,6 @@ export type RegisterUserResponse = {
     phone: {
       number: string
     }
-  }
+  },
+  errors?: any[]
 }

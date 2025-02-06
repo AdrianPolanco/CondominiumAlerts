@@ -22,7 +22,6 @@
                 [formControlName]="field.name"
                 [toggleMask]="true"
                 styleClass="w-full"
-                (onBlur)="showValidationErrors('confirmPassword')"
                 [inputStyleClass]="'w-full px-4 py-2 border border-gray-300 rounded-l-none rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all'"
               />
             </div>
@@ -83,9 +82,9 @@
   <button
     pButton
     type="submit"
-    [class]="(form().invalid || isLoading()) ?
+    [class]="(form().invalid) ?
     'p-button w-full flex justify-center items-center !bg-gray-400 hover:!bg-gray-400 !border-gray-400' :
-    'p-button w-full flex justify-center items-center'"
+    'p-button w-full flex justify-center items-center shadow-md active:shadow-none'"
     [disabled]="form().invalid || isLoading()"
   >
     @if(isLoading()) {
@@ -97,10 +96,12 @@
           fill="var(--surface-ground)"
           animationDuration=".5s"
         />
-        <span>{{formSettings().submittedButtonLabel}}</span>
+
       </div>
+    }@else if(!isLoading() && feedback()?.status === 'success'){
+      <span>{{formSettingsInput().submittedButtonLabel}}</span>
     } @else {
-      <span>{{formSettings().baseButtonLabel}}</span>
+      <span>{{formSettingsInput().baseButtonLabel}}</span>
     }
   </button>
 

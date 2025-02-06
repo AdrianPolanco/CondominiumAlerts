@@ -1,7 +1,7 @@
 export interface SharedFormField {
     name: string;
     label: string;
-    type: 'text' | 'number' | 'textarea' | 'select' | 'checkbox' | 'password';
+    type: 'text' | 'number' | 'textarea' | 'select' | 'checkbox' | 'password' | 'phone';
     options?: { label: string; value: any }[];
     validators?: any[];
     errorMessages?: { [key: string]: string };
