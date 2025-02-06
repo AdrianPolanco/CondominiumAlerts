@@ -3,56 +3,43 @@ using CondominiumAlerts.CrossCutting.Results;
 using FluentValidation;
 using LightResults;
 using MediatR;
+using Microsoft.Extensions.Logging;
 using IResult = Microsoft.AspNetCore.Http.IResult;
 
 namespace CondominiumAlerts.CrossCutting.Behaviors;
 
-public class ValidationBehavior<TRequest, TResponse>
-    : IPipelineBehavior<TRequest, TResponse>
-    where TRequest: ICommand<TResponse>
+public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
+    where TRequest : ICommand<TResponse>
 {
-    
     private readonly IEnumerable<IValidator<TRequest>> _validators;
+    private readonly ILogger<ValidationBehavior<TRequest, TResponse>> _logger;
 
-    public ValidationBehavior(IEnumerable<IValidator<TRequest>> validators)
+    public ValidationBehavior(
+        IEnumerable<IValidator<TRequest>> validators,
+        ILogger<ValidationBehavior<TRequest, TResponse>> logger)
     {
         _validators = validators;
+        _logger = logger;
     }
-    
-    public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
+
+    public async Task<TResponse> Handle(
+        TRequest request,
+        RequestHandlerDelegate<TResponse> next,
+        CancellationToken cancellationToken)
     {
-        // Crear el contexto para la validación
-        var context = new ValidationContext<TRequest>(request);
+        if (!_validators.Any())
+            return await next();
 
-        // Validar todos los validadores disponibles
-        var validationResults = await Task.WhenAll(_validators.Select(v => v.ValidateAsync(context, cancellationToken)));
+        var validationResult = await _validators.First().ValidateAsync(request);
 
-        // Obtener todos los errores de validación
-        var failures = validationResults
-            .Where(r => r.Errors.Any()) // Filtrar los resultados con errores
-            .SelectMany(r => r.Errors) // Aplanar los errores
-            .ToList();
-
-        // Si hay errores de validación, detener la ejecución y retornar los errores
-        if (failures.Any())
+        if (!validationResult.IsValid)
         {
-            // Convertir cada error de FluentValidation en un ValidationError
-            var validationErrors = failures.Select(f => 
-                new ValidationError(f.ErrorMessage, new Dictionary<string, object>
-                {
-                    { "PropertyName", f.PropertyName },
-                    { "Code", f.ErrorCode },
-                    {"AttemptedValue", f.AttemptedValue ?? "null"} 
-                })
-            ).ToList();
-
-            var result = Result.Fail<TResponse>(validationErrors);
-
-            // Retornar los errores de validación como un resultado fallido
-            return (TResponse)(object)result;
+            var validationErrors = string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage));
+            _logger.LogWarning($"Validation failed: {validationErrors}");
+            
+            return (TResponse)(object)Result.Fail<object>(validationErrors);
         }
 
-        // Si no hay errores de validación, continuar con la ejecución del siguiente handler
         return await next();
     }
 }

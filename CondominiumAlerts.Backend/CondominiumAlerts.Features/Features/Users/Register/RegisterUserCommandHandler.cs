@@ -5,6 +5,7 @@ using CondominiumAlerts.Infrastructure.Auth.Interfaces;
 using Coravel.Queuing.Interfaces;
 using FirebaseAdmin;
 using FirebaseAdmin.Auth;
+using FluentValidation;
 using LightResults;
 using Mapster;
 using MediatR;
@@ -19,16 +20,31 @@ public class RegisterUserCommandHandler : ICommandHandler<RegisterUserCommand, R
     private readonly IQueue _queue;
     private readonly ILogger<RegisterUserCommandHandler> _logger;
     private readonly IPublisher _publisher;
-    public RegisterUserCommandHandler(IAuthenticationProvider authenticationProvider, IRepository<User, string> userRepository, IQueue queue, IPublisher publisher, ILogger<RegisterUserCommandHandler> logger)
+    private readonly IValidator<RegisterUserCommand> _validator;
+    public RegisterUserCommandHandler(IAuthenticationProvider authenticationProvider, IRepository<User, string> userRepository, IQueue queue, IPublisher publisher, ILogger<RegisterUserCommandHandler> logger, IValidator<RegisterUserCommand> validator)
     {
         _authenticationProvider = authenticationProvider;
         _userRepository = userRepository;
         _queue = queue;
         _logger = logger;
         _publisher = publisher;
+        _validator = validator;
     }
     public async Task<Result<RegisterUserResponse>> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
     {
+        var validationResults = await _validator.ValidateAsync(request);
+
+        if (!validationResults.IsValid)
+        {
+            // Crear un mensaje de error a partir de los resultados de la validación
+            var validationErrors = validationResults.Errors
+                .Select(e => e.ErrorMessage)
+                .ToList();
+            _logger.LogWarning($"Validation failed: {validationErrors}");
+
+            return Result.Fail<RegisterUserResponse>(string.Join(", ", validationErrors));
+        }
+        
         string? identityId = null;
     
         try
