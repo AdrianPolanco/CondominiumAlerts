@@ -46,7 +46,7 @@ public class ValidationBehavior<TRequest, TResponse>
                 })
             ).ToList();
 
-            var result = Result.Fail<object>(validationErrors);
+            var result = Result.Fail<TResponse>(validationErrors);
 
             // Retornar los errores de validación como un resultado fallido
             return (TResponse)(object)result;

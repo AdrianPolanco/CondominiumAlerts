@@ -9,5 +9,5 @@ export const environment = {
     messagingSenderId: 'TU_MESSAGING_SENDER_ID',
     appId: 'TU_APP_ID',
   },
-  backBaseUrl: ''
+  backBaseUrl: 'https://localhost:5001/api',
 };

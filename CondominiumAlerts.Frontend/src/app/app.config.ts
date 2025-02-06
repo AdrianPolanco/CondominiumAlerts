@@ -11,6 +11,7 @@ import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
 import { getAuth, provideAuth } from '@angular/fire/auth';
 import { environment } from '../enviroments/environment';
 import {MyPreset} from './theme';
+import {provideHttpClient, withFetch} from '@angular/common/http';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -30,6 +31,7 @@ export const appConfig: ApplicationConfig = {
           }
       }
   }),
+    provideHttpClient(withFetch())
   ],
 };
 

@@ -8,8 +8,9 @@ import {Button} from 'primeng/button';
 import {Toolbar} from 'primeng/toolbar';
 import {RouterLink} from '@angular/router';
 import {Divider} from 'primeng/divider';
-import {Card} from 'primeng/card';
 import {NgOptimizedImage} from '@angular/common';
+import {UserService} from '../../../services/user.service';
+import {RegisterUserRequest} from '../../models/RegisterUserRequest';
 
 @Component({
   selector: 'core-register-user-page',
@@ -18,6 +19,8 @@ import {NgOptimizedImage} from '@angular/common';
   styles: ``
 })
 export class RegisterUserPageComponent {
+
+  constructor(private userService: UserService) { }
 
   private readonly formGroup = signal<FormGroup>(new FormGroup({}));
 
@@ -126,6 +129,9 @@ export class RegisterUserPageComponent {
   }
 
   onSubmit(value: any) {
-    console.log("Event: ", value);
+    const request: RegisterUserRequest = this.userService.convertToRegisterUserRequest(value);
+    this.userService.registerUser(request).subscribe(response => {
+      console.log(response);
+    });
   }
 }
