@@ -1,6 +1,7 @@
 ﻿using Carter;
-using CondominiumAlerts.CrossCutting.Results;
-using CondominiumAlerts.Features.Commands;
+
+using CondominiumAlerts.Features.Features.Users.Register;
+using Mapster;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,9 +19,11 @@ public class AuthModule : ICarterModule
                var response = new
                {
                    IsSuccess = result.IsSuccess,
-                   Data = result.Value
+                   Data = result.Value.Adapt<RegisterUserResponse>()
                };
                return Results.Ok(response);
             });
+        
+        app.MapGet("/hello", ()=> Results.Ok("Hello!"));
     }
 }

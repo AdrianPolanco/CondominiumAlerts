@@ -1,6 +1,6 @@
-﻿using System.Reflection;
+using System.Reflection;
 using CondominiumAlerts.CrossCutting.Behaviors;
-using CondominiumAlerts.Features.Commands;
+using CondominiumAlerts.Features.Features.Users.Register;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -14,10 +14,11 @@ public static class DependencyInjection
         {
             config.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
             config.AddOpenBehavior(typeof(LoggingBehavior<,>));
-            config.AddOpenBehavior(typeof(ValidationBehavior<,>));
+            //config.AddOpenBehavior(typeof(ValidationBehavior<,>));
         });
         
         services.AddScoped<IValidator<RegisterUserCommand>, RegisterUserValidator>();
+        services.AddTransient<EmailConfirmationJob>();
         return services;
     }
 }

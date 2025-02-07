@@ -1,4 +1,6 @@
 ﻿using System.Net;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
 using Carter;
 using CondominiumAlerts.CrossCutting.ErrorHandler;
@@ -16,6 +18,7 @@ public static class DependencyInjection
     public static IServiceCollection AddApiServices(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddOpenApi();
+        
         services.ConfigureHttpJsonOptions(options =>
         {
             options.SerializerOptions.Converters.Add(new ResultJsonConverterFactory());
@@ -23,6 +26,18 @@ public static class DependencyInjection
         FirebaseApp.Create(new AppOptions()
         {
             Credential = GoogleCredential.FromFile("./firebase.json")
+        });
+        
+        // Configura la política CORS
+        services.AddCors(options =>
+        {
+            options.AddPolicy("AllowSpecificOrigin", policy =>
+            {
+                policy.WithOrigins("http://localhost:4200")  // Origen permitido
+                    .AllowAnyHeader()                   // Permitir cualquier encabezado
+                    .AllowAnyMethod()                  // Permitir cualquier método (GET, POST, etc.)
+                    .AllowCredentials();
+            });
         });
         services.AddResponseCompression(options =>
         {
@@ -88,6 +103,7 @@ public static class DependencyInjection
         app.UseRateLimiter();
         app.UseRouting();
         app.MapGroup("/api").MapCarter();
+        app.UseCors("AllowSpecificOrigin");
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
         {
