@@ -6,6 +6,14 @@ module.exports = {
   theme: {
     extend: {},
   },
+  theme: {
+    extend: {
+      spacing: {
+        '19': '7.90rem', 
+      },
+    },
+  },
   plugins: [require('tailwindcss-primeui')]
 }
+
 
