@@ -8,6 +8,7 @@ public sealed class ApplicationDbContext : DbContext
     #region sets
 
     public DbSet<Condominium> Condominiums {  get; set; } 
+    public DbSet<CondominiumUser> CondominiumUsers {  get; set; } 
     public DbSet<Post> Posts {  get; set; } 
     public DbSet<Comment> Comments {  get; set; } 
     public DbSet<LevelOfPriority> LevelOfPriorities {  get; set; } 

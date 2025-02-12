@@ -11,7 +11,7 @@ namespace CondominiumAlerts.Domain.Aggregates.Entities;
         public int Priority { get; set; }
         // if condominium is null then is a base level of priority that any condominium can use
         public Guid? CondominiumId { get; set; }
-        public DateTime CreatedAt { get; init; }
+        public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
         
         public Condominium? Condominium { get; set; }  

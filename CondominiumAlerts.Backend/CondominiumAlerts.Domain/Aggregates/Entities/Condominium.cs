@@ -13,7 +13,7 @@ namespace CondominiumAlerts.Domain.Aggregates.Entities;
         public string LinkToken { get; set; } = string.Empty!;
         public string InviteCode { get; set; } = string.Empty!;
         public DateTime TokenExpirationDate {  get; set; }
-        public DateTime CreatedAt { get; init; }
+        public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
 
 

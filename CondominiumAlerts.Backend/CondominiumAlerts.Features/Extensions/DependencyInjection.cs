@@ -1,5 +1,6 @@
 using System.Reflection;
 using CondominiumAlerts.CrossCutting.Behaviors;
+using CondominiumAlerts.Features.Features.Condominium.Join;
 using CondominiumAlerts.Features.Features.Users.Register;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,6 +19,7 @@ public static class DependencyInjection
         });
         
         services.AddScoped<IValidator<RegisterUserCommand>, RegisterUserValidator>();
+        services.AddScoped<IValidator<JoinCondominiumCommand>, JoinCondominiumValidator>();
         services.AddTransient<EmailConfirmationJob>();
         return services;
     }
