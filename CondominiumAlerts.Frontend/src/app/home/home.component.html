@@ -13,10 +13,12 @@
     </ng-template>
     <ng-template #end>
       <div class="flex items-center space-x-4 mr-19">
-        <p-button label="Iniciar Sesión" icon="pi pi-sign-in" class="mr-2" severity="secondary" />
-        <a href="/register">
-          <p-button label="Registrarse" icon="pi pi-user-plus" severity="danger" />
-        </a>
+        <a href="/login">
+          <p-button label="Iniciar Sesión" icon="pi pi-sign-in" class="mr-2" severity="secondary" />
+          </a>
+          <a href="/register">
+            <p-button label="Registrarse" icon="pi pi-user-plus" severity="danger" />
+          </a>
       </div>
     </ng-template>
   </p-toolbar>
@@ -34,7 +36,7 @@
             Condominium Alerts es la plataforma ideal para gestionar y mejorar la comunicación en tu condominio.
           </p>
           <div>
-            <button class="bg-red-500 text-white px-8 py-4 rounded-lg font-semibold hover:bg-red-600">
+            <button class="bg-red-500 text-white px-8 py-4 rounded-lg font-semibold hover:bg-red-600" pButton  [routerLink]="'/register'">
               Comenzar ahora
             </button>
           </div>
@@ -132,7 +134,7 @@
       <p class="text-xl text-red-100 mb-8">
         Regístrate hoy y comienza a disfrutar de todas las ventajas.
       </p>
-      <button class="bg-white text-red-500 px-8 py-4 rounded-lg font-semibold hover:bg-red-50">
+      <button class="bg-white text-red-500 px-8 py-4 rounded-lg font-semibold hover:bg-red-50" pButton  [routerLink]="'/register'">
         Comenzar ahora
       </button>
     </div>
