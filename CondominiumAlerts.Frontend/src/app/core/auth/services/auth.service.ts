@@ -14,6 +14,7 @@ export class AuthService {
   constructor(private auth: Auth, private router: Router) {
     this.auth.onAuthStateChanged((user) => {
       if (user) {
+        console.log(user)
         this.uidSubject.next(user.uid);
         this.currentUser = {
           uid: user.uid,
@@ -27,7 +28,7 @@ export class AuthService {
 
   public async loginWithEmailAndPassword(email: string, password: string) {
     const result = await signInWithEmailAndPassword(this.auth, email, password);
-    return result.user;
+    return result;
   }
 
   public async getUserToken() {
