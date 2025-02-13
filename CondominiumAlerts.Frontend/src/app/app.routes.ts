@@ -17,10 +17,16 @@ export const routes: Routes = [
         (c) => c.SingInComponent
       ),
   },
-     {
-    path: "",
-    title: "Home",
-    loadComponent: () => import('./home/home.component') // Ruta corregida
-      .then(c => c.HomeComponent) // Referencia al componente correcto
+  {
+    path: 'home',  
+    title: 'Home',
+    loadComponent: () =>
+      import('./home/home.component')
+        .then((c) => c.HomeComponent),
+  },
+  {
+    path: '',
+    redirectTo: 'home',
+    pathMatch: 'full',
   }
 ];

@@ -77,7 +77,7 @@ export class SingInComponent {
       );
       if (result.user) {
         //Link de la pagina principal de la app
-        this.router.navigateByUrl('/HomePage');
+        this.router.navigateByUrl('/home');
         return;
       }
       this.presentToast('Error al iniciar sesión. Intente nuevamente.');
@@ -92,7 +92,13 @@ export class SingInComponent {
 
   async loginWithGoogle() {
     try {
-      await this.userService.loginWithGoogle();
+      const user = await this.userService.loginWithGoogle();
+      console.log('Usuario logueado:', user);
+      if (user) {
+        this.router.navigateByUrl('/home');
+        return;
+      }
+
     } catch (e) {
       this.presentToast('Ocurrió un error inesperado.');
     }
