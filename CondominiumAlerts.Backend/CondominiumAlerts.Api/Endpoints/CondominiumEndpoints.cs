@@ -1,5 +1,6 @@
 ﻿using Carter;
 using CondominiumAlerts.Features.Features.Condominium;
+using CondominiumAlerts.Features.Features.Condominium.Add;
 using CondominiumAlerts.Features.Features.Condominium.Join;
 using LightResults;
 using Mapster;
@@ -26,6 +27,20 @@ namespace CondominiumAlerts.Api.Endpoints
                     };
                     return Results.Ok(responce);
                 });
+            app.MapPost("/condominium",
+                async (ISender sender, AddCondominiumCommand command, CancellationToken cancellationToken) =>
+                {
+                    Result<AddCondominiumResponse> result = await sender.Send(command, cancellationToken);
+                    if (!result.IsSuccess) return Results.BadRequest(result);
+
+                    var response = new
+                    {
+                        IsSuccess = result.IsSuccess,
+                        Data = result.Value.Adapt<JoinCondominiumResponce>()
+                    };
+                    return Results.Ok(response);
+                }
+            );
         }
     }
 }
