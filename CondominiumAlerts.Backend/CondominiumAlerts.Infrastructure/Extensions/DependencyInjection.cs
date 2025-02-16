@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Net.Mail;
+using CondominiumAlerts.Domain.Aggregates.Entities;
 using CondominiumAlerts.Domain.Repositories;
 using CondominiumAlerts.Infrastructure.Auth;
 using CondominiumAlerts.Infrastructure.Auth.Interfaces;
@@ -28,7 +29,8 @@ public static class DependencyInjection
         services.Configure<SmtpSettings>(configuration.GetSection("SmtpSettings"));
         services.AddScoped<IEmailService, EmailService>();
         services.AddScoped(typeof(IRepository<,>), typeof(Repository<,>));
-        
+        services.AddScoped<ICondominiumRepository, CondominiumRepository>();
+
         // Registrar política de reintentos con Polly
         services.AddSingleton<IAsyncPolicy>(policy => Policy
             .Handle<SmtpCommandException>() // Maneja excepciones de MailKit
