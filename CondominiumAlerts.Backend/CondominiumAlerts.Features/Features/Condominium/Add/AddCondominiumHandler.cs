@@ -37,7 +37,7 @@ namespace CondominiumAlerts.Features.Features.Condominium.Add
             if (!validation.IsValid)
             {
                 IEnumerable< string> errors = validation.Errors.Select(e => e.ErrorMessage);
-                _logger.LogWarning($"Validation failed {errors}");
+                _logger.LogTrace($"Validation failed {errors}");
                 return Result.Fail(string.Join(", ", errors));
             }
 
