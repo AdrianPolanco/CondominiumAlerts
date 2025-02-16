@@ -3,6 +3,7 @@ using CloudinaryDotNet.Actions;
 using CondominiumAlerts.CrossCutting.CQRS.Interfaces.Handlers;
 using CondominiumAlerts.Domain.Repositories;
 using CondominiumAlerts.Features.Helpers;
+using FluentValidation;
 using LightResults;
 using Microsoft.Extensions.Logging;
 using CondominiumEntity = CondominiumAlerts.Domain.Aggregates.Entities;
@@ -15,17 +16,31 @@ namespace CondominiumAlerts.Features.Features.Condominium.Add
         private readonly Cloudinary _cloudinary;
         private readonly ICondominiumRepository _condominiumRepository;
         private readonly ILogger<AddCondominiumHandler> _logger;
+        private readonly IValidator<AddCondominiumCommand> _validator;
 
-        public AddCondominiumHandler(Cloudinary cloudinary, ICondominiumRepository condominiumRepository, ILogger<AddCondominiumHandler> logger)
+        public AddCondominiumHandler(Cloudinary cloudinary,
+                                     ICondominiumRepository condominiumRepository,
+                                     ILogger<AddCondominiumHandler> logger,
+                                     IValidator<AddCondominiumCommand> validator)
         {
             _cloudinary = cloudinary;
             _condominiumRepository = condominiumRepository;
             _logger = logger;
+            _validator = validator;
         }
 
         public async Task<Result<AddCondominiumResponse>>
         Handle(AddCondominiumCommand request, CancellationToken cancellationToken)
         {
+           FluentValidation.Results.ValidationResult validation = _validator.Validate(request);
+
+            if (!validation.IsValid)
+            {
+                IEnumerable< string> errors = validation.Errors.Select(e => e.ErrorMessage);
+                _logger.LogWarning($"Validation failed {errors}");
+                return Result.Fail(string.Join(", ", errors));
+            }
+
             ImageUploadResult imageUploadResult = await _cloudinary.UploadAsync(new ImageUploadParams()
             {
                 File = new FileDescription(Guid.NewGuid().ToString(), request.ImageFile.OpenReadStream()),
