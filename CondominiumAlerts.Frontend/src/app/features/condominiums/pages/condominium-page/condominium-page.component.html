@@ -1,30 +1,5 @@
-<div class="p-fluid">
-  <form [formGroup]="form" (ngSubmit)="onSubmit()">
-
-    <div class="p-field">
-      <label for="name">Name</label>
-      <input id="name" type="text" pInputText formControlName="name" />
-    </div>
-
-    <div class="p-field">
-      <label for="address">Address</label>
-      <input id="address" type="text" pInputText formControlName="address" />
-    </div>
-
-    <div class="p-field">
-      <label for="imageFile">Upload Image</label>
-      <p-fileUpload
-        id="imageFile"
-        name="imageFile"
-        mode="basic"
-        chooseLabel="Select Image"
-        (onSelect)="onFileSelect($event)"
-        accept="image/*"
-      ></p-fileUpload>
-    </div>
-
-    <div class="p-field">
-      <button type="submit" pButton label="Submit"></button>
-    </div>
-  </form>
-</div>
+<shared-form
+    [formSettingsInput]="condominiumFormSettings()"
+    (onFormCreated)="onFormCreated($event)"
+    (onFormSubmitted)="onSubmit($event)"
+/>
