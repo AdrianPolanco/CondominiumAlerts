@@ -6,5 +6,10 @@ export const routes: Routes = [
     title: "Registrar usuario",
     loadComponent: () => import('./core/register/pages/register-user-page/register-user-page.component')
                                         .then(c => c.RegisterUserPageComponent)
-  }
+  },
+    {
+        path: "condominium/create",
+        loadComponent: () => import('./features/condominiums/pages/condominium-page/condominium-page.component')
+            .then(x => x.CondominiumPageComponent)
+    }
 ];
