@@ -7,6 +7,7 @@ using Mapster;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 
 namespace CondominiumAlerts.Api.Endpoints
 {
@@ -28,19 +29,20 @@ namespace CondominiumAlerts.Api.Endpoints
                     return Results.Ok(responce);
                 });
             app.MapPost("/condominium",
-                async (ISender sender, AddCondominiumCommand command, CancellationToken cancellationToken) =>
+                async (ISender sender, [FromForm] AddCondominiumCommand command, CancellationToken cancellationToken) =>
                 {
                     Result<AddCondominiumResponse> result = await sender.Send(command, cancellationToken);
                     if (!result.IsSuccess) return Results.BadRequest(result);
 
                     var response = new
                     {
-                        IsSuccess = result.IsSuccess,
-                        Data = result.Value.Adapt<JoinCondominiumResponce>()
+                        result.IsSuccess,
+                        Data = result.Value
                     };
                     return Results.Ok(response);
                 }
-            );
+                // TODO: Add anti forgery token in frontend: https://stackoverflow.com/a/77191406
+            ).DisableAntiforgery();
         }
     }
 }

@@ -32,13 +32,13 @@ namespace CondominiumAlerts.Features.Features.Condominium.Add
         public async Task<Result<AddCondominiumResponse>>
         Handle(AddCondominiumCommand request, CancellationToken cancellationToken)
         {
-           FluentValidation.Results.ValidationResult validation = _validator.Validate(request);
+            FluentValidation.Results.ValidationResult validation = _validator.Validate(request);
 
             if (!validation.IsValid)
             {
                 IEnumerable< string> errors = validation.Errors.Select(e => e.ErrorMessage);
                 _logger.LogTrace($"Validation failed {errors}");
-                return Result.Fail(string.Join(", ", errors));
+                return Result.Fail<AddCondominiumResponse>(string.Join(", ", errors));
             }
 
             ImageUploadResult imageUploadResult = await _cloudinary.UploadAsync(new ImageUploadParams()
@@ -47,7 +47,7 @@ namespace CondominiumAlerts.Features.Features.Condominium.Add
             });
             if (imageUploadResult.Error?.Message is { } message) {
                 _logger.LogTrace("Failed to upload image, error with message {Error}.", message);
-                return Result.Fail(message);
+                return Result.Fail<AddCondominiumResponse>(message);
             }
 
             string inviteCode = ByteHelpers.GenerateBase64String(7);
