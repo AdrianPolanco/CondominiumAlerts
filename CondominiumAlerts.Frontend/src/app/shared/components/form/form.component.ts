@@ -13,6 +13,7 @@ import {Password} from 'primeng/password';
 import {SharedForm} from './shared-form.interface';
 import {ProgressSpinner} from 'primeng/progressspinner';
 import {Feedback} from './feedback.interface';
+import { FileUpload } from 'primeng/fileupload';
 
 @Component({
   selector: 'shared-form',
@@ -27,7 +28,8 @@ import {Feedback} from './feedback.interface';
     InputText,
     ButtonDirective,
     Password,
-    ProgressSpinner
+    ProgressSpinner,
+    FileUpload,
   ],
   templateUrl: './form.component.html'
 })
