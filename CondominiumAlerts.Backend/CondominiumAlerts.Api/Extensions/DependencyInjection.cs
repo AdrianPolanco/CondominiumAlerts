@@ -3,6 +3,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
 using Carter;
+using CloudinaryDotNet;
 using CondominiumAlerts.CrossCutting.ErrorHandler;
 using CondominiumAlerts.Infrastructure.Persistence.Context;
 using FirebaseAdmin;
@@ -27,7 +28,11 @@ public static class DependencyInjection
         {
             Credential = GoogleCredential.FromFile("./firebase.json")
         });
-        
+
+        services.AddScoped<Cloudinary>(sp => new Cloudinary(
+            configuration.GetSection("Cloidinary").GetValue<string>("CLOUDINARY_URL")
+        ));
+
         // Configura la política CORS
         services.AddCors(options =>
         {

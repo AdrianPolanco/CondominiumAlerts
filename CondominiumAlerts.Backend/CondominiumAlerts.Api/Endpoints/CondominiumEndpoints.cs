@@ -1,11 +1,13 @@
 ﻿using Carter;
 using CondominiumAlerts.Features.Features.Condominium;
+using CondominiumAlerts.Features.Features.Condominium.Add;
 using CondominiumAlerts.Features.Features.Condominium.Join;
 using LightResults;
 using Mapster;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 
 namespace CondominiumAlerts.Api.Endpoints
 {
@@ -14,7 +16,7 @@ namespace CondominiumAlerts.Api.Endpoints
         public void AddRoutes(IEndpointRouteBuilder app)
         {
             app.MapPost("/condominium/join",
-                async (ISender sender, JoinCondominiumCommand command, CancellationToken cancellationToken) =>
+                async (ISender sender, [FromForm] JoinCondominiumCommand command, CancellationToken cancellationToken) =>
                 {
                     Result<JoinCondominiumResponce> result = await sender.Send(command, cancellationToken);
                     if (!result.IsSuccess) return Results.BadRequest(result);
@@ -25,7 +27,23 @@ namespace CondominiumAlerts.Api.Endpoints
                         Data = result.Value.Adapt<JoinCondominiumResponce>()
                     };
                     return Results.Ok(responce);
-                });
+                }).DisableAntiforgery();
+
+            app.MapPost("/condominium",
+                async (ISender sender, [FromForm] AddCondominiumCommand command, CancellationToken cancellationToken) =>
+                {
+                    Result<AddCondominiumResponse> result = await sender.Send(command, cancellationToken);
+                    if (!result.IsSuccess) return Results.BadRequest(result);
+
+                    var response = new
+                    {
+                        result.IsSuccess,
+                        Data = result.Value
+                    };
+                    return Results.Ok(response);
+                }
+                // TODO: Add anti forgery token in frontend: https://stackoverflow.com/a/77191406
+            ).DisableAntiforgery();
         }
     }
 }
