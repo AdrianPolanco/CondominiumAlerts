@@ -4,7 +4,15 @@ export interface AddCondominiumCommand {
     imageFile: File;
 }
 
+export interface JoinCondominiumCommand{
+  userId: string;
+  condominiumCode: string;
+}
 
+export interface JoinCondominiumResponce{
+  userId: string;
+  CondominiumId: string;
+}
 export interface AddCondominiumResponse {
   isSuccess: boolean;
   data?: {
