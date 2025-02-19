@@ -1,12 +1,13 @@
 import { Component } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { CondominiumService } from '../../services/condominium.service';
-
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core'; 
 @Component({
   selector: 'app-condominium-page',
-  imports: [],
+  imports: [ReactiveFormsModule],
   templateUrl: './condominium-page.component.html',
-  styleUrl: './condominium-page.component.css'
+  styleUrl: './condominium-page.component.css',
+  schemas:[ CUSTOM_ELEMENTS_SCHEMA]
 })
 export class CondominiumPageComponent {
 

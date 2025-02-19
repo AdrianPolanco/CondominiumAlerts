@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { AddCondominiumCommand, AddCondominiumResponse } from '../models/condominium.model';
+import { AddCondominiumCommand, AddCondominiumResponse, JoinCondominiumCommand , JoinCondominiumResponce} from '../models/condominium.model';
 
 @Injectable({
   providedIn: 'root'
@@ -19,5 +19,12 @@ export class CondominiumService {
         fb.append('address', cmd.address);
         fb.append('imageFile',cmd.imageFile);
         return this.httpClient.post<AddCondominiumResponse>("/api/condominium", fb)
+    }
+
+    join(cmd: JoinCondominiumCommand): Observable<JoinCondominiumResponce>{
+      const fb = new FormData();
+      fb.append("userId", cmd.userId)
+      fb.append("condominiumCode", cmd.condominiumCode)
+      return this.httpClient.post<JoinCondominiumResponce>("/condominium/join", fb)
     }
 }

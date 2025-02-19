@@ -1,0 +1,25 @@
+<div class="main-container">
+  <!-- Join Condominium Button -->
+  <div class="top-actions">
+    <button (click)="joinCondominium()" class="btn btn-primary">
+      Join a Condominium
+    </button>
+  </div>
+
+  <div class="main-content">
+    <!-- Create a Condominium Section -->
+    <div class="condo-section create-condo" (click)="createCondominium()">
+      <h3>Create a Condominium</h3>
+    </div>
+
+    <!-- List of Condominiums -->
+    <div
+      class="condo-section success"
+      *ngFor="let condo of condominiums"
+      (click)="viewCondominium(condo.id)"
+    >
+      <h3>{{ condo.name }}</h3>
+      <p>Location: {{ condo.location }}</p>
+    </div>
+  </div>
+</div>
