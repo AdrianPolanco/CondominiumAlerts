@@ -6,6 +6,7 @@ import { FormGroup, Validators } from '@angular/forms';
 import { SharedForm } from '../../../../shared/components/form/shared-form.interface';
 import { CondominiumService } from '../../services/condominium.service';
 import { AddCondominiumCommand } from '../../models/condominium.model';
+import { Router } from '@angular/router';
 import { Feedback } from '../../../../shared/components/form/feedback.interface';
 
 @Component({
@@ -16,7 +17,7 @@ import { Feedback } from '../../../../shared/components/form/feedback.interface'
 })
 export class CondominiumPageComponent {
 
-    constructor(private condominiumService: CondominiumService) {}
+    constructor(private condominiumService: CondominiumService, private router: Router) {}
 
     // Signal for the form group
     private readonly formGroup = signal<FormGroup>(new FormGroup({}));
@@ -68,6 +69,9 @@ export class CondominiumPageComponent {
 
     onFormCreated(form: FormGroup) {
         this.formGroup.set(form);
+    }
+    goToMainPage(){
+      this.router.navigate(["condominiums/main-page"])
     }
 
     onSubmit(value: AddCondominiumCommand) {

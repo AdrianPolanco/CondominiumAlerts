@@ -1,28 +1,26 @@
 import { Component } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators,ReactiveFormsModule  } from '@angular/forms';
 import { CondominiumService } from '../../services/condominium.service';
 import { NgFor, CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+
 @Component({
   selector: 'app-condominiums-main-page',
-  imports: [NgFor,CommonModule ],
+  imports: [NgFor, CommonModule,ReactiveFormsModule ],
   templateUrl: './condominiums-main-page.component.html',
-  styleUrl: './condominiums-main-page.component.css'
+  styleUrls: ['./condominiums-main-page.component.css']
 })
 export class CondominiumsMainPageComponent {
- form: FormGroup
-  constructor(private fb: FormBuilder, private CondominiumService: CondominiumService, private router: Router ){
+  form: FormGroup;
+  isModalOpen: boolean = false;
+
+  constructor(private fb: FormBuilder, private condominiumService: CondominiumService, private router: Router) {
     this.form = this.fb.group({
-      condominiumCode: [''],
-      UserId: [''],
-    })
+      condominiumCode: ['', Validators.required],
+      userId: ['08098098']
+    });
   }
 
-  OnSubmit(){
-    if(!this.form.invalid)
-      return 
-    this.CondominiumService.join(this.form.value)
-  }
   condominiums = [
     { id: 1, name: 'Sunset Villas', location: 'Miami, FL' },
     { id: 2, name: 'Ocean Breeze Condos', location: 'Los Angeles, CA' }
@@ -30,18 +28,33 @@ export class CondominiumsMainPageComponent {
 
   joinCondominium() {
     console.log('Joining a condominium...');
-    // Implement logic here (modal, API call, etc.)
+
+    if (this.form.invalid) {
+      console.log('Form is invalid.');
+      return;
+    }
+    const formData = this.form.value;
+    
+    this.condominiumService.join(formData).subscribe({
+      next: (result) => {
+        console.log('Joined successfully:', result);
+      },
+      error: (err) => {
+        console.error('Error joining condominium:', err);
+      }
+    });
   }
 
-  createCondominium() {
+  goToCreateCondominium() {
     console.log('Creating a new condominium...');
-  
-      this.router.navigate(['/condominium-create']); // Navigates to "condominium/{id}"
+    this.router.navigate(['/condominium/create']);
   }
 
   viewCondominium(id: number) {
     console.log(`Viewing condominium ID: ${id}`);
-    // Implement navigation or API call
   }
- 
+
+  changeModalState() {
+    this.isModalOpen = !this.isModalOpen;
+  }
 }

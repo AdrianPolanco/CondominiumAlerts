@@ -26,8 +26,10 @@ export class CondominiumService {
 
     join(cmd: JoinCondominiumCommand): Observable<JoinCondominiumResponce>{
       const fb = new FormData();
-      fb.append("userId", cmd.userId)
-      fb.append("condominiumCode", cmd.condominiumCode)
-      return this.httpClient.post<JoinCondominiumResponce>("/condominium/join", fb)
+      fb.append('UserId', cmd.userId)
+      fb.append('condominiumCode', cmd.condominiumCode)
+
+      return this.httpClient.post<JoinCondominiumResponce>(
+        "/api/condominium/join", fb)
     }
 }

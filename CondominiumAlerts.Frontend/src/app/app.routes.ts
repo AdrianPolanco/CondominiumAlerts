@@ -14,8 +14,7 @@ export const routes: Routes = [
     },
 
   {
-    path: "condominiums-main-page",
-    title: "Condominium main page",
+    path: "condominiums/main-page",
     loadComponent: () => import('./features/condominiums/pages/condominiums-main-page/condominiums-main-page.component')
                                         .then(c => c.CondominiumsMainPageComponent)
   },

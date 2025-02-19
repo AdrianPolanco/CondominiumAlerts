@@ -1,9 +1,14 @@
-
 <shared-form
-    [formSettingsInput]="condominiumFormSettings()"
-    (onFormCreated)="onFormCreated($event)"
-    (onFormSubmitted)="onSubmit($event)"
+  [formSettingsInput]="condominiumFormSettings()"
+  (onFormCreated)="onFormCreated($event)"
+  (onFormSubmitted)="onSubmit($event)"
 />
-
-<p-toast></p-toast>
-
+<button
+  type="button"
+  p-button
+  class="w-full flex justify-center items-center"
+  (click)="goToMainPage()"
+>
+  Go Back
+</button>
+<!-- <p-toast></p-toast> -->

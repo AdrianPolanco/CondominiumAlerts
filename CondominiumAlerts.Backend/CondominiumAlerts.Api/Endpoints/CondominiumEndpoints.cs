@@ -16,7 +16,7 @@ namespace CondominiumAlerts.Api.Endpoints
         public void AddRoutes(IEndpointRouteBuilder app)
         {
             app.MapPost("/condominium/join",
-                async (ISender sender, JoinCondominiumCommand command, CancellationToken cancellationToken) =>
+                async (ISender sender, [FromForm] JoinCondominiumCommand command, CancellationToken cancellationToken) =>
                 {
                     Result<JoinCondominiumResponce> result = await sender.Send(command, cancellationToken);
                     if (!result.IsSuccess) return Results.BadRequest(result);
@@ -27,7 +27,8 @@ namespace CondominiumAlerts.Api.Endpoints
                         Data = result.Value.Adapt<JoinCondominiumResponce>()
                     };
                     return Results.Ok(responce);
-                });
+                }).DisableAntiforgery();
+
             app.MapPost("/condominium",
                 async (ISender sender, [FromForm] AddCondominiumCommand command, CancellationToken cancellationToken) =>
                 {
