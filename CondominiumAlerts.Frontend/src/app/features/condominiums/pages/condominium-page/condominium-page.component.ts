@@ -1,37 +1,90 @@
-import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+
+import { Component, signal, viewChild } from '@angular/core';
+import { FormComponent } from '../../../../shared/components/form/form.component';
+import { SharedFormField } from '../../../../shared/components/form/shared-form-field.interface';
+import { FormGroup, Validators } from '@angular/forms';
+import { SharedForm } from '../../../../shared/components/form/shared-form.interface';
 import { CondominiumService } from '../../services/condominium.service';
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core'; 
+import { AddCondominiumCommand } from '../../models/condominium.model';
+import { Feedback } from '../../../../shared/components/form/feedback.interface';
+
 @Component({
-  selector: 'app-condominium-page',
-  imports: [ReactiveFormsModule],
-  templateUrl: './condominium-page.component.html',
-  styleUrl: './condominium-page.component.css',
-  schemas:[ CUSTOM_ELEMENTS_SCHEMA]
+    selector: 'app-condominium-page',
+    templateUrl: './condominium-page.component.html',
+    styleUrls: ['./condominium-page.component.css'],
+    imports: [FormComponent]
 })
 export class CondominiumPageComponent {
 
-  form: FormGroup;
-    constructor(private fb: FormBuilder, private condominiumService: CondominiumService) {
-    this.form = this.fb.group({
-      name: [''],
-      address: [''],
-      imageFile: [null],
+    constructor(private condominiumService: CondominiumService) {}
+
+    // Signal for the form group
+    private readonly formGroup = signal<FormGroup>(new FormGroup({}));
+
+    // Reference to the form component
+    formComponent = viewChild(FormComponent);
+
+    // Define form fields using signal
+    condominiumFormFields = signal<SharedFormField[]>([
+        {
+            name: 'name',
+            label: 'Name',
+            type: 'text',
+            validators: [Validators.required],
+            errorMessages: {
+                required: 'Name is required'
+            }
+        },
+        {
+            name: 'address',
+            label: 'Address',
+            type: 'text',
+            validators: [Validators.required],
+            errorMessages: {
+                required: 'Address is required'
+            }
+        },
+        {
+            name: 'imageFile',
+            label: 'Upload Image',
+            type: 'file',
+            filetype: 'image/*',
+            onFileSelect: (event: any) => {
+                if (event.files.length > 0) {
+                    const file = event.files[0];
+                    this.formGroup().patchValue({
+                        imageFile: file,
+                    });
+                }
+            }
+        }
+    ]);
+
+    condominiumFormSettings = signal<SharedForm>({
+        fields: this.condominiumFormFields(),
+        baseButtonLabel: 'Submit',
+        submittedButtonLabel: 'Submitted Successfully'
     });
-  }
 
-  onSubmit() {
-    if (this.form.valid) {
-        this.condominiumService.create(this.form.value);
+    onFormCreated(form: FormGroup) {
+        this.formGroup.set(form);
     }
-  }
 
-  onFileSelect(event: any) {
-    if (event.files.length > 0) {
-      const file = event.files[0];
-      this.form.patchValue({
-        imageFile: file,
-      });
+    onSubmit(value: AddCondominiumCommand) {
+        const formComponent = this.formComponent();
+        this.condominiumService.create(value).subscribe({
+            next: (response) => {
+                formComponent?.resetForm({
+                    status: 'success',
+                    message: 'Condominium created successfully!',
+                });
+            },
+            error: (err) => {
+                formComponent?.resetForm({
+                    status: 'error',
+                    message: err.error?.message || 'An error occurred while creating the condominium.',
+                });
+            }
+        });
     }
-  }
 }

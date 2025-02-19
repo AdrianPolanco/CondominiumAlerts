@@ -18,7 +18,10 @@ export class CondominiumService {
         fb.append('name', cmd.name);
         fb.append('address', cmd.address);
         fb.append('imageFile',cmd.imageFile);
-        return this.httpClient.post<AddCondominiumResponse>("/api/condominium", fb)
+        return this.httpClient.post<AddCondominiumResponse>(
+            "/api/condominium",
+            fb,
+        )
     }
 
     join(cmd: JoinCondominiumCommand): Observable<JoinCondominiumResponce>{
