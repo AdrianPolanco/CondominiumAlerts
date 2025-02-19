@@ -71,7 +71,7 @@ export class CondominiumPageComponent {
         this.formGroup.set(form);
     }
     goToMainPage(){
-      this.router.navigate(["condominiums/main-page"])
+      this.router.navigate(["condominium/main-page"])
     }
 
     onSubmit(value: AddCondominiumCommand) {

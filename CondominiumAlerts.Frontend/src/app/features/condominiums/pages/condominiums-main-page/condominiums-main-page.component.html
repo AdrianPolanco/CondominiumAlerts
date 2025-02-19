@@ -1,18 +1,25 @@
-<div class="max-w-3xl mx-auto p-5">
-  <div class="flex justify-center mb-5">
+<div class="w-[70%] mx-auto p-5 space-y-6">
+  <div class="flex justify-center m-10">
+    <h1
+      class="mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl dark:text-white"
+    >
+      Welcome back
+    </h1>
+  </div>
+  <div class="flex justify-center">
     <button
       (click)="changeModalState()"
-      class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition"
+      class="w-full h-20 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition"
     >
       Join a Condominium
     </button>
   </div>
 
   <div
-    class="grid place-items-center grid-cols-1 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 gap-2"
+    class="grid place-items-center grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8"
   >
     <div
-      class="w-44 flex justify-center place-items-center h-44 bg-blue-200 rounded-lg p-4 cursor-pointer hover:bg-blue-300 transition"
+      class="w-full max-w-[17rem] min-w-[10rem] aspect-square flex flex-col justify-center items-center bg-blue-200 rounded-lg p-4 cursor-pointer hover:bg-blue-300 transition"
       (click)="goToCreateCondominium()"
     >
       <h3 class="text-lg font-semibold text-center">Create a Condominium</h3>
@@ -20,11 +27,11 @@
 
     <div
       *ngFor="let condo of condominiums"
-      class="w-44 h-44 flex justify-center place-items-end bg-green-500 text-white rounded-lg p-4 cursor-pointer hover:bg-green-600 transition"
+      class="w-full max-w-[17rem] min-w-[10rem] aspect-square flex flex-col justify-center items-center bg-green-500 text-white rounded-lg p-4 cursor-pointer hover:bg-green-600 transition"
       (click)="viewCondominium(condo.id)"
     >
-      <h3 class="text-lg font-semibold text-center">{{ condo.name }}</h3>
-      <p class="text-center text-sm">Location: {{ condo.location }}</p>
+      <h3 class="text-xl font-semibold text-center">{{ condo.name }}</h3>
+      <p class="text-center text-sm mt-2">Location: {{ condo.location }}</p>
     </div>
   </div>
 </div>
@@ -44,7 +51,7 @@
           formControlName="condominiumCode"
           max="11"
           name="condominiumCode"
-          class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           placeholder="Enter code"
           required
         />
