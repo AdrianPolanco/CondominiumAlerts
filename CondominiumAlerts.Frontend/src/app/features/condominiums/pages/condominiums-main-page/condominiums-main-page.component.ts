@@ -23,7 +23,13 @@ export class CondominiumsMainPageComponent {
 
   condominiums = [
     { id: 1, name: 'Sunset Villas', location: 'Miami, FL' },
-    { id: 2, name: 'Ocean Breeze Condos', location: 'Los Angeles, CA' }
+    { id: 2, name: 'Sunset Villas', location: 'Miami, FL' },
+    { id: 3, name: 'Sunset Villas', location: 'Miami, FL' },
+    { id: 4, name: 'Sunset Villas', location: 'Miami, FL' },
+    { id: 5, name: 'Sunset Villas', location: 'Miami, FL' },
+    { id: 6, name: 'Sunset Villas', location: 'Miami, FL' },
+    { id: 7, name: 'Sunset Villas', location: 'Miami, FL' },
+    { id: 8, name: 'Ocean Breeze Condos', location: 'Los Angeles, CA' }
   ];
 
   joinCondominium() {
