@@ -2,12 +2,14 @@
 using CondominiumAlerts.Features.Features.Condominium;
 using CondominiumAlerts.Features.Features.Condominium.Add;
 using CondominiumAlerts.Features.Features.Condominium.Join;
+using FirebaseAdmin.Auth;
 using LightResults;
 using Mapster;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Org.BouncyCastle.Asn1.Ocsp;
 
 namespace CondominiumAlerts.Api.Endpoints
 {
@@ -30,8 +32,9 @@ namespace CondominiumAlerts.Api.Endpoints
                 }).DisableAntiforgery();
 
             app.MapPost("/condominium",
-                async (ISender sender, [FromForm] AddCondominiumCommand command, CancellationToken cancellationToken) =>
+                async (ISender sender, [FromForm] AddCondominiumCommand command,CancellationToken cancellationToken) =>
                 {
+              
                     Result<AddCondominiumResponse> result = await sender.Send(command, cancellationToken);
                     if (!result.IsSuccess) return Results.BadRequest(result);
 
