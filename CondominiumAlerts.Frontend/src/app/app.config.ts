@@ -11,6 +11,7 @@ import { getAuth, provideAuth } from '@angular/fire/auth';
 import { environment } from '../enviroments/environment';
 import {MyPreset} from './theme';
 import {provideHttpClient, withFetch} from '@angular/common/http';
+import { MessageService } from 'primeng/api';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -30,7 +31,8 @@ export const appConfig: ApplicationConfig = {
           }
       }
   }),
-    provideHttpClient(withFetch())
+    provideHttpClient(withFetch()),
+    MessageService
   ],
 };
 

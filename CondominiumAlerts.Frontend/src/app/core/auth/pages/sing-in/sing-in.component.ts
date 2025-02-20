@@ -1,65 +1,169 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, signal, viewChild } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
-import { CommonModule } from '@angular/common';
-import {
-  FormBuilder,
-  FormGroup,
-  ReactiveFormsModule,
-  FormControl,
-  Validators,
-} from '@angular/forms';
+import { FormGroup, Validators } from '@angular/forms';
 
-import { PasswordModule } from 'primeng/password';
-import { InputTextModule } from 'primeng/inputtext';
-import { ButtonModule } from 'primeng/button';
-import { MessageModule } from 'primeng/message';
 import { Router } from '@angular/router';
+import { SharedForm } from '../../../../shared/components/form/shared-form.interface';
+import { SharedFormField } from '../../../../shared/components/form/shared-form-field.interface';
+import { FormComponent } from '../../../../shared/components/form/form.component';
+
+import { Button } from 'primeng/button';
+import { Toolbar } from 'primeng/toolbar';
+import { RouterLink } from '@angular/router';
+import { Divider } from 'primeng/divider';
+import { NgOptimizedImage } from '@angular/common';
+import { UserService } from '../../../services/user.service';
+import { MessageService } from 'primeng/api';
+import { FirebaseError } from 'firebase/app';
+
 @Component({
   selector: 'app-sing-in',
   imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    PasswordModule,
-    InputTextModule,
-    ButtonModule,
-    MessageModule,
+    FormComponent,
+    Button,
+    Toolbar,
+    RouterLink,
+    Divider,
+    NgOptimizedImage,
   ],
   templateUrl: './sing-in.component.html',
   styleUrl: './sing-in.component.css',
 })
 export class SingInComponent {
-  public loginForm: FormGroup;
-  public errorMessage: string | null = null;
-  public isLoading = false;
+  private readonly formGroup = signal<FormGroup>(new FormGroup({}));
+  formComponent = viewChild(FormComponent);
+
   constructor(
     private authService: AuthService,
-    private fb: FormBuilder,
-    private router: Router
-  ) {
-    this.loginForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
-    });
+    private router: Router,
+    private userService: UserService,
+    private messageService: MessageService
+  ) {}
+
+  public features: { title: string; details: string }[] = [
+    {
+      title: 'Registra tu cuenta',
+      details: 'Crea tu cuenta en unos pocos pasos',
+    },
+    {
+      title: 'Accede a tu cuenta',
+      details: 'Inicia sesión con tu cuenta y disfruta de nuestros servicios',
+    },
+    {
+      title: 'Invita a tus amigos',
+      details: 'Invita a tus amigos y vecinos a unirse a tu comunidad',
+    },
+    {
+      title: 'Solicita servicios',
+      details:
+        'Solicita servicios y ayuda a tus vecinos a través de nuestra plataforma',
+    },
+    {
+      title: 'Administra tu comunidad desde tu dispositivo',
+      details: '¡Administra tu comunidad a solo un click de distancia!',
+    },
+  ];
+
+  public onFormCreated(form: FormGroup) {
+    this.formGroup.set(form);
   }
 
-  public async login() {
-    // Validar
-    const { email, password } = this.loginForm.value;
-    const user = await this.authService.loginWithEmailAndPassword(
-      email,
-      password
-    );
-
-    if (user) {
-      this.router.navigateByUrl('/HomePage');
+  public async login(data: any) {
+    const { email, password } = data;
+    try {
+      const result = await this.authService.loginWithEmailAndPassword(
+        email,
+        password
+      );
+      if (result.user) {
+        //Link de la pagina principal de la app
+        this.router.navigateByUrl('/home');
+        return;
+      }
+      this.presentToast('Error al iniciar sesión. Intente nuevamente.');
+    } catch (error: any) {
+      if (error instanceof FirebaseError) {
+        this.handleFirebaseError(error);
+        return;
+      }
+      this.presentToast('Ocurrió un error inesperado.');
     }
   }
 
-  get emailControl() {
-    return this.loginForm.get('email') as FormControl;
+  async loginWithGoogle() {
+    try {
+      const user = await this.userService.loginWithGoogle();
+      console.log('Usuario logueado:', user);
+      if (user) {
+        this.router.navigateByUrl('/home');
+        return;
+      }
+
+    } catch (e) {
+      this.presentToast('Ocurrió un error inesperado.');
+    }
   }
 
-  get passwordControl() {
-    return this.loginForm.get('password') as FormControl;
+  private loginFormSettingsFormFields = signal<SharedFormField[]>([
+    {
+      name: 'email',
+      label: 'E-mail',
+      type: 'text',
+      validators: [Validators.required, Validators.email],
+      errorMessages: {
+        required: 'Este campo es requerido',
+        email: 'El e-mail no es válido',
+      },
+      icon: 'pi-at',
+    },
+    {
+      name: 'password',
+      label: 'Contraseña',
+      type: 'password',
+      validators: [
+        Validators.required,
+        Validators.minLength(8),
+        Validators.maxLength(25),
+      ],
+      errorMessages: {
+        required: 'Este campo es requerido',
+        minlength: 'La contraseña debe tener al menos 8 caracteres',
+        maxlength: 'La contraseña no puede tener más de 25 caracteres',
+      },
+      icon: 'pi-lock',
+    },
+  ]);
+
+  private handleFirebaseError(error: FirebaseError) {
+    switch (error.code) {
+      case 'auth/invalid-credential':
+        this.presentToast('Correo o contraseña incorrectos.');
+        break;
+      case 'auth/user-not-found':
+        this.presentToast('No existe una cuenta con este correo.');
+        break;
+      case 'auth/wrong-password':
+        this.presentToast('Contraseña incorrecta.');
+        break;
+      case 'auth/too-many-requests':
+        this.presentToast('Demasiados intentos. Intente más tarde.');
+        break;
+      default:
+        this.presentToast('Error al iniciar sesión.');
+        break;
+    }
   }
+
+  public presentToast(text: string, success = false) {
+    this.messageService.add({
+      detail: text,
+      severity: success ? 'success' : 'error',
+    });
+  }
+
+  public loginFormSettings = signal<SharedForm>({
+    fields: this.loginFormSettingsFormFields(),
+    baseButtonLabel: 'Iniciar sesión',
+    submittedButtonLabel: 'Iniciar sesión',
+  });
 }

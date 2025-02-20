@@ -4,10 +4,11 @@ import { FilterMatchMode } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { PrimeNG } from 'primeng/config';
 import Aura from '@primeng/themes/aura';
+import { ToastModule } from 'primeng/toast';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, ButtonModule],
+  imports: [RouterOutlet, ButtonModule, ToastModule],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
 })
