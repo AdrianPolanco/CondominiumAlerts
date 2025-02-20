@@ -55,6 +55,17 @@
                   class="p-inputtextarea w-full"></textarea>
       }
 
+      @if (field.type === 'file') {
+        <p-fileUpload
+          [id]="field.name"
+          name="imageFile"
+          mode="basic"
+          [chooseLabel]="field.label"
+          (onSelect)="field.onFileSelect($event)"
+          [accept]="field.filetype"
+        ></p-fileUpload>
+      }
+
       @if (field.type === 'select') {
         <p-dropdown
           [options]="field.options"

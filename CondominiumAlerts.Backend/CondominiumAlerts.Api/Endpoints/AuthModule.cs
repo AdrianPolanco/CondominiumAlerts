@@ -3,7 +3,6 @@
 using CondominiumAlerts.Features.Features.Users.Register;
 using Mapster;
 using MediatR;
-using Microsoft.AspNetCore.Mvc;
 
 namespace CondominiumAlerts.Api.Endpoints;
 

@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 
 export const routes: Routes = [
   {
+
     path: 'register',
     title: 'Registrar usuario',
     loadComponent: () =>
@@ -28,5 +29,16 @@ export const routes: Routes = [
     path: '',
     redirectTo: 'home',
     pathMatch: 'full',
-  }
+  },
+    {
+        path: "condominium/create",
+        loadComponent: () => import('./features/condominiums/pages/condominium-page/condominium-page.component')
+            .then(x => x.CondominiumPageComponent)
+    },
+
+  {
+    path: "condominium/main-page",
+    loadComponent: () => import('./features/condominiums/pages/condominiums-main-page/condominiums-main-page.component')
+                                        .then(c => c.CondominiumsMainPageComponent)
+  },
 ];

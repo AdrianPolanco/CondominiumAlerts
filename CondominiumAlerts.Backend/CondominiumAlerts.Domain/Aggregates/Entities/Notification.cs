@@ -13,7 +13,7 @@ namespace CondominiumAlerts.Domain.Aggregates.Entities;
         public string? ReceiverUserId { get; set; }
         public Guid CondominiumId { get; set; }
         public Guid LevelOfPriorityId { get; set; }
-        public DateTime CreatedAt { get; init; }
+        public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
         
         public User? ReceiverUser { get; set; }

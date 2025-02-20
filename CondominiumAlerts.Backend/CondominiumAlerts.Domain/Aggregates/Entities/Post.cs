@@ -11,7 +11,7 @@ namespace CondominiumAlerts.Domain.Aggregates.Entities;
         public Guid CondominiumId { get; set; }
         public string UserId { get; init; }
         public Guid LevelOfPriorityId { get; set; }
-        public DateTime CreatedAt { get; init; }
+        public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
         
         public Condominium Condominium { get; set; }

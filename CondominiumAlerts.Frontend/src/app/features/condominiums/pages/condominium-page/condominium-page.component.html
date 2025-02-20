@@ -1,0 +1,30 @@
+<div class="w-[90%] mx-auto p-5 space-y-6">
+  <div class="flex justify-center place-items-center">
+    <h1
+      class="mb-4 text-4xl m-8 font-extrabold leading-none tracking-tight text-gray-900 md:text-4xl lg:text-4xl dark:text-white"
+    >
+      Create your Condominium
+    </h1>
+  </div>
+  <div class="flex justify-center place-items-center">
+    <div>
+      <shared-form
+        [formSettingsInput]="condominiumFormSettings()"
+        (onFormCreated)="onFormCreated($event)"
+        (onFormSubmitted)="onSubmit($event)"
+      />
+      <div class="flex justify-center place-items-center">
+        <button
+          type="button"
+          p-button
+          class="w-[90%] h-10 rounded-lg flex justify-center items-center bg-red-500 hover:bg-red-700"
+          (click)="goToMainPage()"
+        >
+          Go Back
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- <p-toast></p-toast> -->
