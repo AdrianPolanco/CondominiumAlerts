@@ -50,7 +50,7 @@ namespace CondominiumAlerts.Features.Features.Condominium.Add
                 return Result.Fail<AddCondominiumResponse>(message);
             }
 
-            string inviteCode = ByteHelpers.GenerateBase64String(7);
+            string inviteCode = ByteHelpers.GenerateBase64String(11);
             while (await _condominiumRepository.AnyAsync(x => x.InviteCode == inviteCode, cancellationToken))
             {
                 _logger.LogTrace("Failed to create invite code {InviteCode}, already exists.", inviteCode);
