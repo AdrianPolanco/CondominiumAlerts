@@ -19,15 +19,13 @@ public class RegisterUserCommandHandler : ICommandHandler<RegisterUserCommand, R
     private readonly IRepository<User, string> _userRepository;
     private readonly IQueue _queue;
     private readonly ILogger<RegisterUserCommandHandler> _logger;
-    private readonly IPublisher _publisher;
     private readonly IValidator<RegisterUserCommand> _validator;
-    public RegisterUserCommandHandler(IAuthenticationProvider authenticationProvider, IRepository<User, string> userRepository, IQueue queue, IPublisher publisher, ILogger<RegisterUserCommandHandler> logger, IValidator<RegisterUserCommand> validator)
+    public RegisterUserCommandHandler(IAuthenticationProvider authenticationProvider, IRepository<User, string> userRepository, IQueue queue, ILogger<RegisterUserCommandHandler> logger, IValidator<RegisterUserCommand> validator)
     {
         _authenticationProvider = authenticationProvider;
         _userRepository = userRepository;
         _queue = queue;
         _logger = logger;
-        _publisher = publisher;
         _validator = validator;
     }
     public async Task<Result<RegisterUserResponse>> Handle(RegisterUserCommand request, CancellationToken cancellationToken)

@@ -23,6 +23,5 @@ public class AuthModule : ICarterModule
                return Results.Ok(response);
             });
         
-        app.MapGet("/hello", ()=> Results.Ok("Hello!"));
     }
 }

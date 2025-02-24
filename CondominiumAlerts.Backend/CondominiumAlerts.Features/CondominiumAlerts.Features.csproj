@@ -20,6 +20,7 @@
       <PackageReference Include="libphonenumber-csharp" Version="8.13.54" />
       <PackageReference Include="Mapster" Version="7.4.0" />
       <PackageReference Include="MediatR" Version="12.4.1" />
+      <PackageReference Include="Scrutor" Version="6.0.1" />
     </ItemGroup>
 
 </Project>
