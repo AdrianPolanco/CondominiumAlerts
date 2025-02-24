@@ -16,7 +16,7 @@ public class UserModule : ICarterModule
     }
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapPut("/users/edit", async (ClaimsPrincipal claims, UpdateUserCommand command, ISender sender, CancellationToken cancellationToken) =>
+        /*app.MapPut("/users/edit", async (ClaimsPrincipal claims, UpdateUserCommand command, ISender sender, CancellationToken cancellationToken) =>
         {
             
             var currentUserId = claims.FindFirst("user_id")?.Value;
@@ -33,6 +33,6 @@ public class UserModule : ICarterModule
             };
             
             return Results.Ok(response);
-        }).RequireAuthorization();
+        }).RequireAuthorization();*/
     }
 }
