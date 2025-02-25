@@ -1,5 +1,7 @@
 ﻿using System.Security.Claims;
 using Carter;
+using CondominiumAlerts.Domain.Aggregates.Entities;
+using CondominiumAlerts.Domain.Repositories;
 using CondominiumAlerts.Features.Features.Users;
 using CondominiumAlerts.Features.Features.Users.Register;
 using CondominiumAlerts.Features.Features.Users.Update;
@@ -65,6 +67,30 @@ public class AuthModule : ICarterModule
                };
                return Results.Ok(response);
             });
-        
+
+        app.MapPost("/users/register/google/{id}",
+            async (string id, RegisterUserCommand command, CancellationToken cancellationToken, ClaimsPrincipal claims, IRepository<User, string> repository) =>
+            {
+                var currentUserId = claims.FindFirst("user_id")?.Value;
+                
+                if (currentUserId == null) return Results.BadRequest("El id del usuario no existe.");
+                
+                if (currentUserId != id || string.IsNullOrWhiteSpace(currentUserId.Trim()))
+                    return Results.BadRequest(new
+                        { IsSuccess = false, Message = "El id del usuario no coincide con tus credenciales." });
+                
+                var user = command.Adapt<User>();
+                user.Id = id;
+                
+                user = await repository.CreateAsync(user, cancellationToken);
+
+                var response = new
+                {
+                    IsSuccess = true,
+                    Data = user.Adapt<RegisterUserResponse>()
+                };
+                
+                return Results.Ok(response);
+            });
     }
 }

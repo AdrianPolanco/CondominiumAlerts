@@ -46,7 +46,7 @@ public class EmailConfirmationJob : IInvocable, IInvocableWithPayload<RegisterUs
 
             _logger.LogInformation($"[{uniqueId}] Enviando correo de verificación a {Payload.Email}");
 
-            await _emailService.SendConfirmationEmailAsync(Payload.Name, Payload.LastName, Payload.Email, verificationLink, CancellationToken);
+            await _emailService.SendConfirmationEmailAsync(Payload.Name, Payload.Lastname, Payload.Email, verificationLink, CancellationToken);
 
             _logger.LogInformation($"[{uniqueId}] Correo de verificación enviado exitosamente a {Payload.Email}");
         }
