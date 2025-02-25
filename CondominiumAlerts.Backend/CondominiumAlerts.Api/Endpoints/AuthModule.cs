@@ -91,6 +91,6 @@ public class AuthModule : ICarterModule
                 };
                 
                 return Results.Ok(response);
-            });
+            }).RequireAuthorization();
     }
 }
