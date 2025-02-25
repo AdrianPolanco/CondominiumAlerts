@@ -1,0 +1,32 @@
+<header class="card">
+  <p-toolbar styleClass="rounded-none">
+    <ng-template #start>
+      <img ngSrc="images/condominiumAlertsLogo-removebg.png" alt="Condominium Alerts" height="40" width="40"/>
+    </ng-template>
+    <ng-template #center>
+      <p-iconfield iconPosition="left">
+        <p-inputicon styleClass="pi pi-search" />
+        <input type="text" pInputText placeholder="Search" />
+      </p-iconfield>
+    </ng-template>
+    <ng-template #end>
+      <button (click)="showForm()" class="flex justify-center items-center">
+        <p-avatar icon="pi pi-user" class="mr-2" size="large" shape="circle" />
+      </button>
+    </ng-template>
+  </p-toolbar>
+</header>
+<p-dialog [(visible)]="visible" [modal]="true" [style]="{ width: '25rem' }">
+  <h1 class="text-center text-3xl">Mi perfil</h1>
+  <div class="flex justify-center items-center w-full">
+    <p-image src="https://primefaces.org/cdn/primeng/images/galleria/galleria10.jpg" alt="Image" width="250" [preview]="true" />
+  </div>
+  <shared-form
+    [formSettingsInput]="profileFormSettings()"
+    (onFormCreated)="onFormCreated($event)"
+    (onFormSubmitted)="onSubmit($event)">
+  </shared-form>
+</p-dialog>
+<main>
+  <router-outlet></router-outlet>
+</main>

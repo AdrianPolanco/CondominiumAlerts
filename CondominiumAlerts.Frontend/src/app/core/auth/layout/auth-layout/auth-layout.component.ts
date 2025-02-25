@@ -1,0 +1,221 @@
+import {Component, OnDestroy, OnInit, signal, viewChild} from '@angular/core';
+import {Toolbar} from 'primeng/toolbar';
+import {IconField} from 'primeng/iconfield';
+import {InputIcon} from 'primeng/inputicon';
+import {MenuItem} from 'primeng/api';
+import {RouterOutlet} from '@angular/router';
+import {InputText} from 'primeng/inputtext';
+import {NgOptimizedImage} from '@angular/common';
+import {Avatar} from 'primeng/avatar';
+import {Dialog} from 'primeng/dialog';
+import {SharedFormField} from '../../../../shared/components/form/shared-form-field.interface';
+import {FormGroup, Validators} from '@angular/forms';
+import {SharedForm} from '../../../../shared/components/form/shared-form.interface';
+import {FormComponent} from '../../../../shared/components/form/form.component';
+import {RegisterUserRequest} from '../../../register/models/RegisterUserRequest';
+import {Feedback} from '../../../../shared/components/form/feedback.interface';
+import {UserService} from '../../../services/user.service';
+import {Image} from 'primeng/image';
+import {User, UserData} from './user.type';
+import {interval, Subject, takeUntil} from 'rxjs';
+import {AutoUnsubscribe} from '../../../../shared/decorators/autounsuscribe.decorator';
+
+@AutoUnsubscribe()
+@Component({
+  selector: 'core-auth-layout',
+  imports: [
+    Toolbar,
+    IconField,
+    InputIcon,
+    RouterOutlet,
+    InputText,
+    NgOptimizedImage,
+    Avatar,
+    Dialog,
+    FormComponent,
+    Image
+  ],
+  templateUrl: './auth-layout.component.html',
+  styleUrl: './auth-layout.component.css'
+})
+export class AuthLayoutComponent implements OnInit{
+
+  constructor(private userService: UserService) {
+
+  }
+
+  ngOnInit() {
+    this.userService.userData$
+      .pipe(takeUntil(this.destroy$)) // Se detiene cuando `destroy$` emite un valor en el @AutoUnsubscribe()
+      .subscribe(userData => {
+        if(userData) this.userData = userData?.data;
+        console.log(this.userData)
+        this.updateFormFields(); // <== Actualiza los valores del formulario
+        if(userData) this.formGroup().patchValue(this.mapUserDataToForm(userData.data));
+    });
+  }
+
+  private destroy$ = new Subject<void>(); // Se usa para cancelar la suscripción
+  items: MenuItem[] | undefined;
+  visible = signal(false)
+  formComponent = viewChild(FormComponent);
+  private readonly formGroup = signal<FormGroup>(new FormGroup({}));
+  userData: User | null = null;
+
+
+  userProfileFormFields = signal<SharedFormField[]>([]);
+
+  onSubmit(value: any) {
+    const request: RegisterUserRequest = this.userService.convertToRegisterUserRequest(value);
+    console.log("Request: ", request);
+    const formComponent = this.formComponent();
+    this.userService.registerUser(request).subscribe({
+      next(response) {
+        const status = response.isSuccess ? "success" : "error";
+
+        const message = "Usuario registrado exitosamente";
+
+        const feedback: Feedback = { status, message };
+        formComponent?.resetForm(feedback);
+      },
+      error(err) {
+        const status = "error";
+        console.log(err)
+        const message = err.error.Errors[0].Message;
+        console.log("Message: ", message);
+        const feedback: Feedback = { status, message };
+        formComponent?.resetForm(feedback);
+      }
+    });
+  }
+
+  profileFormSettings = signal<SharedForm>({
+    fields: this.userProfileFormFields(),
+    baseButtonLabel: 'Editar perfil',
+    submittedButtonLabel: '¡Perfil editado satisfactoriamente!'
+  });
+
+  onFormCreated(form: FormGroup) {
+    this.formGroup.set(form);
+  }
+
+  showForm(){
+    this.visible = signal(!this.visible());
+  }
+
+  private updateFormFields(){
+    this.userProfileFormFields.set([
+      {
+        name: 'name',
+        label: 'Nombre',
+        type: 'text',
+        defaultValue: this.userData?.name,
+        validators: [Validators.required],
+        errorMessages: {
+          required: 'El nombre es requerido.'
+        }
+      },
+      {
+        name: 'lastname',
+        label: 'Apellido',
+        type: 'text',
+        defaultValue: this.userData?.lastname,
+        validators: [Validators.required, Validators.minLength(3), Validators.maxLength(200)],
+        errorMessages: {
+          required: 'El apellido es requerido.',
+          minLength: 'El apellido debe tener al menos 3 caracteres.',
+          maxLength: 'El apellido no puede tener más de 200 caracteres.'
+        }
+      },
+      {
+        name: 'username',
+        label: 'Usuario',
+        type: 'text',
+        defaultValue: this.userData?.username,
+        validators: [Validators.required, Validators.minLength(4), Validators.maxLength(25)],
+        errorMessages: {
+          required: 'El nombre de usuario es requerido.',
+          minLength: 'El nombre de usuario debe tener al menos 4 caracteres.',
+          maxLength: 'El nombre de usuario no puede tener más de 25 caracteres.'
+        }
+      },
+      {
+        name: 'email',
+        defaultValue: this.userData?.email,
+        label: 'Correo electrónico',
+        type: 'text',
+        icon: 'pi-at',
+        disabled: true
+      },
+      {
+        name: 'street',
+        label: 'Calle',
+        type: 'text',
+        defaultValue: this.userData?.address ? this.userData?.address.street : '',
+        icon: 'pi-map-marker',
+        validators: [Validators.required, Validators.maxLength(100)],
+        errorMessages: {
+          required: 'La calle es requerida.',
+          maxLength: 'La calle no puede tener más de 100 caracteres.'
+        }
+      },
+      {
+        name: 'city',
+        label: 'Ciudad',
+        type: 'text',
+        icon: 'pi-map',
+        defaultValue: this.userData?.address ? this.userData?.address.city : '',
+        validators: [Validators.required, Validators.maxLength(100)],
+        errorMessages: {
+          required: 'La ciudad es requerida.',
+          maxLength: 'La ciudad no puede tener más de 100 caracteres.'
+        }
+      },
+      {
+        name: 'postalCode',
+        label: 'Código postal',
+        icon: 'pi-address-book',
+        type: 'text',
+        defaultValue: this.userData?.address ? this.userData?.address.postalCode : '',
+        validators: [Validators.required, Validators.minLength(4), Validators.maxLength(6), Validators.pattern('^d{4,6}$')],
+        errorMessages: {
+          required: 'La calle es requerida.',
+          minLength: 'El código postal debe tener al menos 4 caracteres.',
+          maxLength: 'El código postal no puede tener más de 6 caracteres.',
+          pattern: 'El código postal debe ser un número.'
+        }
+      },
+      {
+        name: 'imageFile',
+        label: 'Subir imagen',
+        type: 'file',
+        validators: [],
+        filetype: 'image/*',
+        onFileSelect: (event: any) => {
+          if (event.files.length > 0) {
+            const file = event.files[0];
+            this.formGroup().patchValue({
+              imageFile: file,
+            });
+          }
+        }
+      }
+    ])
+
+    this.profileFormSettings.set({
+      ...this.profileFormSettings(),
+      fields: this.userProfileFormFields()
+    });
+  }
+  private mapUserDataToForm(user: User) {
+    return {
+      name: user.name,
+      lastname: user.lastname,
+      username: user.username,
+      email: user.email,
+      street: user.address?.street ?? '',
+      city: user.address?.city  ?? '',
+      postalCode: user.address?.postalCode  ?? '',
+    };
+  }
+}
