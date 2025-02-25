@@ -144,7 +144,7 @@ export class RegisterUserPageComponent {
 
   async loginWithGoogle() {
     try{
-      await this.userService.loginWithGoogle();
+      await this.userService.signUpWithGoogle();
     }catch (e) {
       console.log(e)
     }

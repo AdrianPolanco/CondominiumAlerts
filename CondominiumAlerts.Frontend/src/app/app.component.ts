@@ -5,6 +5,7 @@ import { ButtonModule } from 'primeng/button';
 import { PrimeNG } from 'primeng/config';
 import Aura from '@primeng/themes/aura';
 import { ToastModule } from 'primeng/toast';
+import {customPreset} from './theme';
 
 @Component({
   selector: 'app-root',
@@ -16,7 +17,7 @@ export class AppComponent implements OnInit {
 
   constructor(private primeng: PrimeNG) {
     this.primeng.theme.set({
-        preset: Aura,
+        preset: customPreset,
             options: {
                 cssLayer: {
                     name: 'primeng',

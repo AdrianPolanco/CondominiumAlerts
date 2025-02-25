@@ -3,7 +3,7 @@
     <h1
       class="mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl dark:text-white"
     >
-      Welcome back
+      ¡Bienvenido a Condominium Alerts!
     </h1>
   </div>
   <div class="flex justify-center">
@@ -11,7 +11,7 @@
       (click)="changeModalState()"
       class="w-full h-20 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition"
     >
-      Join a Condominium
+      Unéte a un condominio
     </button>
   </div>
 
@@ -22,7 +22,7 @@
       class="w-full max-w-[17rem] min-w-[10rem] aspect-square flex flex-col justify-center items-center bg-blue-200 rounded-lg p-4 cursor-pointer hover:bg-blue-300 transition"
       (click)="goToCreateCondominium()"
     >
-      <h3 class="text-lg font-semibold text-center">Create a Condominium</h3>
+      <h3 class="text-lg font-semibold text-center">Crea un condominio</h3>
     </div>
 
     <div
@@ -41,8 +41,8 @@
   class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
 >
   <div class="bg-white p-6 rounded-lg shadow-lg w-96">
-    <h2 class="text-xl font-semibold">Enter the Condominium Code</h2>
-    <p class="text-gray-600 mt-2">Please input the condominium code below.</p>
+    <h2 class="text-xl font-semibold">Introduce un código de condominio</h2>
+    <p class="text-gray-600 mt-2">Por favor, introduce un código de condominio aquí abajo.</p>
 
     <form [formGroup]="form" (ngSubmit)="joinCondominium()">
       <div class="mt-4">
@@ -63,14 +63,14 @@
           (click)="changeModalState()"
           class="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition"
         >
-          Close
+          Cerrar
         </button>
         <button
           type="submit"
           [disabled]="form.invalid"
           class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition"
         >
-          Submit
+          Unirse
         </button>
       </div>
     </form>

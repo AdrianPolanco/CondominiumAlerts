@@ -8,12 +8,13 @@ import { CondominiumService } from '../../services/condominium.service';
 import { AddCondominiumCommand } from '../../models/condominium.model';
 import { Router } from '@angular/router';
 import { Feedback } from '../../../../shared/components/form/feedback.interface';
+import {ButtonDirective} from 'primeng/button';
 
 @Component({
     selector: 'app-condominium-page',
     templateUrl: './condominium-page.component.html',
     styleUrls: ['./condominium-page.component.css'],
-    imports: [FormComponent]
+  imports: [FormComponent, ButtonDirective]
 })
 export class CondominiumPageComponent {
 
@@ -33,7 +34,7 @@ export class CondominiumPageComponent {
             type: 'text',
             validators: [Validators.required],
             errorMessages: {
-                required: 'Name is required'
+                required: 'El nombre es requerido.'
             }
         },
         {
@@ -42,12 +43,12 @@ export class CondominiumPageComponent {
             type: 'text',
             validators: [Validators.required],
             errorMessages: {
-                required: 'Address is required'
+                required: 'La dirección es requerida.'
             }
         },
         {
             name: 'imageFile',
-            label: 'Upload Image',
+            label: 'Subir imagen',
             type: 'file',
             filetype: 'image/*',
             onFileSelect: (event: any) => {
@@ -63,8 +64,8 @@ export class CondominiumPageComponent {
 
     condominiumFormSettings = signal<SharedForm>({
         fields: this.condominiumFormFields(),
-        baseButtonLabel: 'Submit',
-        submittedButtonLabel: 'Submitted Successfully'
+        baseButtonLabel: 'Enviar',
+        submittedButtonLabel: '¡Enviado satisfactoriamente!'
     });
 
     onFormCreated(form: FormGroup) {
@@ -80,13 +81,13 @@ export class CondominiumPageComponent {
             next: (response) => {
                 formComponent?.resetForm({
                     status: 'success',
-                    message: 'Condominium created successfully!',
+                    message: '¡Condominio creado satisfactoriamente!',
                 });
             },
             error: (err) => {
                 formComponent?.resetForm({
                     status: 'error',
-                    message: err.error?.message || 'An error occurred while creating the condominium.',
+                    message: err.error?.message || 'Ha ocurrido un error mientras se creaba el condominio.',
                 });
             }
         });
