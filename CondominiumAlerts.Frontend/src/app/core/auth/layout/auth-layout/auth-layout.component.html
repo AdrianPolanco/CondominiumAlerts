@@ -17,9 +17,13 @@
   </p-toolbar>
 </header>
 <p-dialog [(visible)]="visible" [modal]="true" [style]="{ width: '25rem' }">
-  <h1 class="text-center text-3xl">Mi perfil</h1>
-  <div class="flex justify-center items-center w-full">
-    <p-image src="https://primefaces.org/cdn/primeng/images/galleria/galleria10.jpg" alt="Image" width="250" [preview]="true" />
+  <h1 class="text-center text-3xl mb-5">Mi perfil</h1>
+  <div class="flex justify-center items-center w-full rounded-full">
+    @if(imageUrl()){
+      <p-image styleClass="rounded-full" src="{{imageUrl()}}" alt="Image" width="200" [preview]="true" />
+    }@else{
+      <p-image styleClass="rounded-full" src="images/default-profile-pic.png" alt="Image" width="200" [preview]="true" />
+    }
   </div>
   <shared-form
     [formSettingsInput]="profileFormSettings()"

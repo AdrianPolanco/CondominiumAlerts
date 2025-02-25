@@ -1,8 +1,7 @@
-import {Component, OnDestroy, OnInit, signal, viewChild} from '@angular/core';
+import {Component, effect, OnDestroy, OnInit, signal, viewChild} from '@angular/core';
 import {Toolbar} from 'primeng/toolbar';
 import {IconField} from 'primeng/iconfield';
 import {InputIcon} from 'primeng/inputicon';
-import {MenuItem} from 'primeng/api';
 import {RouterOutlet} from '@angular/router';
 import {InputText} from 'primeng/inputtext';
 import {NgOptimizedImage} from '@angular/common';
@@ -12,12 +11,11 @@ import {SharedFormField} from '../../../../shared/components/form/shared-form-fi
 import {FormGroup, Validators} from '@angular/forms';
 import {SharedForm} from '../../../../shared/components/form/shared-form.interface';
 import {FormComponent} from '../../../../shared/components/form/form.component';
-import {RegisterUserRequest} from '../../../register/models/RegisterUserRequest';
 import {Feedback} from '../../../../shared/components/form/feedback.interface';
 import {UserService} from '../../../services/user.service';
 import {Image} from 'primeng/image';
-import {User, UserData} from './user.type';
-import {interval, Subject, takeUntil} from 'rxjs';
+import {User} from './user.type';
+import {Subject, takeUntil} from 'rxjs';
 import {AutoUnsubscribe} from '../../../../shared/decorators/autounsuscribe.decorator';
 
 @AutoUnsubscribe()
@@ -38,10 +36,15 @@ import {AutoUnsubscribe} from '../../../../shared/decorators/autounsuscribe.deco
   templateUrl: './auth-layout.component.html',
   styleUrl: './auth-layout.component.css'
 })
-export class AuthLayoutComponent implements OnInit{
+export class AuthLayoutComponent implements OnInit, OnDestroy{
 
   constructor(private userService: UserService) {
-
+    effect(() => {
+      if(!this.visible()) {
+        this.formGroup().reset();
+        this.imageUrl.set(this.userData?.profilePictureUrl);
+      };
+    })
   }
 
   ngOnInit() {
@@ -56,24 +59,22 @@ export class AuthLayoutComponent implements OnInit{
   }
 
   private destroy$ = new Subject<void>(); // Se usa para cancelar la suscripción
-  items: MenuItem[] | undefined;
   visible = signal(false)
   formComponent = viewChild(FormComponent);
   private readonly formGroup = signal<FormGroup>(new FormGroup({}));
   userData: User | null = null;
-
+  imageUrl = signal(this.userData?.profilePictureUrl)
 
   userProfileFormFields = signal<SharedFormField[]>([]);
 
   onSubmit(value: any) {
-    const request: RegisterUserRequest = this.userService.convertToRegisterUserRequest(value);
-    console.log("Request: ", request);
     const formComponent = this.formComponent();
-    this.userService.registerUser(request).subscribe({
+
+    this.userService.editProfile(value).subscribe({
       next(response) {
         const status = response.isSuccess ? "success" : "error";
 
-        const message = "Usuario registrado exitosamente";
+        const message = "Perfil editado correctamente.";
 
         const feedback: Feedback = { status, message };
         formComponent?.resetForm(feedback);
@@ -100,7 +101,11 @@ export class AuthLayoutComponent implements OnInit{
   }
 
   showForm(){
-    this.visible = signal(!this.visible());
+    this.visible.set(!this.visible());
+    if (this.visible() && this.userData) {
+      this.formGroup().patchValue(this.mapUserDataToForm(this.userData)); // Vuelve a llenar el formulario
+      this.imageUrl.set(this.userData?.profilePictureUrl); // Restablece la imagen del usuario
+    }
   }
 
   private updateFormFields(){
@@ -197,6 +202,7 @@ export class AuthLayoutComponent implements OnInit{
             this.formGroup().patchValue({
               imageFile: file,
             });
+            if(file) this.imageUrl.set(URL.createObjectURL(file));
           }
         }
       }
@@ -217,5 +223,9 @@ export class AuthLayoutComponent implements OnInit{
       city: user.address?.city  ?? '',
       postalCode: user.address?.postalCode  ?? '',
     };
+  }
+
+  ngOnDestroy() {
+    this.formGroup().reset();
   }
 }

@@ -126,7 +126,7 @@ export class RegisterUserPageComponent {
       next(response) {
         const status = response.isSuccess ? "success" : "error";
 
-        const message = "Usuario registrado exitosamente";
+        const message = "Usuario registrado exitosamente.";
 
         const feedback: Feedback = { status, message };
         formComponent?.resetForm(feedback);
