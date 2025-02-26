@@ -8,16 +8,19 @@ import { CondominiumService } from '../../services/condominium.service';
 import { AddCondominiumCommand } from '../../models/condominium.model';
 import { Router } from '@angular/router';
 import { Feedback } from '../../../../shared/components/form/feedback.interface';
-
+import {Button} from 'primeng/button';
+import {Toolbar} from 'primeng/toolbar';
+import {NgOptimizedImage} from '@angular/common';
+import { AuthService } from '../../../../core/auth/services/auth.service';
 @Component({
     selector: 'app-condominium-page',
     templateUrl: './condominium-page.component.html',
     styleUrls: ['./condominium-page.component.css'],
-    imports: [FormComponent]
+    imports: [FormComponent,Button,Toolbar,NgOptimizedImage]
 })
 export class CondominiumPageComponent {
 
-    constructor(private condominiumService: CondominiumService, private router: Router) {}
+    constructor(private condominiumService: CondominiumService, private router: Router, private authService: AuthService) {}
 
     // Signal for the form group
     private readonly formGroup = signal<FormGroup>(new FormGroup({}));
@@ -73,6 +76,10 @@ export class CondominiumPageComponent {
     goToMainPage(){
       this.router.navigate(["condominium/main-page"])
     }
+    goHome(){
+        this.authService.logout();
+        this.router.navigate(['']);
+      }
 
     onSubmit(value: AddCondominiumCommand) {
         const formComponent = this.formComponent();

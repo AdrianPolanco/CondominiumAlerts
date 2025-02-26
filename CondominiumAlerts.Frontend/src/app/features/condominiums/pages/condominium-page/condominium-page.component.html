@@ -1,9 +1,33 @@
+<p-toolbar styleClass="rounded-none w-full flex justify-between">
+  <ng-template #start>
+    <div class="flex justify-start">
+      <img
+        ngSrc="images/condominiumAlertsLogo.jpg"
+        alt="Condominium Alerts Logo"
+        width="55"
+        height="55"
+      />
+    </div>
+  </ng-template>
+  <ng-template #end>
+    <p-button icon="pi pi-home" class="mr-2" text severity="secondary" />
+    <a (click)="goHome()" class="font-bold">
+      <p-button
+        label="logOut"
+        icon="pi pi-sign-out"
+        class="mr-2"
+        severity="danger"
+      />
+    </a>
+  </ng-template>
+</p-toolbar>
+
 <div class="w-[90%] mx-auto p-5 space-y-6">
   <div class="flex justify-center place-items-center">
     <h1
       class="mb-4 text-4xl m-8 font-extrabold leading-none tracking-tight text-gray-900 md:text-4xl lg:text-4xl dark:text-white"
     >
-      Create your Condominium
+      Crea tu Condominio
     </h1>
   </div>
   <div class="flex justify-center place-items-center">
