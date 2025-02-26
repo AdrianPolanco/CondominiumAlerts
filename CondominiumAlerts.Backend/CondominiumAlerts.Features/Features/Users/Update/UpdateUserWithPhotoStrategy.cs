@@ -49,15 +49,16 @@ public class UpdateUserWithPhotoStrategy : IUpdateUserStrategy
         if(!CanHandle(input) && _innerStrategy.CanHandle(input)) return result;
         
         var oldProfilePictureUrl = result.Value.ProfilePictureUrl;
-        
-        if(oldProfilePictureUrl is null) return result;
-        
-        var oldProfilePictureId = ExtractImageIdFromUrl(oldProfilePictureUrl);
-        
-        var deleteParams = new DeletionParams(oldProfilePictureId);
-        var deleteResult =  await _retryPolicy.ExecuteAsync(async () => await _cloudinary.DestroyAsync(deleteParams));
-        
-        if (deleteResult.StatusCode != HttpStatusCode.OK) return Result<UpdateUserResponse>.Fail($"No se pudo eliminar la imagen anterior. Id {oldProfilePictureId}. Código: {deleteResult.StatusCode}. Error: {deleteResult.Error}. Url: {oldProfilePictureUrl}");
+
+        if (!string.IsNullOrEmpty(oldProfilePictureUrl))
+        {
+            var oldProfilePictureId = ExtractImageIdFromUrl(oldProfilePictureUrl);
+            var deleteParams = new DeletionParams(oldProfilePictureId);
+            var deleteResult =  await _retryPolicy.ExecuteAsync(async () => await _cloudinary.DestroyAsync(deleteParams));
+                    
+            if (deleteResult.StatusCode != HttpStatusCode.OK) return Result<UpdateUserResponse>.Fail($"No se pudo eliminar la imagen anterior. Id {oldProfilePictureId}. Código: {deleteResult.StatusCode}. Error: {deleteResult.Error}. Url: {oldProfilePictureUrl}");
+        }
+
 
         var uploadParams = new ImageUploadParams
         {

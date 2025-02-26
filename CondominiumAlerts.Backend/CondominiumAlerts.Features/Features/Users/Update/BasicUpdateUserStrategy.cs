@@ -41,9 +41,10 @@ public class BasicUpdateUserStrategy : IUpdateUserStrategy
         
         User user = await _repository.GetByIdAsync(input.Id, cancellationToken);
         
-        user.Name = input.Username;
+        user.Name = input.Name;
         user.Lastname = input.Lastname;
         user.Address = input.Address;
+        user.Username = input.Username;
         
         user = await _repository.UpdateAsync(user, cancellationToken)!;
 

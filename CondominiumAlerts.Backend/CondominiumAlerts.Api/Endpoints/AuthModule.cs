@@ -1,6 +1,7 @@
 ﻿using System.Security.Claims;
 using Carter;
 using CondominiumAlerts.Domain.Aggregates.Entities;
+using CondominiumAlerts.Domain.Aggregates.ValueObjects;
 using CondominiumAlerts.Domain.Repositories;
 using CondominiumAlerts.Features.Features.Users;
 using CondominiumAlerts.Features.Features.Users.Register;
@@ -37,12 +38,33 @@ public class AuthModule : ICarterModule
 
             }).RequireAuthorization();
         
-        app.MapPut("/users/edit", async (ClaimsPrincipal claims, UpdateUserCommand command, ISender sender, CancellationToken cancellationToken) =>
+        app.MapPut("/users/edit", async (ClaimsPrincipal claims, HttpContext context, ISender sender, CancellationToken cancellationToken) =>
         {
             var currentUserId = claims.FindFirst("user_id")?.Value;
             
             if (currentUserId == null) return Results.BadRequest("El id del usuario no existe.");
-            var updateUserCommand = new UpdateUserCommand(currentUserId, command.Username, command.Name, command.Lastname, command.ProfilePic, command.Address);
+            
+            var form = await context.Request.ReadFormAsync(); // Leer FormData
+
+            // Extraer datos del formulario
+            var id = form["id"];
+            var username = form["username"];
+            var name = form["name"];
+            var lastname = form["lastname"];
+            var street = form["address.street"];
+            var city = form["address.city"];
+            var postalCode = form["address.postalCode"];
+            // Obtener archivo
+            var profilePic = form.Files.GetFile("profilePic");
+            
+            var address = new Address(street, city, postalCode);
+            
+            if (currentUserId != id || string.IsNullOrWhiteSpace(currentUserId.Trim()))
+                return Results.BadRequest(new
+                    { IsSuccess = false, Message = "El id del usuario no coincide con tus credenciales." });
+            
+            var updateUserCommand = new UpdateUserCommand(currentUserId, username, name, lastname, profilePic, address);
+
             var result = await sender.Send(updateUserCommand, cancellationToken);
             if(result.IsFailed) return Results.BadRequest(result);
 
