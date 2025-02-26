@@ -17,7 +17,7 @@ export class CondominiumService {
         const fb = new FormData();
         fb.append('name', cmd.name);
         fb.append('address', cmd.address);
-        fb.append('imageFile',cmd.imageFile);
+        fb.append('imageFile',cmd.profilePic);
         return this.httpClient.post<AddCondominiumResponse>(
             "/api/condominium",
             fb,

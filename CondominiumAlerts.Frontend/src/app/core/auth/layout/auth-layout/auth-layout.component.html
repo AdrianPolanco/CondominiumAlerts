@@ -11,7 +11,11 @@
     </ng-template>
     <ng-template #end>
       <button (click)="showForm()" class="flex justify-center items-center">
-        <p-avatar icon="pi pi-user" class="mr-2" size="large" shape="circle" />
+        @if(userData?.profilePictureUrl){
+          <p-avatar [image]="userData?.profilePictureUrl" class="mr-2" size="large" shape="circle" />
+        }@else{
+          <p-avatar icon="pi pi-user" class="mr-2" size="large" shape="circle" />
+        }
       </button>
     </ng-template>
   </p-toolbar>

@@ -1,7 +1,7 @@
 export interface AddCondominiumCommand {
     name: string;
     address: string;
-    imageFile: File;
+    profilePic: File;
 }
 
 export interface JoinCondominiumCommand{

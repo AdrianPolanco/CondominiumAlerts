@@ -55,7 +55,7 @@ export class CondominiumPageComponent {
                 if (event.files.length > 0) {
                     const file = event.files[0];
                     this.formGroup().patchValue({
-                        imageFile: file,
+                        profilePic: file,
                     });
                 }
             }

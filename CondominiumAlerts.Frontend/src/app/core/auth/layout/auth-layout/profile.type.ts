@@ -12,6 +12,8 @@ export type PartialProfile = {
   };
 }
 
+export type EditProfileRequest = PartialProfile & { profilePic: File | null; }
+
 export type EditProfileResponse = {
   isSuccess: boolean;
   data: any;

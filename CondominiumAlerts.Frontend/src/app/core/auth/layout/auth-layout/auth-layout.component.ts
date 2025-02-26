@@ -15,7 +15,7 @@ import {Feedback} from '../../../../shared/components/form/feedback.interface';
 import {UserService} from '../../../services/user.service';
 import {Image} from 'primeng/image';
 import {User} from './user.type';
-import {Subject, takeUntil} from 'rxjs';
+import {delay, Subject, takeUntil, tap} from 'rxjs';
 import {AutoUnsubscribe} from '../../../../shared/decorators/autounsuscribe.decorator';
 
 @AutoUnsubscribe()
@@ -56,6 +56,10 @@ export class AuthLayoutComponent implements OnInit, OnDestroy{
         this.updateFormFields(); // <== Actualiza los valores del formulario
         if(userData) this.formGroup().patchValue(this.mapUserDataToForm(userData.data));
     });
+
+    this.userService.userToken$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(token => this.token = token);
   }
 
   private destroy$ = new Subject<void>(); // Se usa para cancelar la suscripción
@@ -63,21 +67,34 @@ export class AuthLayoutComponent implements OnInit, OnDestroy{
   formComponent = viewChild(FormComponent);
   private readonly formGroup = signal<FormGroup>(new FormGroup({}));
   userData: User | null = null;
+  token: string | null = null;
   imageUrl = signal(this.userData?.profilePictureUrl)
 
   userProfileFormFields = signal<SharedFormField[]>([]);
 
   onSubmit(value: any) {
     const formComponent = this.formComponent();
-
-    this.userService.editProfile(value).subscribe({
+    const formGroup = this.formGroup();
+    const visible = this.visible;
+    console.log('VALUE', value)
+    this.userService.editProfile(value, this.token).subscribe({
       next(response) {
+
         const status = response.isSuccess ? "success" : "error";
-
+        console.log('RESPONSE SUCCESS', response)
         const message = "Perfil editado correctamente.";
+        formGroup.reset(response.data)
 
-        const feedback: Feedback = { status, message };
-        formComponent?.resetForm(feedback);
+        setTimeout(() => {
+          const feedback: Feedback = { status, message };
+          formComponent?.resetForm(feedback);
+        }, 100);
+
+        // Cierra el modal después de la actualización exitosa
+        setTimeout(() => {
+          visible.set(false);
+          formGroup.reset();
+        }, 5000);
       },
       error(err) {
         const status = "error";
@@ -191,7 +208,7 @@ export class AuthLayoutComponent implements OnInit, OnDestroy{
         }
       },
       {
-        name: 'imageFile',
+        name: 'profilePic',
         label: 'Subir imagen',
         type: 'file',
         validators: [],
@@ -200,7 +217,7 @@ export class AuthLayoutComponent implements OnInit, OnDestroy{
           if (event.files.length > 0) {
             const file = event.files[0];
             this.formGroup().patchValue({
-              imageFile: file,
+              profilePic: file,
             });
             if(file) this.imageUrl.set(URL.createObjectURL(file));
           }

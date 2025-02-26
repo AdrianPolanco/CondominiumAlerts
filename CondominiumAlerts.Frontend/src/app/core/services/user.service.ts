@@ -2,11 +2,16 @@ import { Injectable } from '@angular/core';
 import {HttpClient, HttpErrorResponse} from '@angular/common/http';
 import {RegisterUserResponse} from '../register/models/RegisterUserResponse';
 import {RegisterUserRequest} from '../register/models/RegisterUserRequest';
-import {Auth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged} from '@angular/fire/auth';
+import {Auth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, idToken} from '@angular/fire/auth';
 import {signOut} from 'firebase/auth';
-import {EditProfileResponse, PartialProfile, Profile} from '../auth/layout/auth-layout/profile.type';
+import {
+  EditProfileRequest,
+  EditProfileResponse,
+  PartialProfile,
+  Profile
+} from '../auth/layout/auth-layout/profile.type';
 import {Router} from '@angular/router';
-import {BehaviorSubject, firstValueFrom} from 'rxjs';
+import {BehaviorSubject, delay, firstValueFrom, of, tap} from 'rxjs';
 import {UserData} from '../auth/layout/auth-layout/user.type';
 
 
@@ -17,6 +22,8 @@ export class UserService{
 
   private userDataSubject = new BehaviorSubject<UserData | null>(null);
   userData$ = this.userDataSubject.asObservable();
+  private userTokenSubject = new BehaviorSubject<string | null>(null);
+  userToken$ = this.userTokenSubject.asObservable();
 
   constructor(private httpClient: HttpClient, private auth: Auth, private router: Router) {
     // Escuchar cambios en la autenticación, cuando el usuario se autentique, obtener sus datos automáticamente y emitir los datos a los suscriptores
@@ -27,6 +34,10 @@ export class UserService{
         this.userDataSubject.next(null);
       }
     });
+
+    idToken(this.auth).subscribe(token => {
+      this.userTokenSubject.next(token);
+    })
   }
 
   registerUser(registerUserRequest: RegisterUserRequest) {
@@ -118,12 +129,12 @@ export class UserService{
 
       this.userDataSubject.next(userData);
     } catch (error) {
-      //console.error("Error en getUserData:", error);
+      console.error("Error en getUserData:", error);
 
       // Si es un error de HTTP, imprime más detalles
-      /*if (error instanceof HttpErrorResponse) {
+      if (error instanceof HttpErrorResponse) {
         console.error("HTTP Error:", error.status, error.message, error.error);
-      }*/
+      }
 
       this.userDataSubject.next(null);
     }
@@ -139,26 +150,38 @@ export class UserService{
     };
   }
 
-  private convertToProfileRequest(data: any): PartialProfile {
+  private convertToProfileRequest(data: any): FormData {
 
     const currentUserId = this.auth.currentUser?.uid;
+    const formData = new FormData();
 
-    return {
-      id: currentUserId!,
-      username: data.username,
-      name: data.name,
-      lastname: data.lastname,
-      address: {
-        street: data.street,
-        city: data.city,
-        postalCode: data.postalCode
-      },
+    formData.append("id", currentUserId!);
+    formData.append("username", data.username);
+    formData.append("name", data.name);
+    formData.append("lastname", data.lastname);
+    formData.append("address.street", data.street);
+    formData.append("address.city", data.city);
+    formData.append("address.postalCode", data.postalCode);
+
+    if (data.profilePic) {
+      formData.append("profilePic", data.profilePic); // Asegurar que es de tipo File
     }
+
+    return formData;
   }
 
-  editProfile(data: any) {
-    const profile = this.convertToProfileRequest(data);
-    return this.httpClient.put<EditProfileResponse>('/api/users/edit', profile);
+  editProfile(data: any, token: string | null) {
+    const formData = this.convertToProfileRequest(data);
+    console.log({profile: formData, token})
+    if(!token) throw new Error("No hay token de usuario");
+    return this.httpClient.put<EditProfileResponse>('/api/users/edit', formData, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }).pipe(
+      delay(5000), // Esperar 5 segundos antes de llamar getUserData
+      tap(() => this.getUserData())
+    )
   }
 
 }

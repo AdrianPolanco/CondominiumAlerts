@@ -59,7 +59,7 @@
       @if (field.type === 'file' && isFileField(field)) {
         <p-fileUpload
           [id]="field.name"
-          name="imageFile"
+          [name]="field.name"
           mode="basic"
           [chooseLabel]="field.label"
           (onSelect)="field.onFileSelect($event)"
