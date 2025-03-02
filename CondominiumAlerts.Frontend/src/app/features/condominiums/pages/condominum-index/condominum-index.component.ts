@@ -15,7 +15,37 @@ export class CondominumIndexComponent {
   constructor(private router: Router){
 
   }
-  users = [{}]
+  users = [{
+    img: "https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg",
+    unReadMessages: 100
+  },{
+    img: "https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg",
+    unReadMessages: 1000
+  },{
+    img: "https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg",
+    unReadMessages: 0
+  },{
+    img: "https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg",
+    unReadMessages: 10
+  },{
+    img: "https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg",
+    unReadMessages: 10
+  },{
+    img: "https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg",
+    unReadMessages: 0
+  },{
+    img: "https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg",
+    unReadMessages: 5
+  },{
+    img: "https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg",
+    unReadMessages: 0
+  },{
+    img: "https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg",
+    unReadMessages: 20
+  },{
+    img: "https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg",
+    unReadMessages: 50
+  },]
 goHome(){
  // this.router.navigate([""])
 }

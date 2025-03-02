@@ -23,11 +23,26 @@
 <div class="flex min-h-screen">
   <div class="w-50 bg-gray-800 text-white p-5">
     <div class="text-lg font-semibold mb-5">Users</div>
-    <div *ngFor="let user of users" class="mb-3 flex items-center space-x-2">
-      <!-- <div class="text-gray-300">{{ user.name }}</div>
-      <div class="bg-red-500 text-white text-xs px-2 rounded-full">
-        {{ user.unreadMessages }}
-      </div> -->
+    <div *ngFor="let user of users" class="mb-4 flex items-center space-x-2">
+      <div
+        class="hover:cursor-pointer transition delay-110 duration-200 ease-in-out hover:space-x-1 hover:scale-110"
+      >
+        <div
+          *ngIf="user.unReadMessages > 0"
+          class="bg-red-500 text-white text-xs px-2 rounded-full shrink-0 grow-0 absolute left-2"
+        >
+          {{ user.unReadMessages }}
+        </div>
+        <div class="text-gray-300 mt-2">
+          <img
+            src="{{ user.img }}"
+            class="rounded-full shrink-0 grow-0"
+            alt="userImage"
+            width="40"
+            height="40"
+          />
+        </div>
+      </div>
       <!-- TODO: Make the users be dynamiclly render -->
     </div>
   </div>
