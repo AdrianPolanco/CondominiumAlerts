@@ -32,4 +32,8 @@ export class CondominiumService {
       return this.httpClient.post<JoinCondominiumResponce>(
         "/api/condominium/join", fb)
     }
+
+    //TODO: Create the get condominium feature and method
+    
+    //TODO: Create the get condominium users mesages side bar feature and method
 }

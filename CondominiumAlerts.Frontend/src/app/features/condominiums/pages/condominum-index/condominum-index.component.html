@@ -1,0 +1,63 @@
+<p-toolbar styleClass="rounded-none w-full flex justify-between">
+  <ng-template #start>
+    <div class="flex justify-start">
+      <img
+        ngSrc="images/condominiumAlertsLogo.jpg"
+        alt="Condominium Alerts Logo"
+        width="55"
+        height="55"
+      />
+    </div>
+  </ng-template>
+  <ng-template #end>
+    <a (click)="goHome()" class="font-bold">
+      <p-button
+        label="logOut"
+        icon="pi pi-sign-out"
+        class="mr-2"
+        severity="danger"
+      />
+    </a>
+  </ng-template>
+</p-toolbar>
+<div class="flex min-h-screen">
+  <div class="w-50 bg-gray-800 text-white p-5">
+    <div class="text-lg font-semibold mb-5">Users</div>
+    <div *ngFor="let user of users" class="mb-3 flex items-center space-x-2">
+      <!-- <div class="text-gray-300">{{ user.name }}</div>
+      <div class="bg-red-500 text-white text-xs px-2 rounded-full">
+        {{ user.unreadMessages }}
+      </div> -->
+      <!-- TODO: Make the users be dynamiclly render -->
+    </div>
+  </div>
+
+  <div class="flex-1 bg-gray-100 p-5">
+    <div class="flex absolute right-2">
+      <div class="flex space-x-4">
+        <button
+          class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md"
+        >
+          New Post
+        </button>
+      </div>
+    </div>
+
+    <div>
+      <h2 class="text-2xl font-semibold mb-4">Publications</h2>
+
+      <!-- <div
+        *ngFor="let publication of publications"
+        class="bg-white p-4 mb-4 shadow-md rounded-lg"
+      >
+        <h3 class="font-bold text-lg">{{ publication.title }}</h3>
+        <p class="text-gray-700">{{ publication.content }}</p>
+        <p class="text-gray-500 text-sm mt-2">
+          Posted by: {{ publication.user }}
+        </p>
+      </div> -->
+
+      <!-- TODO: Make the publications be dynamiclly render -->
+    </div>
+  </div>
+</div>

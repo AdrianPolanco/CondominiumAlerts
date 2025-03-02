@@ -41,4 +41,9 @@ export const routes: Routes = [
     loadComponent: () => import('./features/condominiums/pages/condominiums-main-page/condominiums-main-page.component')
                                         .then(c => c.CondominiumsMainPageComponent)
   },
+  {
+    path: "condominium/index",
+    loadComponent: () => import('./features/condominiums/pages/condominum-index/condominum-index.component')
+                                        .then(c => c.CondominumIndexComponent)
+  },
 ];
