@@ -3,21 +3,25 @@ import { FormBuilder, FormGroup, Validators,ReactiveFormsModule  } from '@angula
 import { CondominiumService } from '../../services/condominium.service';
 import { NgFor, CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-
+import {Button} from 'primeng/button';
+import {Toolbar} from 'primeng/toolbar';
+import {NgOptimizedImage} from '@angular/common';
+import { AuthService } from '../../../../core/auth/services/auth.service';
 @Component({
   selector: 'app-condominiums-main-page',
-  imports: [NgFor, CommonModule,ReactiveFormsModule ],
+  imports: [NgFor, CommonModule,ReactiveFormsModule,Button,Toolbar,NgOptimizedImage],
   templateUrl: './condominiums-main-page.component.html',
   styleUrls: ['./condominiums-main-page.component.css']
 })
 export class CondominiumsMainPageComponent {
   form: FormGroup;
   isModalOpen: boolean = false;
-
-  constructor(private fb: FormBuilder, private condominiumService: CondominiumService, private router: Router) {
+  errorText:string = "";
+  constructor(private fb: FormBuilder, private condominiumService: CondominiumService, private router: Router, private authService: AuthService) {
+ // console.log(this.authService.currentUser?.uid)
     this.form = this.fb.group({
       condominiumCode: ['', Validators.required],
-      userId: ['08098098']
+      userId: ['']
     });
   }
 
@@ -34,19 +38,25 @@ export class CondominiumsMainPageComponent {
 
   joinCondominium() {
     console.log('Joining a condominium...');
+  //  console.log(this.authService.currentUser?.uid);
+    this.form.patchValue({
+      userId: this.authService.currentUser?.uid,
+    });
 
     if (this.form.invalid) {
       console.log('Form is invalid.');
       return;
     }
     const formData = this.form.value;
-    
+    //    console.log(formData);
+
     this.condominiumService.join(formData).subscribe({
       next: (result) => {
-        console.log('Joined successfully:', result);
+       // console.log('Joined successfully:', result);
       },
       error: (err) => {
-        console.error('Error joining condominium:', err);
+       // console.error('Error joining condominium:', err);
+        this.errorText = err.error.Errors[0].Message;
       }
     });
   }
@@ -55,12 +65,16 @@ export class CondominiumsMainPageComponent {
     console.log('Creating a new condominium...');
     this.router.navigate(['/condominium/create']);
   }
-
+  goHome(){
+    this.authService.logout();
+    this.router.navigate(['']);
+  }
   viewCondominium(id: number) {
     console.log(`Viewing condominium ID: ${id}`);
   }
 
   changeModalState() {
     this.isModalOpen = !this.isModalOpen;
+    this.errorText = "";
   }
 }
