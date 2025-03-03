@@ -19,5 +19,5 @@ public sealed class User : IAggregateRoot<string>
     public IReadOnlyCollection<Message>? MessagesCreatedByUser { get; set; }
     public IReadOnlyCollection<Message>? MessagesReceivedByUser { get; set; }
     public IReadOnlyCollection<Notification>? NotificationsReceivedByUser { get; set; }
-    public IReadOnlyCollection<Condominium>? Condominiums { get; set; }
+    public IReadOnlyCollection<CondominiumUser>? Condominiums { get; set; }
 }

@@ -1,15 +1,11 @@
 ﻿using Carter;
-using CondominiumAlerts.Features.Features.Condominium;
 using CondominiumAlerts.Features.Features.Condominium.Add;
+using CondominiumAlerts.Features.Features.Condominium.Get;
 using CondominiumAlerts.Features.Features.Condominium.Join;
-using FirebaseAdmin.Auth;
 using LightResults;
 using Mapster;
 using MediatR;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using Org.BouncyCastle.Asn1.Ocsp;
 
 namespace CondominiumAlerts.Api.Endpoints
 {
@@ -47,6 +43,21 @@ namespace CondominiumAlerts.Api.Endpoints
                 }
                 // TODO: Add anti forgery token in frontend: https://stackoverflow.com/a/77191406
             ).DisableAntiforgery();
+
+            app.MapGet("/condominium/GetById",
+                async (ISender sender, [FromBody] GetCondominiumCommand command, CancellationToken cancellationToken) =>
+                {
+                    Result<GetCondominiumResponce> result = await sender.Send(command, cancellationToken);
+
+                    if (!result.IsSuccess) return Results.BadRequest(result);
+
+                    var responce = new
+                    {
+                        IsSuccess = result.IsSuccess,
+                        Data = result.Value,
+                    };
+                    return Results.Ok(responce);    
+                });
         }
     }
 }

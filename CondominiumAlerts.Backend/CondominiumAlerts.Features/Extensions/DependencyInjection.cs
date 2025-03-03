@@ -1,6 +1,7 @@
 using System.Reflection;
 using CondominiumAlerts.CrossCutting.Behaviors;
 using CondominiumAlerts.Features.Features.Condominium.Add;
+using CondominiumAlerts.Features.Features.Condominium.Get;
 using CondominiumAlerts.Features.Features.Condominium.Join;
 using CondominiumAlerts.Features.Features.Posts.Get;
 using CondominiumAlerts.Features.Features.Users.Register;
@@ -25,6 +26,7 @@ public static class DependencyInjection
         services.AddScoped<IValidator<RegisterUserCommand>, RegisterUserValidator>();
         services.AddScoped<IValidator<JoinCondominiumCommand>, JoinCondominiumValidator>();
         services.AddScoped<IValidator<AddCondominiumCommand>, AddCondominiumValidator>();
+        services.AddScoped<IValidator<GetCondominiumCommand>, GetCondominiumValidator>();
 
         services.AddScoped<IRequestHandler<GetPostsCommand, Result<List<GetPostsResponse>>>, GetPostsHandler>();
         services.AddTransient<EmailConfirmationJob>();
