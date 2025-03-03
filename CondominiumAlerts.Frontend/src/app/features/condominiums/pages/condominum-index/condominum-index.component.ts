@@ -1,53 +1,58 @@
-import { Component, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { NgFor,CommonModule, NgOptimizedImage } from '@angular/common';
+import { Component, OnInit } from '@angular/core';
+import { NgFor, CommonModule, NgOptimizedImage } from '@angular/common';
 import { Router } from '@angular/router';
 import { Toolbar } from 'primeng/toolbar';
 import { Button } from 'primeng/button';
+import { PostService } from '../../../posts/services/post.service';
+
 @Component({
   selector: 'app-condominum-index',
-  imports: [Toolbar, NgFor,CommonModule, Button, NgOptimizedImage],
+  imports: [Toolbar, NgFor, CommonModule, Button, NgOptimizedImage],
   templateUrl: './condominum-index.component.html',
-  styleUrl: './condominum-index.component.css',
-  schemas:[CUSTOM_ELEMENTS_SCHEMA]
+  styleUrls: ['./condominum-index.component.css'],
 })
-export class CondominumIndexComponent {
+export class CondominumIndexComponent implements OnInit {
+  users = [
+    { name: 'Juan Pérez', status: 'En línea', avatar: 'https://via.placeholder.com/40' },
+    { name: 'María López', status: 'Ausente', avatar: 'https://via.placeholder.com/40' },
+    { name: 'Carlos Gómez', status: 'En línea', avatar: 'https://via.placeholder.com/40' },
+  ];
 
-  constructor(private router: Router){
+  notifications = [
+    { message: 'Nuevo mensaje de Juan', time: 'Hace 5 minutos' },
+    { message: 'Carlos ha publicado algo nuevo', time: 'Hace 1 hora' },
+    { message: 'María ha reaccionado a tu publicación', time: 'Hace 2 horas' },
+  ];
 
+  publications: any[] = [];
+
+  constructor(
+    private router: Router,
+    private postService: PostService
+  ) { }
+
+  ngOnInit(): void {
+    this.loadPosts();
   }
-  users = [{
-    img: "https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg",
-    unReadMessages: 100
-  },{
-    img: "https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg",
-    unReadMessages: 1000
-  },{
-    img: "https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg",
-    unReadMessages: 0
-  },{
-    img: "https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg",
-    unReadMessages: 10
-  },{
-    img: "https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg",
-    unReadMessages: 10
-  },{
-    img: "https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg",
-    unReadMessages: 0
-  },{
-    img: "https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg",
-    unReadMessages: 5
-  },{
-    img: "https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg",
-    unReadMessages: 0
-  },{
-    img: "https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg",
-    unReadMessages: 20
-  },{
-    img: "https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg",
-    unReadMessages: 50
-  },]
-goHome(){
- // this.router.navigate([""])
-}
 
+
+  loadPosts(): void {
+    this.postService.getPosts().subscribe({
+      next: (data) => {
+        console.log('Publicaciones recibidas:', data); 
+        this.publications = data;
+      },
+      error: (err) => {
+        console.error('Error al cargar las publicaciones:', err);
+      },
+    });
+  }
+
+  goHome(): void {
+    this.router.navigate(['']);
+  }
+
+  openCreatePostModal(): void {
+    console.log('Abrir modal de creación de publicaciones');
+  }
 }
