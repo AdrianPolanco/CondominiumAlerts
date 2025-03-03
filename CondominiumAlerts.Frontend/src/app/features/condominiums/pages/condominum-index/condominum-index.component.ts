@@ -35,6 +35,7 @@ export class CondominumIndexComponent implements OnInit {
     this.loadPosts();
   }
 
+
   loadPosts(): void {
     this.postService.getPosts().subscribe({
       next: (data) => {
