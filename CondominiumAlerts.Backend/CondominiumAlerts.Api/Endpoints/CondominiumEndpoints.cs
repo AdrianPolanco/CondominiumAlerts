@@ -1,6 +1,7 @@
 ﻿using Carter;
 using CondominiumAlerts.Features.Features.Condominium.Add;
 using CondominiumAlerts.Features.Features.Condominium.Get;
+using CondominiumAlerts.Features.Features.Condominium.GetCondominiumsJoinedByUser;
 using CondominiumAlerts.Features.Features.Condominium.Join;
 using LightResults;
 using Mapster;
@@ -56,6 +57,22 @@ namespace CondominiumAlerts.Api.Endpoints
                         IsSuccess = result.IsSuccess,
                         Data = result.Value,
                     };
+                    return Results.Ok(responce);    
+                });
+
+            app.MapGet("/condominium/GetCondominiumsJoinedByUser",
+                async (ISender sender, [FromBody] GetCondominiumsJoinedByUserCommand command, CancellationToken cancellationToken) =>
+                {
+                    Result<List<GetCondominiumsJoinedByUserResponce>> result = await sender.Send(command, cancellationToken);
+
+                    if (!result.IsSuccess) return Results.BadRequest(result);
+
+                    var responce = new
+                    {
+                        IsSuccess = result.IsSuccess,
+                        Data = result.Value,
+                    };
+
                     return Results.Ok(responce);    
                 });
         }
