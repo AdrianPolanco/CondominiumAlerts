@@ -49,8 +49,8 @@
           <h3 class="text-xl font-bold text-red-500">{{ publication.title }}</h3>
           <span class="text-sm text-gray-400">{{ publication.time }}</span>
         </div>
-        <p class="text-gray-300 mb-4">{{ publication.content }}</p>
-        <img *ngIf="publication.image" [src]="publication.image" alt="Publicación" class="w-full rounded-lg mb-4">
+        <p class="text-gray-300 mb-4">{{ publication.description }}</p>
+        <img *ngIf="publication.imageUrl" [src]="publication.imageUrl" alt="Publicación" class="w-full rounded-lg mb-4">
         <div class="mt-4 flex items-center space-x-4">
           <button class="text-red-500 hover:text-red-600">
             <i class="pi pi-thumbs-up"></i> Like
