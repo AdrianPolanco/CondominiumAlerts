@@ -5,6 +5,6 @@ namespace CondominiumAlerts.Features.Features.Condominium.GetCondominiumsJoinedB
     public record GetCondominiumsJoinedByUserResponse(
         Guid Id,
         string Name,
-        string Addres,
+        string Address,
         string ImageUrl);
 }

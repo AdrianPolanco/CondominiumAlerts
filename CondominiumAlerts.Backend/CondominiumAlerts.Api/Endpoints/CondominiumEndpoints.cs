@@ -46,7 +46,7 @@ namespace CondominiumAlerts.Api.Endpoints
             ).DisableAntiforgery();
 
             app.MapGet("/condominium/GetById",
-                async (ISender sender, [FromBody] GetCondominiumCommand command, CancellationToken cancellationToken) =>
+                async (ISender sender, [AsParameters] GetCondominiumCommand command, CancellationToken cancellationToken) =>
                 {
                     Result<GetCondominiumResponce> result = await sender.Send(command, cancellationToken);
 
@@ -61,7 +61,7 @@ namespace CondominiumAlerts.Api.Endpoints
                 });
 
             app.MapGet("/condominium/GetCondominiumsJoinedByUser",
-                async (ISender sender, [FromBody] GetCondominiumsJoinedByUserCommand command, CancellationToken cancellationToken) =>
+                async (ISender sender, [AsParameters] GetCondominiumsJoinedByUserCommand command, CancellationToken cancellationToken) =>
                 {
                     Result<List<GetCondominiumsJoinedByUserResponse>> result = await sender.Send(command, cancellationToken);
 

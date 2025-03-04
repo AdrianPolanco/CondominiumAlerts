@@ -49,7 +49,7 @@ namespace CondominiumAlerts.Features.Features.Condominium.Get
                 condominium.InviteCode, 
                 condominium.LinkToken,
                 condominium.TokenExpirationDate,
-                condominium.Users == null ? condominium.Users.Count : 0));
+                condominium.Users != null ? condominium.Users.Count : 0));
         }
     }
 }
