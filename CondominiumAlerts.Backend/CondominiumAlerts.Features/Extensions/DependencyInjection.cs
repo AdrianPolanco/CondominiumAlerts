@@ -5,6 +5,7 @@ using CondominiumAlerts.Features.Features.Condominium.Get;
 using CondominiumAlerts.Features.Features.Condominium.GetCondominiumsJoinedByUser;
 using CondominiumAlerts.Features.Features.Condominium.Join;
 using CondominiumAlerts.Features.Features.Posts.Get;
+using CondominiumAlerts.Features.Features.Users.GetCondominiumsUsers;
 using CondominiumAlerts.Features.Features.Users.Register;
 using FluentValidation;
 using LightResults;
@@ -30,7 +31,10 @@ public static class DependencyInjection
         services.AddScoped<IValidator<GetCondominiumCommand>, GetCondominiumValidator>();
         services.AddScoped<IValidator<GetCondominiumsJoinedByUserCommand>, GetCondominiumsJoinedByUserValidator>();
 
+        services.AddScoped<IValidator<GetCondominiumsUsersCommand>, GetCondominiumsUsersValidator>();
+
         services.AddScoped<IRequestHandler<GetPostsCommand, Result<List<GetPostsResponse>>>, GetPostsHandler>();
+
         services.AddTransient<EmailConfirmationJob>();
         return services;
     }

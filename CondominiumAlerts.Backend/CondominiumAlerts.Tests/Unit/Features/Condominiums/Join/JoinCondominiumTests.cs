@@ -64,7 +64,7 @@ namespace CondominiumAlerts.Tests.Unit.Features.Condominiums.Join
             _command.UserId = "OLrNj6uE0WWxeBMpHg9vf1ikirX2";
 
 
-            Result<JoinCondominiumResponce> result = await _handler.Handle(_command,default);
+            Result<JoinCondominiumResponse> result = await _handler.Handle(_command,default);
 
             Assert.False(result.IsSuccess);
             Assert.True(!string.IsNullOrEmpty(result.Error.Message));
@@ -79,7 +79,7 @@ namespace CondominiumAlerts.Tests.Unit.Features.Condominiums.Join
             _command.UserId = "OLrNj6uE0WWxeBMpHg9vf1ikirX2";
 
 
-            Result<JoinCondominiumResponce> result = await _handler.Handle(_command, default);
+            Result<JoinCondominiumResponse> result = await _handler.Handle(_command, default);
 
             Assert.False(result.IsSuccess);
             Assert.True(!string.IsNullOrEmpty(result.Error.Message));
@@ -94,7 +94,7 @@ namespace CondominiumAlerts.Tests.Unit.Features.Condominiums.Join
             _command.UserId = "OLrNj6uE0WWxeBMpHg9vf1ikirX2";
 
 
-            Result<JoinCondominiumResponce> result = await _handler.Handle(_command, default);
+            Result<JoinCondominiumResponse> result = await _handler.Handle(_command, default);
 
             Assert.False(result.IsSuccess);
             Assert.True(!string.IsNullOrEmpty(result.Error.Message));
@@ -110,7 +110,7 @@ namespace CondominiumAlerts.Tests.Unit.Features.Condominiums.Join
             _command.UserId = "OLrNj6uE0WWxeBMpHg9vf1ikirX2";
 
 
-            Result<JoinCondominiumResponce> result = await _handler.Handle(_command, default);
+            Result<JoinCondominiumResponse> result = await _handler.Handle(_command, default);
 
             Assert.False(result.IsSuccess);
             Assert.True(!string.IsNullOrEmpty(result.Error.Message));
@@ -126,7 +126,7 @@ namespace CondominiumAlerts.Tests.Unit.Features.Condominiums.Join
             _command.UserId = null;
 
 
-            Result<JoinCondominiumResponce> result = await _handler.Handle(_command, default);
+            Result<JoinCondominiumResponse> result = await _handler.Handle(_command, default);
 
             Assert.False(result.IsSuccess);
             Assert.True(!string.IsNullOrEmpty(result.Error.Message));
@@ -141,7 +141,7 @@ namespace CondominiumAlerts.Tests.Unit.Features.Condominiums.Join
             _command.UserId = "";
 
 
-            Result<JoinCondominiumResponce> result = await _handler.Handle(_command, default);
+            Result<JoinCondominiumResponse> result = await _handler.Handle(_command, default);
 
             Assert.False(result.IsSuccess);
             Assert.True(!string.IsNullOrEmpty(result.Error.Message));
@@ -155,7 +155,7 @@ namespace CondominiumAlerts.Tests.Unit.Features.Condominiums.Join
             _command.UserId = "OLrNj6uE0WWxeBMpHg9vf1ikirX2";
 
 
-            Result<JoinCondominiumResponce> result = await _handler.Handle(_command, default);
+            Result<JoinCondominiumResponse> result = await _handler.Handle(_command, default);
 
             Assert.False(result.IsSuccess);
             Assert.True(!string.IsNullOrEmpty(result.Error.Message));
@@ -172,7 +172,7 @@ namespace CondominiumAlerts.Tests.Unit.Features.Condominiums.Join
             _command.UserId = "OLrNj6uE0WWxeBMpHg9vf1ikirX2";
 
 
-            Result<JoinCondominiumResponce> result = await _handler.Handle(_command, default);
+            Result<JoinCondominiumResponse> result = await _handler.Handle(_command, default);
 
             Assert.False(result.IsSuccess);
             Assert.True(!string.IsNullOrEmpty(result.Error.Message));
@@ -195,7 +195,7 @@ namespace CondominiumAlerts.Tests.Unit.Features.Condominiums.Join
     //            UserId = "OLrNj6uE0WWxeBMpHg9vf1ikirX2"
     //        });
 
-            Result<JoinCondominiumResponce> result = await _handler.Handle(_command, default);
+            Result<JoinCondominiumResponse> result = await _handler.Handle(_command, default);
 
             Assert.False(result.IsSuccess);
             Assert.True(!string.IsNullOrEmpty(result.Error.Message));

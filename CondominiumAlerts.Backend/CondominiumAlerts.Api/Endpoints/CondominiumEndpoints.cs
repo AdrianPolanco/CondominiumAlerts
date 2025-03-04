@@ -17,13 +17,13 @@ namespace CondominiumAlerts.Api.Endpoints
             app.MapPost("/condominium/join",
                 async (ISender sender, [FromForm] JoinCondominiumCommand command, CancellationToken cancellationToken) =>
                 {
-                    Result<JoinCondominiumResponce> result = await sender.Send(command, cancellationToken);
+                    Result<JoinCondominiumResponse> result = await sender.Send(command, cancellationToken);
                     if (!result.IsSuccess) return Results.BadRequest(result);
 
                     var responce = new
                     {
                         IsSuccess = result.IsSuccess,
-                        Data = result.Value.Adapt<JoinCondominiumResponce>()
+                        Data = result.Value.Adapt<JoinCondominiumResponse>()
                     };
                     return Results.Ok(responce);
                 }).DisableAntiforgery();
@@ -63,7 +63,7 @@ namespace CondominiumAlerts.Api.Endpoints
             app.MapGet("/condominium/GetCondominiumsJoinedByUser",
                 async (ISender sender, [FromBody] GetCondominiumsJoinedByUserCommand command, CancellationToken cancellationToken) =>
                 {
-                    Result<List<GetCondominiumsJoinedByUserResponce>> result = await sender.Send(command, cancellationToken);
+                    Result<List<GetCondominiumsJoinedByUserResponse>> result = await sender.Send(command, cancellationToken);
 
                     if (!result.IsSuccess) return Results.BadRequest(result);
 
