@@ -2,10 +2,16 @@ using System.Reflection;
 using CondominiumAlerts.CrossCutting.Behaviors;
 using CondominiumAlerts.Domain.Aggregates.ValueObjects;
 using CondominiumAlerts.Features.Features.Condominium.Add;
+using CondominiumAlerts.Features.Features.Condominium.Get;
+using CondominiumAlerts.Features.Features.Condominium.GetCondominiumsJoinedByUser;
 using CondominiumAlerts.Features.Features.Condominium.Join;
+using CondominiumAlerts.Features.Features.Posts.Get;
+using CondominiumAlerts.Features.Features.Users.GetCondominiumsUsers;
 using CondominiumAlerts.Features.Features.Users.Register;
 using CondominiumAlerts.Features.Features.Users.Update;
 using FluentValidation;
+using LightResults;
+using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CondominiumAlerts.Features.Extensions;
@@ -24,9 +30,13 @@ public static class DependencyInjection
         services.AddScoped<IValidator<RegisterUserCommand>, RegisterUserValidator>();
         services.AddScoped<IValidator<JoinCondominiumCommand>, JoinCondominiumValidator>();
         services.AddScoped<IValidator<AddCondominiumCommand>, AddCondominiumValidator>();
-        services.AddScoped<IValidator<UpdateUserCommand>, UpdateUserValidator>();
-        services.AddScoped<IValidator<Address>, AddressValidator>();
-        
+        services.AddScoped<IValidator<GetCondominiumCommand>, GetCondominiumValidator>();
+        services.AddScoped<IValidator<GetCondominiumsJoinedByUserCommand>, GetCondominiumsJoinedByUserValidator>();
+
+        services.AddScoped<IValidator<GetCondominiumsUsersCommand>, GetCondominiumsUsersValidator>();
+
+        services.AddScoped<IRequestHandler<GetPostsCommand, Result<List<GetPostsResponse>>>, GetPostsHandler>();
+
         services.AddTransient<EmailConfirmationJob>();
 
         services.AddScoped<BasicUpdateUserStrategy>();

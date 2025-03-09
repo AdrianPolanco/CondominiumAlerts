@@ -17,7 +17,7 @@ namespace CondominiumAlerts.Domain.Aggregates.Entities;
         public DateTime UpdatedAt { get; set; }
 
 
-        public IReadOnlyCollection<User>? Users { get; set; }
+        public IReadOnlyCollection<CondominiumUser>? Users { get; set; }
         public IReadOnlyCollection<Post>? Posts { get; set; }
         public IReadOnlyCollection<LevelOfPriority>? LevelOfPriorities { get; set; }
         public IReadOnlyCollection<Message>? Messages { get; set; }

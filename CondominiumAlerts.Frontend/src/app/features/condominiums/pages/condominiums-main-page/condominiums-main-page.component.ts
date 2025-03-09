@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators,ReactiveFormsModule  } from '@angular/forms';
 import { CondominiumService } from '../../services/condominium.service';
 import { NgFor, CommonModule } from '@angular/common';
@@ -7,6 +7,9 @@ import {Button} from 'primeng/button';
 import {Toolbar} from 'primeng/toolbar';
 import {NgOptimizedImage} from '@angular/common';
 import { AuthService } from '../../../../core/auth/services/auth.service';
+import { getCondominiumsJoinedByUserResponse } from '../../models/condominium.model';
+
+
 @Component({
   selector: 'app-condominiums-main-page',
   imports: [NgFor, CommonModule,ReactiveFormsModule,Button,Toolbar,NgOptimizedImage],
@@ -25,15 +28,9 @@ export class CondominiumsMainPageComponent {
     });
   }
 
-  condominiums = [
-    { id: 1, name: 'Sunset Villas', location: 'Miami, FL' },
-    { id: 2, name: 'Sunset Villas', location: 'Miami, FL' },
-    { id: 3, name: 'Sunset Villas', location: 'Miami, FL' },
-    { id: 4, name: 'Sunset Villas', location: 'Miami, FL' },
-    { id: 5, name: 'Sunset Villas', location: 'Miami, FL' },
-    { id: 6, name: 'Sunset Villas', location: 'Miami, FL' },
-    { id: 7, name: 'Sunset Villas', location: 'Miami, FL' },
-    { id: 8, name: 'Ocean Breeze Condos', location: 'Los Angeles, CA' }
+  condominiums: Array<getCondominiumsJoinedByUserResponse> = [
+    { id: "2d2c3c52-de6d-4697-8634-4e460f9d9516", name: 'Sunset Villas', address: 'Miami, FL', imageUrl: "cadf546w65" },
+
   ];
 
   joinCondominium() {
@@ -69,12 +66,31 @@ export class CondominiumsMainPageComponent {
     this.authService.logout();
     this.router.navigate(['']);
   }
-  viewCondominium(id: number) {
+  viewCondominium(id: string) {
     console.log(`Viewing condominium ID: ${id}`);
+    this.router.navigate(['/condominium/index',id]);
   }
 
   changeModalState() {
     this.isModalOpen = !this.isModalOpen;
     this.errorText = "";
+  }
+
+  ngOnInit(){
+   this.loadUserCondominiums()
+  }
+
+  loadUserCondominiums(): void{
+    this.condominiumService.getCondominiumsJoinedByUser({userId: this.authService.currentUser?.uid ?? ""})
+    .subscribe({
+      next: (result) => {
+        this.condominiums = result
+      },
+      error: (err) => {
+          console.log(err);
+          
+      },
+    })
+    
   }
 }
