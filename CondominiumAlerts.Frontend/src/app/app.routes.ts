@@ -63,6 +63,22 @@ export const routes: Routes = [
   },
 
   {
+    path: 'condominium/create',
+    loadComponent: () =>
+      import(
+        './features/condominiums/pages/condominium-page/condominium-page.component'
+      ).then((x) => x.CondominiumPageComponent),
+  },
+
+  {
+    path: 'condominium/chat',
+    loadComponent: () =>
+      import(
+        './features/condominiums/pages/condominium-chat/condominium-chat.component'
+      ).then((c) => c.CondominiumChatComponent),
+  },
+
+  {
     path: 'condominium/main-page',
     loadComponent: () =>
       import(
