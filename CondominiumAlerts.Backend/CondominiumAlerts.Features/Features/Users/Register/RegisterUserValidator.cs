@@ -17,8 +17,8 @@ public class RegisterUserValidator : AbstractValidator<RegisterUserCommand>
             .Matches(@"[0-9]").WithMessage("La contraseña debe contener al menos un número.")
             .Matches(@"[\W_]").WithMessage("La contraseña debe contener al menos un carácter especial.")
             .Matches(@"^[a-zA-Z0-9\W_]+$").WithMessage("La contraseña solo puede contener caracteres alfanuméricos y especiales.");    
-        //RuleFor(u => u.ConfirmPassword).NotEmpty().WithMessage("El password confirmation es requerido.");
-        //RuleFor(u => u.ConfirmPassword).Equal(u => u.Password).WithMessage("Las contraseñas no coinciden.");
+        RuleFor(u => u.ConfirmPassword).NotEmpty().WithMessage("El password confirmation es requerido.");
+        RuleFor(u => u.ConfirmPassword).Equal(u => u.Password).WithMessage("Las contraseñas no coinciden.");
         RuleFor(u => u.Name).NotEmpty().WithMessage("El nombre es requerido.");         
         RuleFor(u => u.Lastname).NotEmpty().WithMessage("El apellido es requerido.");         
         RuleFor(u => u.Lastname).MinimumLength(3).MaximumLength(200).WithMessage("El apellido debe tener entre 3 y 200 caracteres.");         

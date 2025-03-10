@@ -2,6 +2,7 @@
 module.exports = {
   content: [
     "./src/**/*.{html,ts}",
+    "./node_modules/primeng/**/*.{html,ts}"
   ],
   theme: {
     extend: {},
@@ -9,7 +10,7 @@ module.exports = {
   theme: {
     extend: {
       spacing: {
-        '19': '7.90rem', 
+        '19': '7.90rem',
       },
     },
   },

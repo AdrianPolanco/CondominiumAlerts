@@ -1,9 +1,11 @@
 using System.Reflection;
 using CondominiumAlerts.CrossCutting.Behaviors;
+using CondominiumAlerts.Domain.Aggregates.ValueObjects;
 using CondominiumAlerts.Features.Features.Condominium.Add;
 using CondominiumAlerts.Features.Features.Condominium.Join;
 using CondominiumAlerts.Features.Features.Posts.Get;
 using CondominiumAlerts.Features.Features.Users.Register;
+using CondominiumAlerts.Features.Features.Users.Update;
 using FluentValidation;
 using LightResults;
 using MediatR;
@@ -25,9 +27,21 @@ public static class DependencyInjection
         services.AddScoped<IValidator<RegisterUserCommand>, RegisterUserValidator>();
         services.AddScoped<IValidator<JoinCondominiumCommand>, JoinCondominiumValidator>();
         services.AddScoped<IValidator<AddCondominiumCommand>, AddCondominiumValidator>();
-
+        services.AddScoped<IValidator<UpdateUserCommand>, UpdateUserValidator>();
+        services.AddScoped<IValidator<Address>, AddressValidator>();
         services.AddScoped<IRequestHandler<GetPostsCommand, Result<List<GetPostsResponse>>>, GetPostsHandler>();
+        
+
         services.AddTransient<EmailConfirmationJob>();
+
+        services.AddScoped<BasicUpdateUserStrategy>();
+        services.AddScoped<IUpdateUserStrategy>(sp => 
+        {
+            var basic = sp.GetRequiredService<BasicUpdateUserStrategy>();
+            return basic;
+        });
+        services.Decorate<IUpdateUserStrategy, UpdateUserWithPhotoStrategy>();
+        
         return services;
     }
 }

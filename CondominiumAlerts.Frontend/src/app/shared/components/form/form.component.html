@@ -14,7 +14,7 @@
               [type]="field.type"
               [id]="field.name"
               [formControlName]="field.name"
-              class="p-inputtext w-full" />
+              class="p-inputtext w-full disabled:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50 " />
           }@else if(field.type === 'password'){
             <div class="w-full">
               <p-password
@@ -22,7 +22,7 @@
                 [formControlName]="field.name"
                 [toggleMask]="true"
                 styleClass="w-full"
-                [inputStyleClass]="'w-full px-4 py-2 border border-gray-300 rounded-l-none rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all'"
+                [inputStyleClass]="'w-full px-4 py-2 border border-gray-300 rounded-l-none rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all disabled:bg-gray-100'"
               />
             </div>
           }
@@ -34,7 +34,7 @@
             [type]="field.type"
             [id]="field.name"
             [formControlName]="field.name"
-            class="p-inputtext w-full" />
+            class="p-inputtext w-full disabled:bg-gray-100" />
         }@else if(field.type === 'password'){
           <div class="w-full">
             <p-password
@@ -42,7 +42,7 @@
               [formControlName]="field.name"
               [toggleMask]="true"
               styleClass="w-full"
-              [inputStyleClass]="'w-full px-4 py-2 border border-gray-300 rounded-l-none rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all'"
+              [inputStyleClass]="'w-full px-4 py-2 border border-gray-300 rounded-l-none rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all disabled:bg-gray-100'"
             />
           </div>
         }
@@ -52,13 +52,14 @@
         <textarea pTextarea
                   [id]="field.name"
                   [formControlName]="field.name"
-                  class="p-inputtextarea w-full"></textarea>
+                  class="p-inputtextarea w-full disabled:bg-gray-100"
+        ></textarea>
       }
 
-      @if (field.type === 'file') {
+      @if (field.type === 'file' && isFileField(field)) {
         <p-fileUpload
           [id]="field.name"
-          name="imageFile"
+          [name]="field.name"
           mode="basic"
           [chooseLabel]="field.label"
           (onSelect)="field.onFileSelect($event)"
@@ -71,13 +72,14 @@
           [options]="field.options"
           [formControlName]="field.name"
           [id]="field.name"
-          placeholder="Selecciona una opción" class="w-full"></p-dropdown>
+          placeholder="Selecciona una opción" class="w-full  disabled:bg-gray-100"></p-dropdown>
       }
 
       @if (field.type === 'checkbox') {
         <p-checkbox
           [formControlName]="field.name"
           [id]="field.name"
+          class="disabled:bg-gray-100"
           binary="true"></p-checkbox>
       }
 

@@ -1,33 +1,9 @@
-<p-toolbar styleClass="rounded-none w-full flex justify-between">
-  <ng-template #start>
-    <div class="flex justify-start">
-      <img
-        ngSrc="images/condominiumAlertsLogo.jpg"
-        alt="Condominium Alerts Logo"
-        width="55"
-        height="55"
-      />
-    </div>
-  </ng-template>
-  <ng-template #end>
-    <p-button icon="pi pi-home" class="mr-2" text severity="secondary" />
-    <a (click)="goHome()" class="font-bold">
-      <p-button
-        label="logOut"
-        icon="pi pi-sign-out"
-        class="mr-2"
-        severity="danger"
-      />
-    </a>
-  </ng-template>
-</p-toolbar>
-
 <div class="w-[70%] mx-auto p-5 space-y-6">
   <div class="flex justify-center m-10">
     <h1
       class="mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl dark:text-white"
     >
-      Bienvenido
+      ¡Bienvenido a Condominium Alerts!
     </h1>
   </div>
   <div class="flex justify-center">
@@ -35,7 +11,7 @@
       (click)="changeModalState()"
       class="w-full h-20 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition"
     >
-      Unete a un Condominio
+      Unéte a un condominio
     </button>
   </div>
 
@@ -43,21 +19,19 @@
     class="grid place-items-center grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8"
   >
     <div
-      class="w-full max-w-[17rem] min-w-[10rem] aspect-square flex flex-col justify-center items-center bg-green-500 rounded-lg p-4 cursor-pointer hover:bg-green-400 transition"
+      class="w-full max-w-[17rem] min-w-[10rem] aspect-square flex flex-col justify-center items-center bg-blue-200 rounded-lg p-4 cursor-pointer hover:bg-blue-300 transition"
       (click)="goToCreateCondominium()"
     >
-      <h3 class="text-lg font-semibold text-center">
-        Crea tu propio Condominio
-      </h3>
+      <h3 class="text-lg font-semibold text-center">Crea un condominio</h3>
     </div>
 
     <div
       *ngFor="let condo of condominiums"
-      class="w-full max-w-[17rem] min-w-[10rem] aspect-square flex flex-col justify-center items-center bg-red-300 text-white rounded-lg p-4 cursor-pointer hover:bg-red-400 transition"
+      class="w-full max-w-[17rem] min-w-[10rem] aspect-square flex flex-col justify-center items-center bg-green-500 text-white rounded-lg p-4 cursor-pointer hover:bg-green-600 transition"
       (click)="viewCondominium(condo.id)"
     >
       <h3 class="text-xl font-semibold text-center">{{ condo.name }}</h3>
-      <p class="text-center text-sm mt-2">Dirreccion: {{ condo.location }}</p>
+      <p class="text-center text-sm mt-2">Location: {{ condo.location }}</p>
     </div>
   </div>
 </div>
@@ -67,8 +41,8 @@
   class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
 >
   <div class="bg-white p-6 rounded-lg shadow-lg w-96">
-    <h2 class="text-xl font-semibold">Ingresa el codigo del Condominio</h2>
-    <p class="text-gray-600 mt-2">Por favor ingresa el codigo abajo.</p>
+    <h2 class="text-xl font-semibold">Introduce un código de condominio</h2>
+    <p class="text-gray-600 mt-2">Por favor, introduce un código de condominio aquí abajo.</p>
 
     <form [formGroup]="form" (ngSubmit)="joinCondominium()">
       <div class="mt-4">
@@ -78,27 +52,25 @@
           max="11"
           name="condominiumCode"
           class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          placeholder="Ingresa codigo"
+          placeholder="Enter code"
           required
         />
       </div>
-      <small *ngIf="errorText" class="text-red-500">
-        {{ errorText }}
-      </small>
+
       <div class="mt-4 flex justify-between">
         <button
           type="button"
           (click)="changeModalState()"
           class="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition"
         >
-          Close
+          Cerrar
         </button>
         <button
           type="submit"
           [disabled]="form.invalid"
           class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition"
         >
-          Submit
+          Unirse
         </button>
       </div>
     </form>

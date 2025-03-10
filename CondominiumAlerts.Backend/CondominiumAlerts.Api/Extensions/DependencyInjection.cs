@@ -1,14 +1,13 @@
 ﻿using System.Net;
-using System.Text.Json;
-using System.Text.Json.Serialization;
+using System.Security.Claims;
 using System.Threading.RateLimiting;
 using Carter;
 using CloudinaryDotNet;
 using CondominiumAlerts.CrossCutting.ErrorHandler;
-using CondominiumAlerts.Infrastructure.Persistence.Context;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
 using LightResults.Extensions.Json;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 
@@ -19,18 +18,66 @@ public static class DependencyInjection
     public static IServiceCollection AddApiServices(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddOpenApi();
+
+        services.AddAuthentication();
+        services.AddAuthorization();
         
         services.ConfigureHttpJsonOptions(options =>
         {
             options.SerializerOptions.Converters.Add(new ResultJsonConverterFactory());
         });
+        
         FirebaseApp.Create(new AppOptions()
         {
             Credential = GoogleCredential.FromFile("./firebase.json")
         });
 
+        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(options =>
+            {
+                options.Authority = configuration["FirebaseAuth:Authority"];
+                options.TokenValidationParameters = new()
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidIssuer = configuration["FirebaseAuth:Issuer"],
+                    ValidAudience = configuration["FirebaseAuth:ProjectId"],
+                };
+                
+                options.Events = new JwtBearerEvents
+                {
+                    OnTokenValidated = async context =>
+                    {
+                        var claims = new List<Claim>();
+                    
+                        if (context.Principal?.Identity is ClaimsIdentity identity)
+                        {
+                            // Mapear claims de Firebase a claims estándar
+                            var userId = identity.FindFirst("user_id")?.Value 
+                                         ?? identity.FindFirst("sub")?.Value;
+                        
+                            if (userId != null)
+                            {
+                                claims.Add(new Claim("user_id", userId));
+                                claims.Add(new Claim(ClaimTypes.NameIdentifier, userId));
+                            }
+
+                            var email = identity.FindFirst("email")?.Value;
+                            if (email != null)
+                            {
+                                claims.Add(new Claim(ClaimTypes.Email, email));
+                            }
+
+                            // Agregar los claims al identity actual
+                            identity.AddClaims(claims);
+                        }
+                    }
+                };
+            });
+
         services.AddScoped<Cloudinary>(sp => new Cloudinary(
-            configuration.GetSection("Cloidinary").GetValue<string>("CLOUDINARY_URL")
+            configuration.GetSection("Cloudinary").GetValue<string>("CLOUDINARY_URL")
         ));
 
         // Configura la política CORS
@@ -107,6 +154,8 @@ public static class DependencyInjection
         app.UseResponseCompression();
         app.UseRateLimiter();
         app.UseRouting();
+        app.UseAuthentication();
+        app.UseAuthorization();
         app.MapGroup("/api").MapCarter();
         app.UseCors("AllowSpecificOrigin");
         // Configure the HTTP request pipeline.

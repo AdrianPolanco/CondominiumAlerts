@@ -8,19 +8,17 @@ import { CondominiumService } from '../../services/condominium.service';
 import { AddCondominiumCommand } from '../../models/condominium.model';
 import { Router } from '@angular/router';
 import { Feedback } from '../../../../shared/components/form/feedback.interface';
-import {Button} from 'primeng/button';
-import {Toolbar} from 'primeng/toolbar';
-import {NgOptimizedImage} from '@angular/common';
-import { AuthService } from '../../../../core/auth/services/auth.service';
+import {ButtonDirective} from 'primeng/button';
+
 @Component({
     selector: 'app-condominium-page',
     templateUrl: './condominium-page.component.html',
     styleUrls: ['./condominium-page.component.css'],
-    imports: [FormComponent,Button,Toolbar,NgOptimizedImage]
+  imports: [FormComponent, ButtonDirective]
 })
 export class CondominiumPageComponent {
 
-    constructor(private condominiumService: CondominiumService, private router: Router, private authService: AuthService) {}
+    constructor(private condominiumService: CondominiumService, private router: Router) {}
 
     // Signal for the form group
     private readonly formGroup = signal<FormGroup>(new FormGroup({}));
@@ -36,7 +34,7 @@ export class CondominiumPageComponent {
             type: 'text',
             validators: [Validators.required],
             errorMessages: {
-                required: 'Name is required'
+                required: 'El nombre es requerido.'
             }
         },
         {
@@ -45,19 +43,19 @@ export class CondominiumPageComponent {
             type: 'text',
             validators: [Validators.required],
             errorMessages: {
-                required: 'Address is required'
+                required: 'La dirección es requerida.'
             }
         },
         {
             name: 'imageFile',
-            label: 'Upload Image',
+            label: 'Subir imagen',
             type: 'file',
             filetype: 'image/*',
             onFileSelect: (event: any) => {
                 if (event.files.length > 0) {
                     const file = event.files[0];
                     this.formGroup().patchValue({
-                        imageFile: file,
+                        profilePic: file,
                     });
                 }
             }
@@ -66,8 +64,8 @@ export class CondominiumPageComponent {
 
     condominiumFormSettings = signal<SharedForm>({
         fields: this.condominiumFormFields(),
-        baseButtonLabel: 'Submit',
-        submittedButtonLabel: 'Submitted Successfully'
+        baseButtonLabel: 'Enviar',
+        submittedButtonLabel: '¡Enviado satisfactoriamente!'
     });
 
     onFormCreated(form: FormGroup) {
@@ -76,10 +74,6 @@ export class CondominiumPageComponent {
     goToMainPage(){
       this.router.navigate(["condominium/main-page"])
     }
-    goHome(){
-        this.authService.logout();
-        this.router.navigate(['']);
-      }
 
     onSubmit(value: AddCondominiumCommand) {
         const formComponent = this.formComponent();
@@ -87,13 +81,13 @@ export class CondominiumPageComponent {
             next: (response) => {
                 formComponent?.resetForm({
                     status: 'success',
-                    message: 'Condominium created successfully!',
+                    message: '¡Condominio creado satisfactoriamente!',
                 });
             },
             error: (err) => {
                 formComponent?.resetForm({
                     status: 'error',
-                    message: err.error?.message || 'An error occurred while creating the condominium.',
+                    message: err.error?.message || 'Ha ocurrido un error mientras se creaba el condominio.',
                 });
             }
         });

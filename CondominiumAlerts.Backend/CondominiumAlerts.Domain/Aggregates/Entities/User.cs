@@ -8,7 +8,8 @@ public sealed class User : IAggregateRoot<string>
     public string Id { get; set; }
     public string? ProfilePictureUrl { get; set; }
     public string Name { get; set; } = string.Empty!;
-    public string LastName { get; set; } = string.Empty!;
+    public string Lastname { get; set; } = string.Empty!;
+    public string Username { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty!;
     public Address? Address { get; set; }
     public DateTime CreatedAt { get; set; }

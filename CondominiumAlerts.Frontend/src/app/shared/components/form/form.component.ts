@@ -1,5 +1,5 @@
 import {Component, computed, input, OnInit, output, signal, WritableSignal} from '@angular/core';
-import {SharedFormField} from './shared-form-field.interface';
+import {SharedFormField, SharedFormFieldFile} from './shared-form-field.interface';
 import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {Checkbox} from 'primeng/checkbox';
 import {Textarea} from 'primeng/textarea';
@@ -69,18 +69,25 @@ export class FormComponent implements OnInit{
     });
   }
 
-  createForm() {
+  isFileField(field: SharedFormField): field is SharedFormFieldFile {
+    return field.type === 'file';
+  }
+
+  private createForm() {
     const group: any = {};
 
-    // Crear los controles básicos
+    // Crear los controles básicos con opción de `disabled`
     this.fields().forEach(field => {
-      group[field.name] = ['', field.validators || []];
+      group[field.name] = {
+        value: field.defaultValue ?? '',
+        disabled: !!field.disabled,  // ⬅️ Si `field.disabled` está definido, se aplicará
+      };
     });
 
     // Crear el formGroup
     const formGroup = this.fb.group(group);
 
-    // Agregar validadores personalizados a nivel de formulario si existen
+    // Agregar validadores si existen
     if (this.formSettings().formValidators?.length) {
       formGroup.addValidators(this.formSettings().formValidators!);
     }

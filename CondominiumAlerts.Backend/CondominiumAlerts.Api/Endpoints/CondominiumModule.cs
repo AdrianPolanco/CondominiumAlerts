@@ -1,19 +1,16 @@
 ﻿using Carter;
-using CondominiumAlerts.Features.Features.Condominium;
 using CondominiumAlerts.Features.Features.Condominium.Add;
 using CondominiumAlerts.Features.Features.Condominium.Join;
 using FirebaseAdmin.Auth;
 using LightResults;
 using Mapster;
 using MediatR;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Org.BouncyCastle.Asn1.Ocsp;
 
 namespace CondominiumAlerts.Api.Endpoints
 {
-    public class CondominiumEndpoints : ICarterModule
+    public class CondominiumModule : ICarterModule
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {

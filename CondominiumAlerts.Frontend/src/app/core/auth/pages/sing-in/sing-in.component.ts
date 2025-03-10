@@ -17,7 +17,7 @@ import { MessageService } from 'primeng/api';
 import { FirebaseError } from 'firebase/app';
 
 @Component({
-  selector: 'app-sing-in',
+  selector: 'core-sing-in',
   imports: [
     FormComponent,
     Button,
