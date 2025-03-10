@@ -12,9 +12,9 @@ namespace CondominiumAlerts.Api.Endpoints
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            app.MapGet("/posts", async (ISender sender, CancellationToken cancellationToken) =>
+            app.MapGet("/posts", async (ISender sender, [FromQuery] Guid condominiumId, CancellationToken cancellationToken) =>
             {
-                var command = new GetPostsCommand();
+                var command = new GetPostsCommand { CondominiumId = condominiumId };
                 Result<List<GetPostsResponse>> result = await sender.Send(command, cancellationToken);
 
                 if (!result.IsSuccess)

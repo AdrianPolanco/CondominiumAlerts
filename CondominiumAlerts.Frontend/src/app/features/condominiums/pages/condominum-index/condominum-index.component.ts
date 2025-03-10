@@ -36,9 +36,11 @@ export class CondominumIndexComponent implements OnInit {
   }
 
   loadPosts(): void {
-    this.postService.getPosts().subscribe({
+    const condominiumId = '2d2c3c52-de6d-4697-8634-4e460f9d9516'; // ID estático
+
+    this.postService.getPosts(condominiumId).subscribe({
       next: (data) => {
-        console.log('Publicaciones recibidas:', data); 
+        console.log('Publicaciones recibidas:', data);
         this.publications = data;
       },
       error: (err) => {
@@ -50,7 +52,7 @@ export class CondominumIndexComponent implements OnInit {
   goHome(): void {
     this.router.navigate(['']);
   }
-
+  
   openCreatePostModal(): void {
     console.log('Abrir modal de creación de publicaciones');
   }
