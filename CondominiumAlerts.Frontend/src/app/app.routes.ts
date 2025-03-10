@@ -2,7 +2,6 @@ import { Routes } from '@angular/router';
 
 export const routes: Routes = [
   {
-
     path: 'register',
     title: 'Registrar usuario',
     loadComponent: () =>
@@ -29,25 +28,44 @@ export const routes: Routes = [
     path: '',
     loadComponent: () => import('../app/core/auth/layout/auth-layout/auth-layout.component')
       .then(c => c.AuthLayoutComponent), // El layout autenticado
-     // Protege todas las rutas dentro
     children: [
       {
         path: "condominiums",
         children: [
-            {
-              path: '',
-              title: 'Condominios',
-              loadComponent: () => import('./features/condominiums/pages/condominiums-main-page/condominiums-main-page.component')
-                .then(c => c.CondominiumsMainPageComponent),
-            },
-            {
-              path: 'create',
-              title: 'Crear condominio',
-              loadComponent: () => import('./features/condominiums/pages/condominium-page/condominium-page.component')
-                .then(x => x.CondominiumPageComponent),
-            }
-          ]
+          {
+            path: '',
+            title: 'Condominios',
+            loadComponent: () => import('./features/condominiums/pages/condominiums-main-page/condominiums-main-page.component')
+              .then(c => c.CondominiumsMainPageComponent),
+          },
+          {
+            path: 'create',
+            title: 'Crear condominio',
+            loadComponent: () => import('./features/condominiums/pages/condominium-page/condominium-page.component')
+              .then(x => x.CondominiumPageComponent),
+          }
+        ]
       }
     ]
+  },
+  {
+    path: "condominium/create",
+    loadComponent: () => import('./features/condominiums/pages/condominium-page/condominium-page.component')
+      .then(x => x.CondominiumPageComponent)
+  },
+  {
+    path: "condominium/main-page",
+    loadComponent: () => import('./features/condominiums/pages/condominiums-main-page/condominiums-main-page.component')
+      .then(c => c.CondominiumsMainPageComponent)
+  },
+  {
+    path: "condominium/index",
+    loadComponent: () => import('./features/condominiums/pages/condominum-index/condominum-index.component')
+      .then(c => c.CondominumIndexComponent)
+  },
+  {
+    path: '',
+    redirectTo: 'home',
+    pathMatch: 'full',
   }
 ];
