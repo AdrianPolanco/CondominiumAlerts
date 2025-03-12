@@ -72,6 +72,7 @@ export class UserService{
         lastname: lastName,
         email: user.email!,
         password: '',
+        confirmPassword: ''
       };
 
       console.log(registerUserRequest);
@@ -147,6 +148,7 @@ export class UserService{
       lastname: user.lastname,
       email: user.email,
       password: user.password,
+      confirmPassword: user.confirmPassword
     };
   }
 
