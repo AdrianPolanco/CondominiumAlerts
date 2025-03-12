@@ -30,6 +30,7 @@ public static class DependencyInjection
         services.AddScoped<IEmailService, EmailService>();
         services.AddScoped(typeof(IRepository<,>), typeof(Repository<,>));
         services.AddScoped<ICondominiumRepository, CondominiumRepository>();
+        services.AddScoped<IPostsRepository, PostsRepository>();
 
         // Registrar política de reintentos con Polly
         services.AddSingleton<IAsyncPolicy>(policy => Policy
