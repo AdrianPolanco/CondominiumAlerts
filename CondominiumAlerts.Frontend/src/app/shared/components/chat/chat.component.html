@@ -1,11 +1,14 @@
 <section class="chat">
   <header class="chat-header bg-gray-50 dark:bg-gray-700">
-    <div class="text-xl"><i class="fa-solid fa-user"></i> {{currentUser()?.fullName}}</div>
+    <div class="text-xl">
+      <i class="fa-solid fa-user"></i> {{ currentUser()?.fullName }}
+    </div>
   </header>
-  <section class="chat-content bg-white scroll-invisible">
-    <app-chat-buble></app-chat-buble>
-    <app-chat-buble></app-chat-buble>
-    <app-chat-buble></app-chat-buble>
+  <section class="chat-content bg-white scroll-invisible w-full flex flex-col gap-4 ">
+    <app-chat-buble
+      *ngFor="let message of messages()"
+      [message]="message"
+    ></app-chat-buble>
   </section>
   <app-chat-box> </app-chat-box>
 </section>

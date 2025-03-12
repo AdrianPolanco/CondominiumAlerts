@@ -1,12 +1,13 @@
-<p-toolbar styleClass="rounded-none w-full flex justify-between">
+<p-toolbar styleClass="w-full flex justify-between p-1">
   <ng-template #start>
-    <div class="flex justify-start">
+    <div class="flex justify-start items-center gap-6">
       <img
         ngSrc="images/condominiumAlertsLogo.jpg"
         alt="Condominium Alerts Logo"
         width="55"
         height="55"
       />
+      <p class="text-lg font-bold m-0">{{ getLoggedUsername() }}</p>
     </div>
   </ng-template>
   <ng-template #end>
@@ -23,7 +24,9 @@
 
 <div class="flex container-height">
   <div class="w-52 bg-gray-800 text-white p-5 rounded-lg">
-    <div class="text-lg font-semibold mb-4">Inquilinos</div>
+    <div class="text-lg font-semibold mb-4 text-center border-b pb-4 border-cyan-400">
+      Inquilinos
+    </div>
     <div
       *ngFor="let user of users"
       class="flex items-center space-x-3 cursor-pointer p-3 rounded-lg transition-all duration-200"

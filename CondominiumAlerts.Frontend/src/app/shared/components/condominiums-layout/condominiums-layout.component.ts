@@ -5,6 +5,7 @@ import { Toolbar } from 'primeng/toolbar';
 import { Button } from 'primeng/button';
 import { getCondominiumsUsersResponse } from '../../../features/users/models/user.model';
 import { UserService } from '../../../features/users/services/user.service';
+import { AuthService } from '../../../core/auth/services/auth.service';
 
 @Component({
   selector: 'app-condominiums-layout',
@@ -13,7 +14,9 @@ import { UserService } from '../../../features/users/services/user.service';
   styleUrl: './condominiums-layout.component.css',
 })
 export class CondominiumsLayoutComponent {
+  private authService = inject(AuthService);
   private userService = inject(UserService);
+  private router = inject(Router);
   currentUser = this.userService.currentCondominiumUserActive;
 
   notifications = [
@@ -22,8 +25,9 @@ export class CondominiumsLayoutComponent {
     { message: 'María ha reaccionado a tu publicación', time: 'Hace 2 horas' },
   ];
 
-  constructor(private router: Router) {}
-
+  getLoggedUsername() {
+    return this.authService.currentUser?.displayName;
+  }
   goHome(): void {
     this.router.navigate(['']);
   }

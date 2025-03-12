@@ -10,7 +10,6 @@ import { SignalRService } from '../../../core/services/signal-r.service';
   styleUrl: './chat-box.component.css',
 })
 export class ChatBoxComponent {
-  
   messageControl = new FormControl();
   constructor(private signalRService: SignalRService) {}
 
