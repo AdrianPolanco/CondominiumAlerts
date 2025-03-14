@@ -17,7 +17,12 @@ export class CondominiumService {
         const fb = new FormData();
         fb.append('name', cmd.name);
         fb.append('address', cmd.address);
-        fb.append('imageFile',cmd.profilePic);
+        fb.append('imageFile',cmd.imageFile);
+        console.log("data", {
+            name: fb.get('name'),
+            address: fb.get('address'),
+            imageFile: fb.get('imageFile')
+        })
         return this.httpClient.post<AddCondominiumResponse>(
             "/api/condominium",
             fb,
@@ -34,6 +39,6 @@ export class CondominiumService {
     }
 
     //TODO: Create the get condominium feature and method
-    
+
     //TODO: Create the get condominium users mesages side bar feature and method
 }

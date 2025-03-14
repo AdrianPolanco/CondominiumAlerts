@@ -65,6 +65,7 @@ export class UserService{
       const nameParts = displayName.split(' '); // Divide el nombre en partes
       const firstName = nameParts.slice(0, -1).join(' ') || displayName; // Todo menos la última palabra
       const lastName = nameParts.length > 1 ? nameParts[nameParts.length - 1] : ''; // Última palabra como apellido
+      const profilePictureUrl = user.photoURL;
 
       const registerUserRequest: RegisterUserRequest = {
         username: displayName || user.email?.split('@')[0] || '',
@@ -72,7 +73,8 @@ export class UserService{
         lastname: lastName,
         email: user.email!,
         password: '',
-        confirmPassword: ''
+        confirmPassword: '',
+        profilePictureUrl
       };
 
       console.log(registerUserRequest);
@@ -148,7 +150,8 @@ export class UserService{
       lastname: user.lastname,
       email: user.email,
       password: user.password,
-      confirmPassword: user.confirmPassword
+      confirmPassword: user.confirmPassword,
+      profilePictureUrl: user.profilePictureUrl
     };
   }
 

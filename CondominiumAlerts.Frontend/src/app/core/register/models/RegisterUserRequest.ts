@@ -5,4 +5,5 @@ export type RegisterUserRequest = {
   email: string;
   password: string;
   confirmPassword: string;
+  profilePictureUrl: string | null;
 }

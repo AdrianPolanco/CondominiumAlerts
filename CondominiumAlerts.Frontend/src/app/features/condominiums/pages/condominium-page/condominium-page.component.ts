@@ -52,11 +52,13 @@ export class CondominiumPageComponent {
             type: 'file',
             filetype: 'image/*',
             onFileSelect: (event: any) => {
+
                 if (event.files.length > 0) {
                     const file = event.files[0];
                     this.formGroup().patchValue({
-                        profilePic: file,
+                        imageFile: file,
                     });
+                    console.log("Archivo seleccionado")
                 }
             }
         }
@@ -85,6 +87,7 @@ export class CondominiumPageComponent {
                 });
             },
             error: (err) => {
+              console.log(err)
                 formComponent?.resetForm({
                     status: 'error',
                     message: err.error?.message || 'Ha ocurrido un error mientras se creaba el condominio.',
