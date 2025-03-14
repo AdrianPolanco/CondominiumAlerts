@@ -1,12 +1,12 @@
 ﻿using CondominiumAlerts.Domain.Aggregates.Entities;
 
-namespace CondominiumAlerts.Features.Features.Condominiums.Summary;
+namespace CondominiumAlerts.Infrastructure.Services.AI.MessagesSummary;
 
 public record MessageDto(
     Guid Id,
     string Text,
     Guid CondominiumId,
     Condominium Condominium,
-    Guid CreatorUserId,
+    string CreatorUserId,
     User CreatorUser,
     DateTime CreatedAt);

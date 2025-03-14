@@ -1,7 +1,4 @@
-﻿using CondominiumAlerts.Domain.Aggregates.Entities;
-using CondominiumAlerts.Domain.Aggregates.Interfaces;
-
-namespace CondominiumAlerts.Features.Features.Summary;
+﻿namespace CondominiumAlerts.Domain.Aggregates.Entities;
 
 public class Summary
 {

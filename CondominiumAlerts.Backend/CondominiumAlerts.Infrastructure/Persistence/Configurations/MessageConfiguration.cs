@@ -19,11 +19,11 @@ public class MessageConfiguration : IEntityTypeConfiguration<Message>
             .HasForeignKey(m => m.ReceiverUserId)
             .OnDelete(DeleteBehavior.SetNull);
         
-        builder.Property(b => b.CreatedAt)
+        builder.Property(m => m.CreatedAt)
             .HasDefaultValueSql("CURRENT_TIMESTAMP")
             .ValueGeneratedOnAdd();
         
-        builder.Property(b => b.UpdatedAt)
+        builder.Property(m => m.UpdatedAt)
             .HasDefaultValueSql("CURRENT_TIMESTAMP")
             .ValueGeneratedOnAddOrUpdate();
     }

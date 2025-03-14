@@ -53,7 +53,7 @@ namespace CondominiumAlerts.Features.Features.Condominiums.Join
 
             if (await _userRepository.AnyAsync((u => u.Id == request.UserId), default))
             {
-                _logger.LogWarning($"The user with supposed id {request.UserId} couldn't be founded");
+                _logger.LogWarning($"The user with supposed Id {request.UserId} couldn't be founded");
                 return Result.Fail<JoinCondominiumResponce>($"The user couldn't be founded");
             }
 

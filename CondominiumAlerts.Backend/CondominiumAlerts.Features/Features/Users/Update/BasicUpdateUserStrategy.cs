@@ -33,7 +33,7 @@ public class BasicUpdateUserStrategy : IUpdateUserStrategy
     {
         var doesUserExist = await _authenticationProvider.DoesUserExistAsync(input.Id, cancellationToken);
         
-        if (!doesUserExist) return Result<UpdateUserResponse>.Fail($"El usuario con el id {input.Id} no existe");
+        if (!doesUserExist) return Result<UpdateUserResponse>.Fail($"El usuario con el Id {input.Id} no existe");
         
         var result = await _authenticationProvider.UpdateUserAsync(input.Id, input.Username, cancellationToken);
 

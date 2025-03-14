@@ -6,6 +6,7 @@ using CondominiumAlerts.Infrastructure.Auth;
 using CondominiumAlerts.Infrastructure.Auth.Interfaces;
 using CondominiumAlerts.Infrastructure.Persistence.Context;
 using CondominiumAlerts.Infrastructure.Persistence.Repositories;
+using CondominiumAlerts.Infrastructure.Services;
 using CondominiumAlerts.Infrastructure.Settings;
 using Coravel;
 using FirebaseAdmin;
@@ -16,6 +17,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using OpenAI.Chat;
 using Polly;
 using RestSharp;
 
@@ -26,12 +28,30 @@ public static class DependencyInjection
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")!));
+            options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")!), ServiceLifetime.Scoped);
         services.AddSingleton<IAuthenticationProvider, AuthenticationProvider>();
         services.Configure<SmtpSettings>(configuration.GetSection("SmtpSettings"));
         services.AddScoped<IEmailService, EmailService>();
         services.AddScoped(typeof(IRepository<,>), typeof(Repository<,>));
         services.AddScoped<ICondominiumRepository, CondominiumRepository>();
+        
+        services.Configure<AISettings>(configuration.GetSection("AISettings"));
+
+        /*services.AddSingleton(sp =>
+        {
+            var settings = sp.GetRequiredService<IOptions<AISettings>>().Value;
+
+            return new ChatClient(settings.Model, settings.AIKey);
+        });*/
+        
+        services.AddHttpClient<IAIService, AIService>((sp,client) =>
+        {
+            var settings = sp.GetRequiredService<IOptions<AISettings>>().Value;
+            client.BaseAddress = new Uri("https://openrouter.ai/api/v1/");
+            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {settings.AIKey}");
+        });
+
+
 
         // Registrar política de reintentos con Polly
         services.AddSingleton<IAsyncPolicy>(policy => Policy

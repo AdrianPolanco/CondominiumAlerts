@@ -1,6 +1,5 @@
 ﻿using CondominiumAlerts.Domain.Aggregates.Interfaces;
 using CondominiumAlerts.Domain.Aggregates.ValueObjects;
-using CondominiumAlerts.Features.Features.Summary;
 
 namespace CondominiumAlerts.Domain.Aggregates.Entities;
 

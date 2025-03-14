@@ -1,5 +1,4 @@
 ﻿using CondominiumAlerts.Domain.Aggregates.Entities;
-using CondominiumAlerts.Features.Features.Summary;
 using Microsoft.EntityFrameworkCore;
 
 namespace CondominiumAlerts.Infrastructure.Persistence.Context;

@@ -146,7 +146,6 @@ public class Repository<TEntity, TId> : IRepository<TEntity, TId> where TEntity 
     {
         try
         {
-            entities.ForEach(e => e.CreatedAt = DateTime.Now);
             await _context.BulkInsertAsync(entities, cancellationToken: cancellationToken);
         }
         catch

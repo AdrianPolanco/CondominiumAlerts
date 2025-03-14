@@ -6,7 +6,7 @@ namespace CondominiumAlerts.Domain.Aggregates.Entities;
     public sealed class Message : IEntity<Guid>
     {
         public Guid Id { get; set; }
-        public string Text{ get; set; } = string.Empty!;
+        public string Text { get; set; } = string.Empty!;
         public string? MediaUrl { get; set; }
         public string CreatorUserId { get; set; }
         // if receiver user id is null means that the message is for the global chat

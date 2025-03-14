@@ -1,4 +1,4 @@
-﻿using CondominiumAlerts.Features.Features.Summary;
+﻿using CondominiumAlerts.Domain.Aggregates.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

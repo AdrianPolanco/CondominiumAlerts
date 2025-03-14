@@ -15,14 +15,14 @@ public class AuthModule : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapGet("/users/{id}",
+        app.MapGet("/users/{Id}",
             async (string id, ISender sender, ClaimsPrincipal claims, CancellationToken cancellationToken) =>
             {
                 var currentUserId = claims.FindFirst("user_id")?.Value;
 
                 if (currentUserId != id || string.IsNullOrWhiteSpace(currentUserId.Trim()))
                     return Results.BadRequest(new
-                        { IsSuccess = false, Message = "El id del usuario no coincide con tus credenciales." });
+                        { IsSuccess = false, Message = "El Id del usuario no coincide con tus credenciales." });
 
                 var queryRequest = new GetUserDataQuery(id);
                 
@@ -42,12 +42,12 @@ public class AuthModule : ICarterModule
         {
             var currentUserId = claims.FindFirst("user_id")?.Value;
             
-            if (currentUserId == null) return Results.BadRequest("El id del usuario no existe.");
+            if (currentUserId == null) return Results.BadRequest("El Id del usuario no existe.");
             
             var form = await context.Request.ReadFormAsync(); // Leer FormData
 
             // Extraer datos del formulario
-            var id = form["id"];
+            var id = form["Id"];
             var username = form["username"];
             var name = form["name"];
             var lastname = form["lastname"];
@@ -61,7 +61,7 @@ public class AuthModule : ICarterModule
             
             if (currentUserId != id || string.IsNullOrWhiteSpace(currentUserId.Trim()))
                 return Results.BadRequest(new
-                    { IsSuccess = false, Message = "El id del usuario no coincide con tus credenciales." });
+                    { IsSuccess = false, Message = "El Id del usuario no coincide con tus credenciales." });
             
             var updateUserCommand = new UpdateUserCommand(currentUserId, username, name, lastname, profilePic, address);
 
@@ -90,16 +90,16 @@ public class AuthModule : ICarterModule
                return Results.Ok(response);
             });
 
-        app.MapPost("/users/register/google/{id}",
+        app.MapPost("/users/register/google/{Id}",
             async (string id, RegisterUserCommand command, CancellationToken cancellationToken, ClaimsPrincipal claims, IRepository<User, string> repository) =>
             {
                 var currentUserId = claims.FindFirst("user_id")?.Value;
                 
-                if (currentUserId == null) return Results.BadRequest("El id del usuario no existe.");
+                if (currentUserId == null) return Results.BadRequest("El Id del usuario no existe.");
                 
                 if (currentUserId != id || string.IsNullOrWhiteSpace(currentUserId.Trim()))
                     return Results.BadRequest(new
-                        { IsSuccess = false, Message = "El id del usuario no coincide con tus credenciales." });
+                        { IsSuccess = false, Message = "El Id del usuario no coincide con tus credenciales." });
                 
                 var user = command.Adapt<User>();
                 user.Id = id;

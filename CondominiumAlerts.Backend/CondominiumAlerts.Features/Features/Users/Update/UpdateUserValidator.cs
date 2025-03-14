@@ -16,7 +16,7 @@ public class UpdateUserValidator : AbstractValidator<UpdateUserCommand>
         RuleFor(u => u.Lastname).NotEmpty().WithMessage("El apellido es requerido.");         
         RuleFor(u => u.Lastname).MinimumLength(3).MaximumLength(200).WithMessage("El apellido debe tener entre 3 y 200 caracteres.");  
         RuleFor(u => u.Id)
-            .NotEmpty().WithMessage("El id es requerido.")
+            .NotEmpty().WithMessage("El Id es requerido.")
             .Matches(@"^[a-zA-Z0-9_-]+$").WithMessage("El Id contiene caracteres no válidos.");
         RuleFor(u => u.ProfilePic)
             .Must(BeAValidImage).WithMessage("El archivo debe ser una imagen válida (JPG, PNG, WEBP).");
