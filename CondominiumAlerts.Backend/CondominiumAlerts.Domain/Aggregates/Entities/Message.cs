@@ -5,7 +5,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace CondominiumAlerts.Domain.Aggregates.Entities;
     public sealed class Message : IEntity<Guid>
     {
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid Id { get; set; }
         public string Text{ get; set; } = string.Empty!;
         public string? MediaUrl { get; set; }

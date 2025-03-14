@@ -2,7 +2,7 @@ using CondominiumAlerts.CrossCutting.CQRS.Interfaces;
 using LightResults;
 using Microsoft.AspNetCore.Http;
 
-namespace CondominiumAlerts.Features.Features.Condominium.Add
+namespace CondominiumAlerts.Features.Features.Condominiums.Add
 {
     public class AddCondominiumCommand
     : ICommand<Result<AddCondominiumResponse>>

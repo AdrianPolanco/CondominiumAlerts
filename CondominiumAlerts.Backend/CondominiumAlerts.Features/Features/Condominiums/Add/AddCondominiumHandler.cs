@@ -8,7 +8,7 @@ using LightResults;
 using Microsoft.Extensions.Logging;
 using CondominiumEntity = CondominiumAlerts.Domain.Aggregates.Entities;
 
-namespace CondominiumAlerts.Features.Features.Condominium.Add
+namespace CondominiumAlerts.Features.Features.Condominiums.Add
 {
     public class AddCondominiumHandler
     : ICommandHandler<AddCondominiumCommand, Result<AddCondominiumResponse>>

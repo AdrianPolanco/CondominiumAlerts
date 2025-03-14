@@ -1,8 +1,8 @@
 using System.Reflection;
 using CondominiumAlerts.CrossCutting.Behaviors;
 using CondominiumAlerts.Domain.Aggregates.ValueObjects;
-using CondominiumAlerts.Features.Features.Condominium.Add;
-using CondominiumAlerts.Features.Features.Condominium.Join;
+using CondominiumAlerts.Features.Features.Condominiums.Add;
+using CondominiumAlerts.Features.Features.Condominiums.Join;
 using CondominiumAlerts.Features.Features.Posts.Get;
 using CondominiumAlerts.Features.Features.Users.Register;
 using CondominiumAlerts.Features.Features.Users.Update;

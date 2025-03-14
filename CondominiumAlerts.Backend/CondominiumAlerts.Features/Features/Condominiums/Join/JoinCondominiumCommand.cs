@@ -1,7 +1,7 @@
 ﻿using CondominiumAlerts.CrossCutting.CQRS.Interfaces;
 using LightResults;
 
-namespace CondominiumAlerts.Features.Features.Condominium.Join
+namespace CondominiumAlerts.Features.Features.Condominiums.Join
 {
     public class JoinCondominiumCommand : ICommand<Result<JoinCondominiumResponce>>
     {

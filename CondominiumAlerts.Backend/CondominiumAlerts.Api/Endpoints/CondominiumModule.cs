@@ -1,6 +1,6 @@
 ﻿using Carter;
-using CondominiumAlerts.Features.Features.Condominium.Add;
-using CondominiumAlerts.Features.Features.Condominium.Join;
+using CondominiumAlerts.Features.Features.Condominiums.Add;
+using CondominiumAlerts.Features.Features.Condominiums.Join;
 using FirebaseAdmin.Auth;
 using LightResults;
 using Mapster;

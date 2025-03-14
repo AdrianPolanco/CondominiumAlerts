@@ -11,6 +11,7 @@ using Coravel;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
 using MailKit.Net.Smtp;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -24,7 +25,8 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddNpgsql<ApplicationDbContext>(configuration.GetConnectionString("DefaultConnection")!);
+        services.AddDbContext<ApplicationDbContext>(options =>
+            options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")!));
         services.AddSingleton<IAuthenticationProvider, AuthenticationProvider>();
         services.Configure<SmtpSettings>(configuration.GetSection("SmtpSettings"));
         services.AddScoped<IEmailService, EmailService>();

@@ -2,7 +2,7 @@
 
 using FluentValidation;
 
-namespace CondominiumAlerts.Features.Features.Condominium.Join
+namespace CondominiumAlerts.Features.Features.Condominiums.Join
 {
     public class JoinCondominiumValidator : AbstractValidator<JoinCondominiumCommand>
     {

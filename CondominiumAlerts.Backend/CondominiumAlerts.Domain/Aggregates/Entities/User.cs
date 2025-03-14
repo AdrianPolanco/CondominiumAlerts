@@ -1,5 +1,6 @@
 ﻿using CondominiumAlerts.Domain.Aggregates.Interfaces;
 using CondominiumAlerts.Domain.Aggregates.ValueObjects;
+using CondominiumAlerts.Features.Features.Summary;
 
 namespace CondominiumAlerts.Domain.Aggregates.Entities;
 
@@ -21,4 +22,5 @@ public sealed class User : IAggregateRoot<string>
     public IReadOnlyCollection<Message>? MessagesReceivedByUser { get; set; }
     public IReadOnlyCollection<Notification>? NotificationsReceivedByUser { get; set; }
     public IReadOnlyCollection<Condominium>? Condominiums { get; set; }
+    public IReadOnlyCollection<Summary> TriggeredSummaries { get; set; }
 }

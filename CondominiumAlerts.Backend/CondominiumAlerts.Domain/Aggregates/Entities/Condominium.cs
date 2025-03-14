@@ -1,6 +1,7 @@
 ﻿
 using CondominiumAlerts.Domain.Aggregates.Interfaces;
 using System.ComponentModel.DataAnnotations.Schema;
+using CondominiumAlerts.Features.Features.Summary;
 
 
 namespace CondominiumAlerts.Domain.Aggregates.Entities;
@@ -21,5 +22,6 @@ namespace CondominiumAlerts.Domain.Aggregates.Entities;
         public IReadOnlyCollection<Post>? Posts { get; set; }
         public IReadOnlyCollection<LevelOfPriority>? LevelOfPriorities { get; set; }
         public IReadOnlyCollection<Message>? Messages { get; set; }
+        public IReadOnlyCollection<Summary> Summaries { get; set; }
 
     }

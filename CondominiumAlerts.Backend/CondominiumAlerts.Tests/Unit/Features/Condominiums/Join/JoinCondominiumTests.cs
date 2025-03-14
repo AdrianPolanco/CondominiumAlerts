@@ -2,7 +2,7 @@
 using CondominiumAlerts.Domain.Aggregates.Entities;
 using CondominiumAlerts.Domain.Repositories;
 using CondominiumAlerts.Features.Extensions;
-using CondominiumAlerts.Features.Features.Condominium.Join;
+using CondominiumAlerts.Features.Features.Condominiums.Join;
 using CondominiumAlerts.Infrastructure.Persistence.Context;
 using CondominiumAlerts.Infrastructure.Persistence.Repositories;
 using FluentValidation;

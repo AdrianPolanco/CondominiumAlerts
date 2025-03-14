@@ -1,4 +1,5 @@
 ﻿using CondominiumAlerts.Domain.Aggregates.Entities;
+using CondominiumAlerts.Features.Features.Summary;
 using Microsoft.EntityFrameworkCore;
 
 namespace CondominiumAlerts.Infrastructure.Persistence.Context;
@@ -12,6 +13,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<Message> Messages { get; set; }
     public DbSet<Notification> Notifications { get; set; }
     public DbSet<User> Users { get; set; }
+    public DbSet<Summary> Summaries { get; set; }
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> dbContextOptions) : base(dbContextOptions)
     {
         

@@ -6,7 +6,7 @@ using LightResults;
 using Microsoft.Extensions.Logging;
 
 
-namespace CondominiumAlerts.Features.Features.Condominium.Join
+namespace CondominiumAlerts.Features.Features.Condominiums.Join
 {
     public class JoinCondominiumCommandHandler : ICommandHandler<JoinCondominiumCommand, Result<JoinCondominiumResponce>>
     {

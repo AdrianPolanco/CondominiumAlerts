@@ -28,7 +28,7 @@ public class EmailService: IEmailService
         var mimeMessage = new MimeMessage();
         mimeMessage.From.Add(new MailboxAddress(_smtpSettings.SenderName, _smtpSettings.Sender));
         mimeMessage.To.Add(new MailboxAddress($"{name} {lastname}", email));
-        mimeMessage.Subject = "Confirma tu cuenta de Condominium Alerts.";
+        mimeMessage.Subject = "Confirma tu cuenta de Condominiums Alerts.";
 
         var bodyBuilder = new BodyBuilder();
         bodyBuilder.HtmlBody = string.Format(
@@ -70,14 +70,14 @@ public class EmailService: IEmailService
                 <table width=""600"" style=""background-color: #ffffff; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);"">
                     <tr>
                         <td align=""center"" style=""padding-bottom: 20px;"">
-                            <img src=""https://res.cloudinary.com/dmeixgsxo/image/upload/v1738627118/CondominiumAlertsLogo_kqozqe.jpg"" alt=""Condominium Alerts"" style=""max-width: 150px; margin-bottom: 20px;"">
-                            <h1 style=""color: #333;"">Bienvenido a Condominium Alerts</h1>
+                            <img src=""https://res.cloudinary.com/dmeixgsxo/image/upload/v1738627118/CondominiumAlertsLogo_kqozqe.jpg"" alt=""Condominiums Alerts"" style=""max-width: 150px; margin-bottom: 20px;"">
+                            <h1 style=""color: #333;"">Bienvenido a Condominiums Alerts</h1>
                         </td>
                     </tr>
                     <tr>
                         <td style=""padding: 10px 20px; font-size: 16px; color: #555;"">
                             <p>Hola <strong>{0} {1}</strong>,</p>
-                            <p>Gracias por registrarte en <strong>Condominium Alerts</strong>. Para completar tu registro, por favor confirma tu cuenta haciendo clic en el botón a continuación:</p>
+                            <p>Gracias por registrarte en <strong>Condominiums Alerts</strong>. Para completar tu registro, por favor confirma tu cuenta haciendo clic en el botón a continuación:</p>
                         </td>
                     </tr>
                     <tr>
@@ -88,7 +88,7 @@ public class EmailService: IEmailService
                     <tr>
                         <td style=""padding: 10px 20px; font-size: 14px; color: #777; text-align: center;"">
                             <p>Si no solicitaste esta cuenta, simplemente ignora este mensaje.</p>
-                            <p>&copy; 2024 Condominium Alerts. Todos los derechos reservados.</p>
+                            <p>&copy; 2024 Condominiums Alerts. Todos los derechos reservados.</p>
                         </td>
                     </tr>
                 </table>

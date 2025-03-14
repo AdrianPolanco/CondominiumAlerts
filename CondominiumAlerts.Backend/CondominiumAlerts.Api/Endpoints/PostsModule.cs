@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CondominiumAlerts.Api.Endpoints
 {
-    public class PostsEndpoints : ICarterModule
+    public class PostsModule : ICarterModule
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
