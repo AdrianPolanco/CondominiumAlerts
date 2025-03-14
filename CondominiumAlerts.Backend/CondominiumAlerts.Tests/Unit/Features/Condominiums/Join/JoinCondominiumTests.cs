@@ -35,7 +35,7 @@ namespace CondominiumAlerts.Tests.Unit.Features.Condominiums.Join
         {
 
             var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-         .UseNpgsql<ApplicationDbContext>("Host=ep-sweet-wave-a87bdkhv-pooler.eastus2.azure.neon.tech;Port=5432;Username=neondb_owner;Password=npg_cW8RGSzdx1vp;Database=neondb;SSL Mode=Require;Trust Server Certificate=true;\n")
+         .UseNpgsql<ApplicationDbContext>("ConnectionString")
             .Options;
 
             _context = new ApplicationDbContext(options);
@@ -184,7 +184,7 @@ namespace CondominiumAlerts.Tests.Unit.Features.Condominiums.Join
         {
             //Get data for making this test run
             _command.CondominiumCode = "tTd/uIvrthy";
-            _command.UserId = "OLrNj6uE0WWxeBMpHg9vf1ikirX2";
+            _command.UserId = "gqm3lFdtECVIek1p23aFD5SqSTs2";
 
             // try to make a db entry so that this test can pass
 

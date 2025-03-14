@@ -9,23 +9,31 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
     public void Configure(EntityTypeBuilder<User> builder)
     {
         builder.HasKey(u => u.Id);
+
         builder.HasMany(u => u.MessagesCreatedByUser)
             .WithOne(m => m.CreatorUser)
             .HasForeignKey(m => m.CreatorUserId)
             .OnDelete(DeleteBehavior.SetNull);
+
         builder.HasMany(u => u.MessagesReceivedByUser)
             .WithOne(m => m.ReceiverUser)
             .HasForeignKey(m => m.ReceiverUserId)
             .OnDelete(DeleteBehavior.SetNull);
+
         builder.HasMany(u => u.NotificationsReceivedByUser)
             .WithOne(n => n.ReceiverUser)
             .HasForeignKey(n => n.ReceiverUserId)
             .OnDelete(DeleteBehavior.SetNull);
+
         builder.HasMany(u => u.Posts)
             .WithOne(p => p.User)
             .HasForeignKey(p => p.UserId)
             .OnDelete(DeleteBehavior.SetNull);
-        
+
+        builder.HasMany(u => u.Condominiums)
+            .WithOne(c => c.User)
+            .HasForeignKey(c => c.UserId).OnDelete(DeleteBehavior.SetNull);
+
         builder.Property(b => b.CreatedAt)
             .HasDefaultValueSql("CURRENT_TIMESTAMP")
             .ValueGeneratedOnAdd();
