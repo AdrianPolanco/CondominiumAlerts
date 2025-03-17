@@ -51,13 +51,13 @@ namespace CondominiumAlerts.Features.Features.Condominiums.Join
                 return Result.Fail<JoinCondominiumResponse>($"The Code {request.CondominiumCode} dosent belong to any condominium");
             }
 
-            if (await _userRepository.AnyAsync((u => u.Id == request.UserId), default))
+            if (!await _userRepository.AnyAsync((u => u.Id == request.UserId), default))
             {
                 _logger.LogWarning($"The user with supposed Id {request.UserId} couldn't be founded");
                 return Result.Fail<JoinCondominiumResponse>($"The user couldn't be founded");
             }
 
-            if (await _condominiumUserRepository.AnyAsync(cu => cu.UserId == request.UserId && cu.CondominiumId == condominiumTobeJoined.Id, default))
+            if (await _condominiumUserRepository.AnyAsync(cu => cu.UserId == request.UserId && cu.CondominiumId == condominiumTobeJoined.Id, cancellationToken))
             {
                 _logger.LogWarning($"The user is already part of the condominium {condominiumTobeJoined?.Name }");
                 return Result.Fail<JoinCondominiumResponse>($"The user is already part of the condominium {condominiumTobeJoined?.Name}");
@@ -67,7 +67,7 @@ namespace CondominiumAlerts.Features.Features.Condominiums.Join
             {
                 CondominiumId = condominiumTobeJoined.Id,
                 UserId = request.UserId,
-            });
+            }, cancellationToken);
 
             return Result.Ok<JoinCondominiumResponse>(new(request.UserId, condominiumTobeJoined.Id));
 

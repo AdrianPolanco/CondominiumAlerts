@@ -32,7 +32,7 @@ namespace CondominiumAlerts.Features.Features.Condominiums.GetCondominiumsJoined
             if (!validResult.IsValid)
             {
                 IEnumerable<string> erros = validResult.Errors.Select(e => e.ErrorMessage);
-                _logger.LogWarning("validation failed: \n {errors}", String.Join("\n ", erros));
+                _logger.LogWarning("validation failed: \n {errors}", string.Join("\n ", erros));
                 return Result.Fail<List<GetCondominiumsJoinedByUserResponse>>(String.Join(", ", erros));
             }
 
