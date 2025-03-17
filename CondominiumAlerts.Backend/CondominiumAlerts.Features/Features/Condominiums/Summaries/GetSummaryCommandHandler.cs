@@ -5,6 +5,7 @@ using CondominiumAlerts.Infrastructure.Services;
 using CondominiumAlerts.Infrastructure.Services.AI.MessagesSummary;
 using LightResults;
 using Mapster;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 using Message = CondominiumAlerts.Domain.Aggregates.Entities.Message;
 
@@ -13,28 +14,33 @@ namespace CondominiumAlerts.Features.Features.Condominiums.Summaries;
 
 public class GetSummaryCommandHandler : ICommandHandler<GetSummaryCommand, Result<GetSummaryCommandResponse>>
 {
+    private readonly IHubContext<SummaryHub> _hubContext;
     private readonly ILogger<GetSummaryCommandHandler> _logger;
     private readonly IRepository<Condominium, Guid> _condominiumRepository;
     private readonly IRepository<Message, Guid> _messageRepository;
     private readonly IRepository<User, string> _userRepository;
-    private readonly IAIService _aiService;
+    private readonly IAiService _aiService;
 
     public GetSummaryCommandHandler(
         ILogger<GetSummaryCommandHandler> logger, 
-        IRepository<Domain.Aggregates.Entities.Condominium, Guid> condominiumRepository, 
+        IRepository<Condominium, Guid> condominiumRepository, 
         IRepository<Message, Guid> messageRepository,
         IRepository<User, string> userRepository,
-        IAIService aiService)
+        IAiService aiService,
+        IHubContext<SummaryHub> hubContext
+        )
     {
         _logger = logger;
         _condominiumRepository = condominiumRepository;
         _messageRepository = messageRepository;
         _userRepository = userRepository;
         _aiService = aiService;
+        _hubContext = hubContext;
     }
     
     public async Task<Result<GetSummaryCommandResponse>> Handle(GetSummaryCommand request, CancellationToken cancellationToken)
     {
+        
         //Validacion de condominio
         var condominium = await _condominiumRepository.GetByIdAsync(request.CondominiumId, cancellationToken);
         if (condominium is null)
@@ -43,6 +49,8 @@ public class GetSummaryCommandHandler : ICommandHandler<GetSummaryCommand, Resul
             _logger.LogWarning(errorMessage);
             return Result.Fail<GetSummaryCommandResponse>(errorMessage);
         }
+        
+        await _hubContext.Clients.Group(request.CondominiumId.ToString()).SendAsync("NotifyProcessingStarted", $"Se inició el procesamiento para el condominio {condominium.Name}.", cancellationToken);
         
         // Validación de usuario
         var user = await _userRepository.GetByIdAsync(request.TriggeredBy, cancellationToken);

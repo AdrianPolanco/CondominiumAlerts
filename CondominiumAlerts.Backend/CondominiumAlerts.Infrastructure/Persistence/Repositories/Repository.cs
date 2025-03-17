@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage;
 
 namespace CondominiumAlerts.Infrastructure.Persistence.Repositories;
 
-public class Repository<TEntity, TId> : IRepository<TEntity, TId> where TEntity : class, IEntity<TId>
+public class Repository<TEntity, TId> : IRepository<TEntity, TId> where TEntity : class, IBaseEntity<TId>
 {
     private readonly ApplicationDbContext _context;
     private readonly DbSet<TEntity> _dbSet;
@@ -105,7 +105,9 @@ public class Repository<TEntity, TId> : IRepository<TEntity, TId> where TEntity 
         {
             try
             {
-                entity.UpdatedAt = DateTime.UtcNow;
+                if(entity is IEntity<TId>)) {
+                    (IEntity<TId>)entity.UpdatedAt = DateTime.UtcNow;
+                }
                 _dbSet.Update(entity);
                 await SaveChangesAsync(cancellationToken);
                 await CommitAsync(cancellationToken);

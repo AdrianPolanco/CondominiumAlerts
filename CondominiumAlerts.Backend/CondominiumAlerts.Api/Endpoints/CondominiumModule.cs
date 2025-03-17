@@ -6,10 +6,12 @@ using CondominiumAlerts.Features.Features.Condominiums.GetCondominiumsJoinedByUs
 using CondominiumAlerts.Features.Features.Condominiums.Get;
 using CondominiumAlerts.Features.Features.Condominiums.Join;
 using CondominiumAlerts.Features.Features.Condominiums.Summaries;
+using CondominiumAlerts.Infrastructure.Services.AI.MessagesSummary;
 using LightResults;
 using Mapster;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Message = CondominiumAlerts.Domain.Aggregates.Entities.Message;
 
 namespace CondominiumAlerts.Api.Endpoints
 {
@@ -413,6 +415,8 @@ namespace CondominiumAlerts.Api.Endpoints
 
                 return Results.Ok(messages);
             });
+
+            app.MapHub<SummaryHub>("/condominiums/hubs/summary");
         }
     }
 }

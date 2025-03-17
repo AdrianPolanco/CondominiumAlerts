@@ -6,14 +6,14 @@ using CondominiumAlerts.Infrastructure.Services.AI.MessagesSummary;
 using Microsoft.Extensions.Logging;
 
 
-namespace CondominiumAlerts.Infrastructure.Services;
+namespace CondominiumAlerts.Infrastructure.Services.AI.MessagesSummary;
 
-public class AIService : IAIService
+public class AiService : IAiService
 {
     private readonly HttpClient _httpClient;
-    private readonly ILogger<AIService> _logger;
+    private readonly ILogger<AiService> _logger;
     
-    public AIService(HttpClient httpClient, ILogger<AIService> logger)
+    public AiService(HttpClient httpClient, ILogger<AiService> logger)
     {
         _httpClient = httpClient;
         _logger = logger;

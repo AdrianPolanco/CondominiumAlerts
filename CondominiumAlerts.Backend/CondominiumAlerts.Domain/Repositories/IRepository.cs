@@ -4,7 +4,7 @@ using CondominiumAlerts.Domain.Aggregates.Interfaces;
 
 namespace CondominiumAlerts.Domain.Repositories;
 
-public interface IRepository<TEntity, TId> where TEntity : class, IEntity<TId>
+public interface IRepository<TEntity, TId> where TEntity : class, IBaseEntity<TId>
 {
     Task<bool> AnyAsync(Expression<Func<TEntity, bool>> filter, CancellationToken cancellationToken);
     Task<TEntity?> GetByIdAsync(TId id, CancellationToken cancellationToken, bool readOnly = false, bool ignoreQueryFilters = false, params Expression<Func<TEntity, object>>[] includes);

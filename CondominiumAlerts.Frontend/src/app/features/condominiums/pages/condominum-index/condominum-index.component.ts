@@ -51,15 +51,20 @@ export class CondominumIndexComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+<<<<<<< HEAD
     this.condominiumId = this.route.snapshot.paramMap.get('condominiumId');
     console.log(this.condominiumId);
-   
+=======
+   this.condominiumId =  this.route.snapshot.paramMap.get("condominiumId")
+   console.log(this.condominiumId);
+   this.getCondominiumData();
    if (this.condominium === null) {
     this.router.navigate(['condominium/main-page']);
    }
+>>>>>>> feature/condominiumIndex
     this.loadPosts();
     this.loadUsers();
-    this.getCondominiumData();
+
   }
 
   loadPosts(): void {

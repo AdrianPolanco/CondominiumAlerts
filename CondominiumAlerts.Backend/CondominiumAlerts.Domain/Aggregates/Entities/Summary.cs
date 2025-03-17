@@ -1,6 +1,8 @@
-﻿namespace CondominiumAlerts.Domain.Aggregates.Entities;
+﻿using CondominiumAlerts.Domain.Aggregates.Interfaces;
 
-public class Summary
+namespace CondominiumAlerts.Domain.Aggregates.Entities;
+
+public class Summary : IEntity<Guid>
 {
     public Guid Id { get; set; }
     public string Content { get; set; }
@@ -9,4 +11,5 @@ public class Summary
     public Guid CondominiumId { get; set; }
     public Condominium Condominium { get; set; }
     public DateTime CreatedAt { get; set; }
+    public DateTime UpdatedAt { get; set; }
 }
