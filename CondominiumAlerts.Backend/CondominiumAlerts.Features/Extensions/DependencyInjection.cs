@@ -1,8 +1,8 @@
 using System.Reflection;
 using CondominiumAlerts.CrossCutting.Behaviors;
 using CondominiumAlerts.Features.Features.Condominiums.Add;
-using CondominiumAlerts.Features.Features.Condominium.Get;
-using CondominiumAlerts.Features.Features.Condominium.GetCondominiumsJoinedByUser;
+using CondominiumAlerts.Features.Features.Condominiums.Get;
+using CondominiumAlerts.Features.Features.Condominiums.GetCondominiumsJoinedByUser;
 using CondominiumAlerts.Features.Features.Condominiums.Join;
 using CondominiumAlerts.Features.Features.Posts.Get;
 using CondominiumAlerts.Features.Features.Users.GetCondominiumsUsers;

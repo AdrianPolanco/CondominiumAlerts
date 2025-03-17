@@ -5,7 +5,7 @@ using FluentValidation;
 using LightResults;
 using Microsoft.Extensions.Logging;
 
-namespace CondominiumAlerts.Features.Features.Condominium.GetCondominiumsJoinedByUser
+namespace CondominiumAlerts.Features.Features.Condominiums.GetCondominiumsJoinedByUser
 {
     public class GetCondominiumsJoinedByUserCommandHandler : ICommandHandler<GetCondominiumsJoinedByUserCommand, Result<List<GetCondominiumsJoinedByUserResponse>>>
     {

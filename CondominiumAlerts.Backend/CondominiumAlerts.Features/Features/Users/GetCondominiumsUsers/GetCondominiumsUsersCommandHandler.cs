@@ -62,7 +62,7 @@ namespace CondominiumAlerts.Features.Features.Users.GetCondominiumsUsers
 
             return Result<List<GetCondominiumsUsersResponse>>.Ok(condominia.Select(cu => new GetCondominiumsUsersResponse(
                 cu.UserId,
-                cu.User?.Name + " " + cu.User?.LastName,
+                cu.User?.Name + " " + cu.User?.Lastname,
                 cu.User?.Email,
                 cu.User?.ProfilePictureUrl
                 )).ToList());

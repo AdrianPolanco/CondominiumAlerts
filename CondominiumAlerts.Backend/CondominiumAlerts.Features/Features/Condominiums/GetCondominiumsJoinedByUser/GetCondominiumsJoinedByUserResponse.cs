@@ -1,6 +1,6 @@
 ﻿
 
-namespace CondominiumAlerts.Features.Features.Condominium.GetCondominiumsJoinedByUser
+namespace CondominiumAlerts.Features.Features.Condominiums.GetCondominiumsJoinedByUser
 {
     public record GetCondominiumsJoinedByUserResponse(
         Guid Id,

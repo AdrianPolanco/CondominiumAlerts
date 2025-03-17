@@ -8,6 +8,7 @@ using Mapster;
 using Microsoft.Extensions.Logging;
 using Message = CondominiumAlerts.Domain.Aggregates.Entities.Message;
 
+
 namespace CondominiumAlerts.Features.Features.Condominiums.Summaries;
 
 public class GetSummaryCommandHandler : ICommandHandler<GetSummaryCommand, Result<GetSummaryCommandResponse>>
@@ -20,7 +21,7 @@ public class GetSummaryCommandHandler : ICommandHandler<GetSummaryCommand, Resul
 
     public GetSummaryCommandHandler(
         ILogger<GetSummaryCommandHandler> logger, 
-        IRepository<Condominium, Guid> condominiumRepository, 
+        IRepository<Domain.Aggregates.Entities.Condominium, Guid> condominiumRepository, 
         IRepository<Message, Guid> messageRepository,
         IRepository<User, string> userRepository,
         IAIService aiService)

@@ -2,7 +2,7 @@
 using LightResults;
 
 
-namespace CondominiumAlerts.Features.Features.Condominium.GetCondominiumsJoinedByUser
+namespace CondominiumAlerts.Features.Features.Condominiums.GetCondominiumsJoinedByUser
 {
     public class GetCondominiumsJoinedByUserCommand : ICommand<Result<List<GetCondominiumsJoinedByUserResponse>>>
     {

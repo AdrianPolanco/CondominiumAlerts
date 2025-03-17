@@ -2,8 +2,8 @@
 using CondominiumAlerts.Domain.Aggregates.Entities;
 using CondominiumAlerts.Domain.Repositories;
 using CondominiumAlerts.Features.Features.Condominiums.Add;
-using CondominiumAlerts.Features.Features.Condominium.Get;
-using CondominiumAlerts.Features.Features.Condominium.GetCondominiumsJoinedByUser;
+using CondominiumAlerts.Features.Features.Condominiums.GetCondominiumsJoinedByUser;
+using CondominiumAlerts.Features.Features.Condominiums.Get;
 using CondominiumAlerts.Features.Features.Condominiums.Join;
 using CondominiumAlerts.Features.Features.Condominiums.Summaries;
 using LightResults;
@@ -51,7 +51,7 @@ namespace CondominiumAlerts.Api.Endpoints
             app.MapGet("/condominium/GetById",
                 async (ISender sender, [AsParameters] GetCondominiumCommand command, CancellationToken cancellationToken) =>
                 {
-                    Result<GetCondominiumResponce> result = await sender.Send(command, cancellationToken);
+                    Result<GetCondominiumResponse> result = await sender.Send(command, cancellationToken);
 
                     if (!result.IsSuccess) return Results.BadRequest(result);
 

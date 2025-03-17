@@ -1,8 +1,8 @@
 ﻿
 
-namespace CondominiumAlerts.Features.Features.Condominium.Get
+namespace CondominiumAlerts.Features.Features.Condominiums.Get
 {
-    public record GetCondominiumResponce(
+    public record GetCondominiumResponse(
         Guid Id,
         string Name,
         string Addres,

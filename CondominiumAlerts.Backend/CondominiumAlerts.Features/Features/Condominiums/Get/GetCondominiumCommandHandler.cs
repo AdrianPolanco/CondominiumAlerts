@@ -4,9 +4,10 @@ using FluentValidation;
 using LightResults;
 using Microsoft.Extensions.Logging;
 using CondominiumEntity = CondominiumAlerts.Domain.Aggregates.Entities.Condominium;
-namespace CondominiumAlerts.Features.Features.Condominium.Get
+
+namespace CondominiumAlerts.Features.Features.Condominiums.Get
 {
-    public class GetCondominiumCommandHandler : ICommandHandler<GetCondominiumCommand, Result<GetCondominiumResponce>>
+    public class GetCondominiumCommandHandler : ICommandHandler<GetCondominiumCommand, Result<GetCondominiumResponse>>
     {
         private readonly IRepository<CondominiumEntity, Guid> _condominiumRepository;
         private readonly IValidator<GetCondominiumCommand> _validator;
@@ -23,14 +24,14 @@ namespace CondominiumAlerts.Features.Features.Condominium.Get
             _logger = logger;
         }
 
-        public async Task<Result<GetCondominiumResponce>> Handle(GetCondominiumCommand request, CancellationToken cancellationToken)
+        public async Task<Result<GetCondominiumResponse>> Handle(GetCondominiumCommand request, CancellationToken cancellationToken)
         {
          FluentValidation.Results.ValidationResult validResult = _validator.Validate(request);   
             if(!validResult.IsValid)
             {
                 IEnumerable<string> erros = validResult.Errors.Select(e => e.ErrorMessage);
                 _logger.LogWarning("validation failed: \n {errors}", String.Join("\n ", erros));
-                return Result.Fail<GetCondominiumResponce>(String.Join(", ", erros)); 
+                return Result.Fail<GetCondominiumResponse>(String.Join(", ", erros)); 
             }
 
             CondominiumEntity condominium = 
@@ -38,10 +39,10 @@ namespace CondominiumAlerts.Features.Features.Condominium.Get
 
             if (condominium == null) {
                 _logger.LogWarning("No condominium with the id {request.CondominiumId} was found", request.CondominiumId);
-                return Result.Fail<GetCondominiumResponce>("No condominium was found");
+                return Result.Fail<GetCondominiumResponse>("No condominium was found");
             }
 
-            return Result< GetCondominiumResponce >.Ok(new(
+            return Result< GetCondominiumResponse >.Ok(new(
                 condominium.Id,
                 condominium.Name,
                 condominium.Address, 

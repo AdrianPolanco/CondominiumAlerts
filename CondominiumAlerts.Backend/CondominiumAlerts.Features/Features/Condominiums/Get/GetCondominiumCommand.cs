@@ -2,9 +2,9 @@
 using LightResults;
 
 
-namespace CondominiumAlerts.Features.Features.Condominium.Get
+namespace CondominiumAlerts.Features.Features.Condominiums.Get
 {
-    public class GetCondominiumCommand : ICommand<Result<GetCondominiumResponce>>
+    public class GetCondominiumCommand : ICommand<Result<GetCondominiumResponse>>
     {
         public string CondominiumId { get; set; } = string.Empty;
     }
