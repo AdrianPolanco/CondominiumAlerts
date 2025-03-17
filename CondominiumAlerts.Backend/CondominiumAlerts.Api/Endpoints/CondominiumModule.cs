@@ -2,14 +2,14 @@
 using CondominiumAlerts.Domain.Aggregates.Entities;
 using CondominiumAlerts.Domain.Repositories;
 using CondominiumAlerts.Features.Features.Condominiums.Add;
+using CondominiumAlerts.Features.Features.Condominium.Get;
+using CondominiumAlerts.Features.Features.Condominium.GetCondominiumsJoinedByUser;
 using CondominiumAlerts.Features.Features.Condominiums.Join;
 using CondominiumAlerts.Features.Features.Condominiums.Summaries;
-using FirebaseAdmin.Auth;
 using LightResults;
 using Mapster;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Org.BouncyCastle.Asn1.Ocsp;
 
 namespace CondominiumAlerts.Api.Endpoints
 {
@@ -20,13 +20,13 @@ namespace CondominiumAlerts.Api.Endpoints
             app.MapPost("/condominium/join",
                 async (ISender sender, [FromForm] JoinCondominiumCommand command, CancellationToken cancellationToken) =>
                 {
-                    Result<JoinCondominiumResponce> result = await sender.Send(command, cancellationToken);
+                    Result<JoinCondominiumResponse> result = await sender.Send(command, cancellationToken);
                     if (!result.IsSuccess) return Results.BadRequest(result);
 
                     var responce = new
                     {
                         IsSuccess = result.IsSuccess,
-                        Data = result.Value.Adapt<JoinCondominiumResponce>()
+                        Data = result.Value.Adapt<JoinCondominiumResponse>()
                     };
                     return Results.Ok(responce);
                 }).DisableAntiforgery();
@@ -47,6 +47,37 @@ namespace CondominiumAlerts.Api.Endpoints
                 }
                 // TODO: Add anti forgery token in frontend: https://stackoverflow.com/a/77191406
             ).DisableAntiforgery();
+
+            app.MapGet("/condominium/GetById",
+                async (ISender sender, [AsParameters] GetCondominiumCommand command, CancellationToken cancellationToken) =>
+                {
+                    Result<GetCondominiumResponce> result = await sender.Send(command, cancellationToken);
+
+                    if (!result.IsSuccess) return Results.BadRequest(result);
+
+                    var responce = new
+                    {
+                        IsSuccess = result.IsSuccess,
+                        Data = result.Value,
+                    };
+                    return Results.Ok(responce);    
+                });
+
+            app.MapGet("/condominium/GetCondominiumsJoinedByUser",
+                async (ISender sender, [AsParameters] GetCondominiumsJoinedByUserCommand command, CancellationToken cancellationToken) =>
+                {
+                    Result<List<GetCondominiumsJoinedByUserResponse>> result = await sender.Send(command, cancellationToken);
+
+                    if (!result.IsSuccess) return Results.BadRequest(result);
+
+                    var responce = new
+                    {
+                        IsSuccess = result.IsSuccess,
+                        Data = result.Value,
+                    };
+
+                    return Results.Ok(responce);    
+                });
 
             app.MapPost("/condominiums/{condominiumId}/summary/{userId}", async (string condominiumId, string userId,
                 ISender sender, CancellationToken CancellationToken) =>

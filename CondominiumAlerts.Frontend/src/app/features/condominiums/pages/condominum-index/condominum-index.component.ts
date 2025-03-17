@@ -1,22 +1,38 @@
 import { Component, OnInit } from '@angular/core';
 import { NgFor, CommonModule, NgOptimizedImage } from '@angular/common';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Toolbar } from 'primeng/toolbar';
 import { Button } from 'primeng/button';
 import { PostService } from '../../../posts/services/post.service';
 
+import { getCondominiumsUsersResponse } from '../../../users/models/user.model';
+import { UserService } from '../../../users/services/user.service';
+import { CondominiumService } from '../../services/condominium.service';
+import { getCondominiumResponse } from '../../models/condominium.model';
+import { CondominiumsLayoutComponent } from '../../../../shared/components/condominiums-layout/condominiums-layout.component';
+
 @Component({
   selector: 'app-condominum-index',
-  imports: [Toolbar, NgFor, CommonModule, Button, NgOptimizedImage],
+  imports: [
+    NgFor,
+    CommonModule,
+    CondominiumsLayoutComponent,
+  ],
   templateUrl: './condominum-index.component.html',
   styleUrls: ['./condominum-index.component.css'],
 })
 export class CondominumIndexComponent implements OnInit {
-  users = [
-    { name: 'Juan Pérez', status: 'En línea', avatar: 'https://via.placeholder.com/40' },
-    { name: 'María López', status: 'Ausente', avatar: 'https://via.placeholder.com/40' },
-    { name: 'Carlos Gómez', status: 'En línea', avatar: 'https://via.placeholder.com/40' },
+  users: Array<getCondominiumsUsersResponse> = [
+    {
+      id: 'dddddfsdfdfs',
+      fullName: 'Juan Pérez',
+      email: 'En línea',
+      profilePictureUrl:
+        'https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg?t=st=1741553994~exp=1741557594~hmac=6790b2380695298926314ad92146ef39a5664838888864b60616996a0850ffdc&w=740',
+    },
   ];
+
+  condominium: getCondominiumResponse | null = null;
 
   notifications = [
     { message: 'Nuevo mensaje de Juan', time: 'Hace 5 minutos' },
@@ -25,20 +41,27 @@ export class CondominumIndexComponent implements OnInit {
   ];
 
   publications: any[] = [];
-
+  condominiumId: string | null = null;
   constructor(
     private router: Router,
-    private postService: PostService
-  ) { }
+    private postService: PostService,
+    private route: ActivatedRoute,
+    private userService: UserService,
+    private condominiumService: CondominiumService
+  ) {}
 
   ngOnInit(): void {
+    this.condominiumId = this.route.snapshot.paramMap.get('condominiumId');
+    console.log(this.condominiumId);
     this.loadPosts();
+    this.loadUsers();
+    this.getCondominiumData();
   }
 
   loadPosts(): void {
     this.postService.getPosts().subscribe({
       next: (data) => {
-        console.log('Publicaciones recibidas:', data); 
+        console.log('Publicaciones recibidas:', data);
         this.publications = data;
       },
       error: (err) => {
@@ -47,6 +70,32 @@ export class CondominumIndexComponent implements OnInit {
     });
   }
 
+  loadUsers(): void {
+    this.userService
+      .getCondominiumsUsers({ condominiumId: this.condominiumId ?? '' })
+      .subscribe({
+        next: (result) => {
+          this.users = result;
+        },
+        error: (err) => {
+          console.log(err);
+        },
+      });
+  }
+
+  getCondominiumData(): void {
+    this.condominiumService
+      .get({ condominiumId: this.condominiumId ?? '' })
+      .subscribe({
+        next: (result) => {
+          this.condominium = result;
+          console.log(this.condominium);
+        },
+        error: (err) => {
+          console.log(err);
+        },
+      });
+  }
   goHome(): void {
     this.router.navigate(['']);
   }

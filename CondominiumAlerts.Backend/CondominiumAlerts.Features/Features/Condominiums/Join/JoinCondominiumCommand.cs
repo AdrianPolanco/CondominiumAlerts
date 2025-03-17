@@ -3,7 +3,7 @@ using LightResults;
 
 namespace CondominiumAlerts.Features.Features.Condominiums.Join
 {
-    public class JoinCondominiumCommand : ICommand<Result<JoinCondominiumResponce>>
+    public class JoinCondominiumCommand : ICommand<Result<JoinCondominiumResponse>>
     {
         public string UserId { get; set; } = String.Empty;
         public string CondominiumCode { get; set; } = String.Empty;

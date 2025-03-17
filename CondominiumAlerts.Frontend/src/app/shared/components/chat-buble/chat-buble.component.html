@@ -1,0 +1,44 @@
+<div
+  class="flex"
+  [ngClass]="{
+    'justify-end': isCurrentUser(),
+    'justify-start': !isCurrentUser()
+  }"
+>
+  <div class="flex gap-2.5 mb-4">
+    <img
+      [src]="
+        isCurrentUser()
+          ? 'https://pagedone.io/asset/uploads/1704091591.png'
+          : 'https://pagedone.io/asset/uploads/1710412177.png'
+      "
+      [alt]="isCurrentUser() ? 'Hailey image' : 'Shanay image'"
+      class="w-10 h-11"
+    />
+    <div>
+      <h5 class="text-gray-900 text-sm font-semibold leading-snug pb-1">
+        {{
+          isCurrentUser() ? "You" : getUserNameById(message()?.receiverUserId)
+        }}
+      </h5>
+      <div class="w-max grid">
+        <div
+          [ngClass]="{
+            'bg-indigo-600 text-white': isCurrentUser(),
+            'bg-gray-100 text-gray-700': !isCurrentUser()
+          }"
+          class="rounded px-3.5 py-2 justify-start items-center gap-3 inline-flex"
+        >
+          <h5 class="text-sm font-normal leading-snug">
+            {{ message()?.text }}
+          </h5>
+        </div>
+        <div class="justify-end items-center inline-flex mb-2.5">
+          <h6 class="text-gray-500 text-xs font-normal leading-4 py-1">
+            {{ message()?.createdAt ? formatDate(message()?.createdAt!) : "" }}
+          </h6>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

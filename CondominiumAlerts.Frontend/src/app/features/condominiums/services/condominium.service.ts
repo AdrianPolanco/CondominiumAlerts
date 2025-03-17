@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { AddCondominiumCommand, AddCondominiumResponse, JoinCondominiumCommand , JoinCondominiumResponce} from '../models/condominium.model';
+import { AddCondominiumCommand, AddCondominiumResponse, getCondominiumCommand, getCondominiumResponse, getCondominiumsJoinedByUserCommand, getCondominiumsJoinedByUserResponse, JoinCondominiumCommand , JoinCondominiumResponce} from '../models/condominium.model';
 
 @Injectable({
   providedIn: 'root'
@@ -38,7 +38,15 @@ export class CondominiumService {
         "/api/condominium/join", fb)
     }
 
-    //TODO: Create the get condominium feature and method
-
-    //TODO: Create the get condominium users mesages side bar feature and method
+    get(cmd: getCondominiumCommand): Observable<getCondominiumResponse>{
+      
+      return this.httpClient.get<getCondominiumResponse>(
+        "/api/condominium/GetById", {params: {condominiumId: cmd.condominiumId}})
+    }
+ 
+    getCondominiumsJoinedByUser(cmd: getCondominiumsJoinedByUserCommand): Observable<Array<getCondominiumsJoinedByUserResponse>>{
+      
+      return this.httpClient.get<Array<getCondominiumsJoinedByUserResponse>>(
+        "/api/condominium/GetCondominiumsJoinedByUser",  {params: {userId: cmd.userId}})
+    }
 }
