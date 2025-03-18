@@ -44,7 +44,7 @@ export class UserService{
     return this.httpClient.post<RegisterUserResponse>("/api/users/register", registerUserRequest);
   }
 
-  async loginWithGoogle(){
+  private async signInWithPopup(){
     try {
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(this.auth, provider);
@@ -57,9 +57,18 @@ export class UserService{
 
   async signUpWithGoogle(){
     try {
-      const user = await this.loginWithGoogle();
+      const user = await this.signInWithPopup();
 
       if(!user) throw new Error("No se pudo iniciar sesión con Google");
+
+      const doesUserExist = await firstValueFrom(
+        this.httpClient.get<{doesUserExist: boolean}>(`/api/users/exists/${user.uid}`)
+      );
+
+      if(doesUserExist.doesUserExist) {
+        this.router.navigate(['/']);
+        return;
+      }
 
       const displayName = user.displayName || '';
       const nameParts = displayName.split(' '); // Divide el nombre en partes
