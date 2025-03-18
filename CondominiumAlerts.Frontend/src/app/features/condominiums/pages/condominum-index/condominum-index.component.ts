@@ -5,10 +5,10 @@ import { Toolbar } from 'primeng/toolbar';
 import { Button } from 'primeng/button';
 import { PostService } from '../../../posts/services/post.service';
 
-import { getCondominiumsUsersResponse } from '../../../users/models/user.model';
+import { GetCondominiumsUsersResponse } from '../../../users/models/user.model';
 import { UserService } from '../../../users/services/user.service';
 import { CondominiumService } from '../../services/condominium.service';
-import { getCondominiumResponse } from '../../models/condominium.model';
+import { GetCondominiumResponse } from '../../models/condominium.model';
 import { CondominiumsLayoutComponent } from '../../../../shared/components/condominiums-layout/condominiums-layout.component';
 
 @Component({
@@ -22,7 +22,7 @@ import { CondominiumsLayoutComponent } from '../../../../shared/components/condo
   styleUrls: ['./condominum-index.component.css'],
 })
 export class CondominumIndexComponent implements OnInit {
-  users: Array<getCondominiumsUsersResponse> = [
+  users: Array<GetCondominiumsUsersResponse> = [
     {
       id: 'dddddfsdfdfs',
       fullName: 'Juan Pérez',
@@ -32,7 +32,7 @@ export class CondominumIndexComponent implements OnInit {
     },
   ];
 
-  condominium: getCondominiumResponse | null = null;
+  condominium: GetCondominiumResponse | null = null;
 
   notifications = [
     { message: 'Nuevo mensaje de Juan', time: 'Hace 5 minutos' },

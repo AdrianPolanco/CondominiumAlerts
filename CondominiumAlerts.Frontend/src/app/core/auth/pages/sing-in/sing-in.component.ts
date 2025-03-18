@@ -12,7 +12,7 @@ import { Toolbar } from 'primeng/toolbar';
 import { RouterLink } from '@angular/router';
 import { Divider } from 'primeng/divider';
 import { NgOptimizedImage } from '@angular/common';
-import { UserService } from '../../../services/user.service';
+import { AuthenticationService } from '../../../services/authentication.service';
 import { MessageService } from 'primeng/api';
 import { FirebaseError } from 'firebase/app';
 
@@ -36,7 +36,7 @@ export class SingInComponent {
   constructor(
     private authService: AuthService,
     private router: Router,
-    private userService: UserService,
+    private userService: AuthenticationService,
     private messageService: MessageService
   ) {}
 
