@@ -26,14 +26,9 @@ export class CondominiumsMainPageComponent {
   }
 
   condominiums = [
-    { id: 1, name: 'Sunset Villas', location: 'Miami, FL' },
-    { id: 2, name: 'Sunset Villas', location: 'Miami, FL' },
-    { id: 3, name: 'Sunset Villas', location: 'Miami, FL' },
-    { id: 4, name: 'Sunset Villas', location: 'Miami, FL' },
-    { id: 5, name: 'Sunset Villas', location: 'Miami, FL' },
-    { id: 6, name: 'Sunset Villas', location: 'Miami, FL' },
-    { id: 7, name: 'Sunset Villas', location: 'Miami, FL' },
-    { id: 8, name: 'Ocean Breeze Condos', location: 'Los Angeles, CA' }
+    { id: "2d2c3c52-de6d-4697-8634-4e460f9d9516", name: 'Sunset Villas  a', location: 'Miami, FL' },
+    { id: "2d2c3c52-de6d-4697-8634-4e460f9d9516", name: 'Sunset Villas b', location: 'Miami, FL' },
+    { id: "2d2c3c52-de6d-4697-8634-4e460f9d9516", name: 'Sunset Villas', location: 'Miami, FL' },
   ];
 
   joinCondominium() {
@@ -69,9 +64,11 @@ export class CondominiumsMainPageComponent {
     this.authService.logout();
     this.router.navigate(['']);
   }
-  viewCondominium(id: number) {
+  viewCondominium(id: string) {
     console.log(`Viewing condominium ID: ${id}`);
+    this.router.navigate([`/condominium/index`, id]);
   }
+
 
   changeModalState() {
     this.isModalOpen = !this.isModalOpen;

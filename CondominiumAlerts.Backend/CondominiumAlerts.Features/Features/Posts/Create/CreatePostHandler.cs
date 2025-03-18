@@ -70,7 +70,7 @@ public class CreatePostHandler : ICommandHandler<CreatePostCommand, Result<Creat
             Title = request.Title,
             Description = request.Description,
             ImageUrl = imageUploadResult.SecureUrl.ToString(),
-            UserId = request.UserId,
+            UserId = userId,
             CreatedAt = DateTime.UtcNow, 
             UpdatedAt = DateTime.UtcNow 
         }, cancellationToken);

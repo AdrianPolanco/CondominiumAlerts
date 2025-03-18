@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { NgFor, CommonModule, NgOptimizedImage } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router'; // Asegúrate de importar ActivatedRoute
 import { Toolbar } from 'primeng/toolbar';
 import { Button } from 'primeng/button';
 import { PostService } from '../../../posts/services/post.service';
@@ -12,6 +12,7 @@ import { PostService } from '../../../posts/services/post.service';
   styleUrls: ['./condominum-index.component.css'],
 })
 export class CondominumIndexComponent implements OnInit {
+
   users = [
     { name: 'Juan Pérez', status: 'En línea', avatar: 'https://via.placeholder.com/40' },
     { name: 'María López', status: 'Ausente', avatar: 'https://via.placeholder.com/40' },
@@ -25,34 +26,45 @@ export class CondominumIndexComponent implements OnInit {
   ];
 
   publications: any[] = [];
+  condominiumId: string = '';
 
   constructor(
     private router: Router,
+    private activatedRoute: ActivatedRoute, 
     private postService: PostService
   ) { }
 
   ngOnInit(): void {
-    this.loadPosts();
+    this.activatedRoute.params.subscribe(params => {
+      this.condominiumId = params['id']; 
+      this.loadPosts();
+    });
+  }
+
+  goToCreatePosts() {
+    console.log('Creating a new Posts...');
+    this.router.navigate(['condominium/index/create']);
   }
 
   loadPosts(): void {
-    const condominiumId = '2d2c3c52-de6d-4697-8634-4e460f9d9516'; // ID estático
-
-    this.postService.getPosts(condominiumId).subscribe({
-      next: (data) => {
-        console.log('Publicaciones recibidas:', data);
-        this.publications = data;
-      },
-      error: (err) => {
-        console.error('Error al cargar las publicaciones:', err);
-      },
-    });
+    // Usamos el ID dinámico para cargar las publicaciones
+    if (this.condominiumId) {
+      this.postService.getPosts(this.condominiumId).subscribe({
+        next: (data) => {
+          console.log('Publicaciones recibidas:', data);
+          this.publications = data;
+        },
+        error: (err) => {
+          console.error('Error al cargar las publicaciones:', err);
+        },
+      });
+    }
   }
 
   goHome(): void {
     this.router.navigate(['']);
   }
-  
+
   openCreatePostModal(): void {
     console.log('Abrir modal de creación de publicaciones');
   }
