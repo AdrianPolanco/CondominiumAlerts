@@ -85,6 +85,18 @@ namespace CondominiumAlerts.Api.Endpoints
                     return Results.Ok(responce);    
                 });
 
+            app.MapGet("/condominiums/{condominiumId}/messages", async (Guid condominiumId, CancellationToken cancellationToken, IRepository<Message, Guid> messagesRepository) =>
+            {
+                var messages = await messagesRepository.GetAsync(
+                    cancellationToken: cancellationToken,
+                    filter: m => m.CondominiumId == condominiumId
+                );
+
+                return Results.Ok(new {
+                    messages
+                });
+            });
+
             app.MapPost("/condominiums/{condominiumId}/summary/{userId}", 
                 async (
                     Guid condominiumId, 
