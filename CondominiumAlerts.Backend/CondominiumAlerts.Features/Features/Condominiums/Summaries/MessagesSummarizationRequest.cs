@@ -3,4 +3,4 @@ using CondominiumAlerts.Features.Features.Users.Register;
 
 namespace CondominiumAlerts.Features.Features.Condominiums.Summaries;
 
-public record MessagesSummarizationRequest(Guid CondominiumId, string CondominiumName, string TriggeredBy);
+public record MessagesSummarizationRequest(Guid CondominiumId, string TriggeredBy);

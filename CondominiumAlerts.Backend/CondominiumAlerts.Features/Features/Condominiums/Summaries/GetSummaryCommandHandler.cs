@@ -16,73 +16,49 @@ public class GetSummaryCommandHandler : ICommandHandler<GetSummaryCommand, Resul
 {
     private readonly IHubContext<SummaryHub> _hubContext;
     private readonly ILogger<GetSummaryCommandHandler> _logger;
-    private readonly IRepository<Condominium, Guid> _condominiumRepository;
     private readonly IRepository<Message, Guid> _messageRepository;
-    private readonly IRepository<User, string> _userRepository;
     private readonly IAiService _aiService;
 
     public GetSummaryCommandHandler(
         ILogger<GetSummaryCommandHandler> logger, 
-        IRepository<Condominium, Guid> condominiumRepository, 
         IRepository<Message, Guid> messageRepository,
-        IRepository<User, string> userRepository,
         IAiService aiService,
         IHubContext<SummaryHub> hubContext
         )
     {
         _logger = logger;
-        _condominiumRepository = condominiumRepository;
         _messageRepository = messageRepository;
-        _userRepository = userRepository;
         _aiService = aiService;
         _hubContext = hubContext;
     }
     
     public async Task<Result<GetSummaryCommandResponse>> Handle(GetSummaryCommand request, CancellationToken cancellationToken)
     {
+        // await _hubContext.Clients.Group(request.CondominiumId.ToString()).SendAsync("NotifyProcessingStarted", $"Se inició el procesamiento para el condominio {condominium.Name}.", cancellationToken);
         
-        //Validacion de condominio
-        var condominium = await _condominiumRepository.GetByIdAsync(request.CondominiumId, cancellationToken);
-        if (condominium is null)
-        {
-            var errorMessage = $"Condominio no encontrado. CondominiumId: {request.CondominiumId}";
-            _logger.LogWarning(errorMessage);
-            return Result.Fail<GetSummaryCommandResponse>(errorMessage);
-        }
-        
-        await _hubContext.Clients.Group(request.CondominiumId.ToString()).SendAsync("NotifyProcessingStarted", $"Se inició el procesamiento para el condominio {condominium.Name}.", cancellationToken);
-        
-        // Validación de usuario
-        var user = await _userRepository.GetByIdAsync(request.TriggeredBy, cancellationToken);
-        if (user is null)
-        {
-            var errorMessage = $"Usuario no encontrado. UserId: {request.TriggeredBy}";
-            _logger.LogWarning(errorMessage);
-            return Result.Fail<GetSummaryCommandResponse>(errorMessage);
-        }
         // Validación de mensajes
-        var messages = await _messageRepository.GetAsync(filter: m => m.CondominiumId == request.CondominiumId && m.CreatedAt > DateTime.UtcNow.AddHours(-24), cancellationToken: cancellationToken);
+        var messages = await _messageRepository.GetAsync(filter: m => m.CondominiumId == request.Condominium.Id && m.CreatedAt > DateTime.UtcNow.AddHours(-24), cancellationToken: cancellationToken);
         if (messages.Count == 0)
         {
-            var errorMessage = $"No se encontraron mensajes en el condominio. CondominiumId: {request.CondominiumId}, Mensajes: 0";
+            var errorMessage = $"No se encontraron mensajes en el condominio. CondominiumId: {request.Condominium.Id}, Mensajes: 0";
             _logger.LogWarning(errorMessage);
             return Result.Fail<GetSummaryCommandResponse>(errorMessage);
         }
         
-        var recoveredMessagesLog = $"Mensajes recuperados exitosamente. CondominiumId: {request.CondominiumId}. Cantidad de mensajes: {messages.Count}";
+        var recoveredMessagesLog = $"Mensajes recuperados exitosamente. CondominiumId: {request.Condominium.Id}. Cantidad de mensajes: {messages.Count}";
         _logger.LogInformation(recoveredMessagesLog);
         
         var messagesDto = messages.Adapt<List<MessageDto>>();
         
         _logger.LogInformation("MessagesDTO: {dto}", messagesDto);
 
-        var summary = await _aiService.GenerateSummary(messagesDto, user, condominium, cancellationToken);
+        var summary = await _aiService.GenerateSummary(messagesDto, request.TriggeredByUser, request.Condominium, cancellationToken);
         
         if(summary is null) return Result.Fail<GetSummaryCommandResponse>("Hubo un error al resumir la conversacion.");
         
         var response = new GetSummaryCommandResponse(summary);
         
-        var successMessage = $"Resumen solicitado exitosamente. CondominiumId: {request.CondominiumId}, UserId: {request.TriggeredBy}, Mensajes: {messages.Count}";
+        var successMessage = $"Resumen solicitado exitosamente. CondominiumId: {request.Condominium.Id}, UserId: {request.TriggeredByUser}, Mensajes: {messages.Count}";
         _logger.LogInformation(successMessage);
         
         return Result.Ok<GetSummaryCommandResponse>(response);

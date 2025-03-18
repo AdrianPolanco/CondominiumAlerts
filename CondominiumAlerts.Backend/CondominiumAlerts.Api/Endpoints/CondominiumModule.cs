@@ -7,6 +7,7 @@ using CondominiumAlerts.Features.Features.Condominiums.Get;
 using CondominiumAlerts.Features.Features.Condominiums.Join;
 using CondominiumAlerts.Features.Features.Condominiums.Summaries;
 using CondominiumAlerts.Infrastructure.Services.AI.MessagesSummary;
+using Coravel.Queuing.Interfaces;
 using LightResults;
 using Mapster;
 using MediatR;
@@ -81,21 +82,25 @@ namespace CondominiumAlerts.Api.Endpoints
                     return Results.Ok(responce);    
                 });
 
-            app.MapPost("/condominiums/{condominiumId}/summary/{userId}", async (string condominiumId, string userId,
-                ISender sender, CancellationToken CancellationToken) =>
+            app.MapPost("/condominiums/{condominiumId}/summary/{userId}", 
+                async (
+                    Guid condominiumId, 
+                    string userId, 
+                    ISender sender,
+                    IQueue queue,
+                    CancellationToken CancellationToken
+                    ) =>
             {
-                GetSummaryCommand command = new(Guid.Parse(condominiumId), userId);
+                MessagesSummarizationRequest request = new(condominiumId, userId);
 
-                var result = await sender.Send(command, CancellationToken);
-
-                if (!result.IsSuccess) return Results.BadRequest(result);
+                queue.QueueInvocableWithPayload<MessagesSummarizationJob, MessagesSummarizationRequest>(request);
 
                 var response = new
                 {
-                    result.IsSuccess,
-                    Data = result.Value
+                    IsSuccess = "pending",
+                    Message = "Tu solicitud para resumir los mensajesdel condominio fue recibida."
                 };
-                return Results.Ok(response);
+                return Results.Accepted("/condominiums/hubs/summary", response);
             });
 
             app.MapPost("/condominiums/test", async (IRepository<Condominium, Guid> repository) =>

@@ -1,9 +1,11 @@
 using System.Reflection;
 using CondominiumAlerts.CrossCutting.Behaviors;
+using CondominiumAlerts.Domain.Aggregates.ValueObjects;
 using CondominiumAlerts.Features.Features.Condominiums.Add;
 using CondominiumAlerts.Features.Features.Condominiums.Get;
 using CondominiumAlerts.Features.Features.Condominiums.GetCondominiumsJoinedByUser;
 using CondominiumAlerts.Features.Features.Condominiums.Join;
+using CondominiumAlerts.Features.Features.Condominiums.Summaries;
 using CondominiumAlerts.Features.Features.Posts.Get;
 using CondominiumAlerts.Features.Features.Users.GetCondominiumsUsers;
 using CondominiumAlerts.Features.Features.Users.Register;
@@ -31,12 +33,14 @@ public static class DependencyInjection
         services.AddScoped<IValidator<AddCondominiumCommand>, AddCondominiumValidator>();
         services.AddScoped<IValidator<GetCondominiumCommand>, GetCondominiumValidator>();
         services.AddScoped<IValidator<GetCondominiumsJoinedByUserCommand>, GetCondominiumsJoinedByUserValidator>();
-
+        services.AddScoped<IValidator<UpdateUserCommand>, UpdateUserValidator>();
+        services.AddScoped<IValidator<Address>, AddressValidator>();
         services.AddScoped<IValidator<GetCondominiumsUsersCommand>, GetCondominiumsUsersValidator>();
 
         services.AddScoped<IRequestHandler<GetPostsCommand, Result<List<GetPostsResponse>>>, GetPostsHandler>();
 
         services.AddTransient<EmailConfirmationJob>();
+        services.AddTransient<MessagesSummarizationJob>();
 
         services.AddScoped<BasicUpdateUserStrategy>();
         services.AddScoped<IUpdateUserStrategy>(sp => 

@@ -18,15 +18,27 @@ public class MessagesSummarizationJob : IInvocable, IInvocableWithPayload<Messag
     private readonly IRepository<Summary, Guid> _summaryRepository;
     private readonly ISender _sender;
     private readonly IHubContext<SummaryHub> _hubContext;
+    private readonly IRepository<User, string> _userRepository;
+    private readonly IRepository<Condominium, Guid> _condominiumRepository;
     public MessagesSummarizationRequest Payload { get; set; }
     public CancellationToken CancellationToken { get; set; }
     
-    public MessagesSummarizationJob(JobCancellationService jobCancellationService, ILogger<MessagesSummarizationJob> logger, ISender sender, IHubContext<SummaryHub> hubContext)
+    public MessagesSummarizationJob(
+        JobCancellationService jobCancellationService, 
+        ILogger<MessagesSummarizationJob> logger, 
+        ISender sender, 
+        IHubContext<SummaryHub> hubContext,
+        IRepository<Summary, Guid> summaryRepository,
+        IRepository<User, string> userRepository,
+        IRepository<Condominium, Guid> condominiumRepository)
     {
         _jobCancellationService = jobCancellationService;
         _logger = logger;
         _sender = sender;
         _hubContext = hubContext;
+        _summaryRepository = summaryRepository;
+        _userRepository = userRepository;
+        _condominiumRepository = condominiumRepository;
     }
     
     public async Task Invoke()
@@ -37,23 +49,52 @@ public class MessagesSummarizationJob : IInvocable, IInvocableWithPayload<Messag
         if (CancellationToken.IsCancellationRequested)
         {
             _logger.LogInformation($"[Solicitud {_jobId}] Solicitud cancelada antes de comenzar.", _jobId);
+            _hubContext.Clients.Group(Payload.CondominiumId.ToString())
+                .SendAsync("CancelledProcessing", "Se cancelo el proceso antes de empezar", CancellationToken);
         }
 
         try
         {
-            _logger.LogInformation($"[Solicitud {_jobId}] Procesando mensajes para el condominio [${Payload.CondominiumId} - ${Payload.CondominiumName}].");
+            //Validacion de condominio
+            var condominium = await _condominiumRepository.GetByIdAsync(Payload.CondominiumId, CancellationToken);
+            if (condominium is null)
+            {
+                var errorMessage = $"Condominio no encontrado. CondominiumId: {Payload.CondominiumId}";
+                _logger.LogWarning(errorMessage);
+                return;
+            }
             
-            var command = Payload.Adapt<GetSummaryCommand>();
+            // Validación de usuario
+            var user = await _userRepository.GetByIdAsync(Payload.TriggeredBy, CancellationToken);
+            if (user is null)
+            {
+                var errorMessage = $"Usuario no encontrado. UserId: {Payload.TriggeredBy}";
+                _logger.LogWarning(errorMessage);
+                return;
+            }
+            
+            _logger.LogInformation($"[Solicitud {_jobId}] Procesando mensajes para el condominio [${condominium.Id} - ${condominium.Name}] por solicitud del usuario [${user.Id} - {user.Username}].");
+            
+            var command = new GetSummaryCommand(condominium, user);
             var result = await _sender.Send(command, CancellationToken);
 
-            if (result.IsSuccess && result.Value is GetSummaryCommandResponse response)
+            if (result.IsSuccess && result.Value is not null)
             {
-                await _hubContext.Clients.Group(command.CondominiumId.ToString()).SendAsync("SendSummary", response.Summary.Content);
-                
+                await _hubContext.Clients.Group(command.Condominium.Id.ToString()).SendAsync("SendSummary", result.Value.Summary, CancellationToken);
+                await _summaryRepository.CreateAsync(result.Value.Summary, CancellationToken);
             }
+            else
+            {
+                // Notificar que hubo un error en el procesamiento
+                await _hubContext.Clients.Group(command.Condominium.Id.ToString())
+                    .SendAsync("NotifyProcessingError", $"Error en el procesamiento: {result.Error}", CancellationToken);
+            }
+            
             if (CancellationToken.IsCancellationRequested)
             {
                 _logger.LogWarning($"[Solicitud {_jobId}] Cancelando solicitud...");
+                _hubContext.Clients.Group(Payload.CondominiumId.ToString())
+                    .SendAsync("CancelledProcessing", "Se ha cancelado el proceso.");
                 return;
             }
             
@@ -62,16 +103,19 @@ public class MessagesSummarizationJob : IInvocable, IInvocableWithPayload<Messag
         catch (OperationCanceledException)
         {
             _logger.LogWarning($"[Job {_jobId}] Se canceló correctamente.", _jobId);
+            _hubContext.Clients.Group(Payload.CondominiumId.ToString())
+                .SendAsync("CancelledProcessing", "Se cancelo el proceso antes de empezar", CancellationToken);
         }
         catch(Exception ex)
         {
             _logger.LogError($"[Job {_jobId}] Error: {ex.Message}.");
+            await _hubContext.Clients.Group(Payload.CondominiumId.ToString())
+                .SendAsync("NotifyProcessingError", $"Error en el procesamiento: {ex.Message}", CancellationToken);
         }
         finally
         {
             _jobCancellationService.RemoveJob(_jobId);
         }
     }
-
-
+    
 }
