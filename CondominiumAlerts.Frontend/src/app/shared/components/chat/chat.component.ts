@@ -18,11 +18,14 @@ import { AutoUnsubscribe } from '../../decorators/autounsuscribe.decorator';
 import { Subject, takeUntil } from 'rxjs';
 import { ChatOptions } from './chat.type';
 import { ChatMessageDto } from '../../../core/models/chatMessage.dto';
+import { FormsModule } from '@angular/forms';
+import { ToggleButton } from 'primeng/togglebutton';
+import { Button } from 'primeng/button';
 
 @AutoUnsubscribe()
 @Component({
   selector: 'app-chat',
-  imports: [ChatBoxComponent, ChatBubleComponent, NgFor],
+  imports: [ChatBoxComponent, ChatBubleComponent, NgFor, FormsModule, Button],
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.css',
 })
@@ -35,48 +38,7 @@ export class ChatComponent implements OnInit, OnDestroy {
   options = signal<ChatOptions | null>(null);
   currentUser = this.userService.currentCondominiumUserActive;
   messages = signal<ChatMessageDto[]>([]);
-  /*messages = signal<Message[]>([
-    {
-      id: '1',
-      text: 'Hola, ¿cómo están todos en el condominio?',
-      creatorUserId: 'user1',
-      condominiumId: '123',
-      createdAt: new Date('2025-03-12T12:00:00Z'),
-      updatedAt: new Date('2025-03-12T12:00:00Z'),
-    },
-    {
-      id: '2',
-      text: 'Todo bien, gracias. ¿Y tú?',
-      creatorUserId: 'Z2jPvGKvZ6XIhVPLUhisYkJDPb93',
-      condominiumId: '123',
-      createdAt: new Date('2025-03-12T12:02:00Z'),
-      updatedAt: new Date('2025-03-12T12:02:00Z'),
-    },
-    {
-      id: '3',
-      text: 'Bien, gracias. ¿Alguna novedad en la junta de vecinos?',
-      creatorUserId: 'user1',
-      condominiumId: '123',
-      createdAt: new Date('2025-03-12T12:05:00Z'),
-      updatedAt: new Date('2025-03-12T12:05:00Z'),
-    },
-    {
-      id: '4',
-      text: 'Sí, habrá una reunión el viernes a las 7 PM en el salón comunal.',
-      creatorUserId: 'Z2jPvGKvZ6XIhVPLUhisYkJDPb93',
-      condominiumId: '123',
-      createdAt: new Date('2025-03-12T12:07:00Z'),
-      updatedAt: new Date('2025-03-12T12:07:00Z'),
-    },
-    {
-      id: '5',
-      text: 'Perfecto, estaré ahí. Gracias por avisar.',
-      creatorUserId: 'user1',
-      condominiumId: '123',
-      createdAt: new Date('2025-03-12T12:08:00Z'),
-      updatedAt: new Date('2025-03-12T12:08:00Z'),
-    },
-  ]);*/
+  summarizing = signal(false)
 
   ngOnInit(): void {
     this.chatService.chatOptions$.pipe(takeUntil(this.destroy$)).subscribe((options) => {
@@ -95,10 +57,11 @@ export class ChatComponent implements OnInit, OnDestroy {
           });
       }
     });
-
-    effect(() => {
-      console.log("MESSAGES", this.messages())
-    });
   }
+
+  summarizeMessages() {
+    this.summarizing.set(!this.summarizing());
+  }
+
   ngOnDestroy(): void {}
 }
