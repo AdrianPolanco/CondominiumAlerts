@@ -12,7 +12,7 @@ import { Button } from 'primeng/button';
 import { Toolbar } from 'primeng/toolbar';
 import { NgOptimizedImage } from '@angular/common';
 import { AuthService } from '../../../../core/auth/services/auth.service';
-import { getCondominiumsJoinedByUserResponse } from '../../models/condominium.model';
+import { GetCondominiumsJoinedByUserResponse } from "../../models/getCondominiumsJoinedByUser.response";
 
 @Component({
   selector: 'app-condominiums-main-page',
@@ -44,7 +44,7 @@ export class CondominiumsMainPageComponent {
     });
   }
 
-  condominiums: Array<getCondominiumsJoinedByUserResponse> = [
+  condominiums: Array<GetCondominiumsJoinedByUserResponse> = [
     {
       id: '2d2c3c52-de6d-4697-8634-4e460f9d9516',
       name: 'Sunset Villas',
@@ -108,7 +108,7 @@ export class CondominiumsMainPageComponent {
       })
       .subscribe({
         next: (result) => {
-          this.condominiums = result;
+          this.condominiums = result.data;
         },
         error: (err) => {
           console.log(err);

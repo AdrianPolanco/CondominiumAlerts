@@ -5,9 +5,10 @@ import {
   inject,
   input,
 } from '@angular/core';
-import { Message } from '../../../core/models/index.models';
+import { Message } from '../../../core/models/message.models';
 import { AuthService } from '../../../core/auth/services/auth.service';
 import { NgClass } from '@angular/common';
+import { ChatMessageDto } from '../../../core/models/chatMessage.dto';
 
 @Component({
   selector: 'app-chat-buble',
@@ -18,7 +19,7 @@ import { NgClass } from '@angular/common';
 })
 export class ChatBubleComponent {
   authService = inject(AuthService);
-  message = input<Message>();
+  message = input<ChatMessageDto>();
 
   get getCurrentUserId() {
     return this.authService.currentUser?.uid;
@@ -29,7 +30,8 @@ export class ChatBubleComponent {
       hour: '2-digit',
       minute: '2-digit',
     };
-    return date.toLocaleTimeString([], options);
+    const formattedDate = new Date(date).toLocaleTimeString([], options);
+    return formattedDate;
   }
 
   getUserNameById(uid: string | undefined) {
@@ -37,6 +39,6 @@ export class ChatBubleComponent {
   }
 
   isCurrentUser = computed(
-    () => this.message()?.creatorUserId === this.getCurrentUserId
+    () => this.message()?.creatorUser.id === this.getCurrentUserId
   );
 }

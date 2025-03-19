@@ -1,7 +1,14 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { AddCondominiumCommand, AddCondominiumResponse, getCondominiumCommand, getCondominiumResponse, getCondominiumsJoinedByUserCommand, getCondominiumsJoinedByUserResponse, JoinCondominiumCommand , JoinCondominiumResponce} from '../models/condominium.model';
+import { AddCondominiumResponse } from "../models/addCondominium.response";
+import { GetCondominiumsJoinedByUserResponse } from "../models/getCondominiumsJoinedByUser.response";
+import { GetCondominiumsJoinedByUserCommand } from "../models/getCondominiumsJoinedByUser.command";
+import { GetCondominiumResponse } from "../models/getCondominium.response";
+import { GetCondominiumCommand } from "../models/getCondominium.command";
+import { JoinCondominiumResponse } from "../models/joinCondominium.r}esponse";
+import { JoinCondominiumCommand } from "../models/joinCondominium.command";
+import { AddCondominiumCommand } from "../models/addCondominium.command";
 
 @Injectable({
   providedIn: 'root'
@@ -29,24 +36,30 @@ export class CondominiumService {
         )
     }
 
-    join(cmd: JoinCondominiumCommand): Observable<JoinCondominiumResponce>{
+    join(cmd: JoinCondominiumCommand): Observable<JoinCondominiumResponse>{
       const fb = new FormData();
       fb.append('userId', cmd.userId)
       fb.append('condominiumCode', cmd.condominiumCode)
 
-      return this.httpClient.post<JoinCondominiumResponce>(
+      return this.httpClient.post<JoinCondominiumResponse>(
         "/api/condominium/join", fb)
     }
 
-    get(cmd: getCondominiumCommand): Observable<getCondominiumResponse>{
+    get(cmd: GetCondominiumCommand): Observable<GetCondominiumResponse>{
       
-      return this.httpClient.get<getCondominiumResponse>(
+      return this.httpClient.get<GetCondominiumResponse>(
         "/api/condominium/GetById", {params: {condominiumId: cmd.condominiumId}})
     }
  
-    getCondominiumsJoinedByUser(cmd: getCondominiumsJoinedByUserCommand): Observable<Array<getCondominiumsJoinedByUserResponse>>{
+    getCondominiumsJoinedByUser(cmd: GetCondominiumsJoinedByUserCommand): Observable<{
+          isSuccess:boolean,
+          data: GetCondominiumsJoinedByUserResponse[]
+        }>{
       
-      return this.httpClient.get<Array<getCondominiumsJoinedByUserResponse>>(
+      return this.httpClient.get<{
+            isSuccess:boolean,
+            data: GetCondominiumsJoinedByUserResponse[]
+          }>(
         "/api/condominium/GetCondominiumsJoinedByUser",  {params: {userId: cmd.userId}})
     }
 }

@@ -12,7 +12,7 @@ import {FormGroup, Validators} from '@angular/forms';
 import {SharedForm} from '../../../../shared/components/form/shared-form.interface';
 import {FormComponent} from '../../../../shared/components/form/form.component';
 import {Feedback} from '../../../../shared/components/form/feedback.interface';
-import {UserService} from '../../../services/user.service';
+import {AuthenticationService} from '../../../services/authentication.service';
 import {Image} from 'primeng/image';
 import {User} from './user.type';
 import {delay, Subject, takeUntil, tap} from 'rxjs';
@@ -38,7 +38,7 @@ import {AutoUnsubscribe} from '../../../../shared/decorators/autounsuscribe.deco
 })
 export class AuthLayoutComponent implements OnInit, OnDestroy{
 
-  constructor(private userService: UserService) {
+  constructor(private userService: AuthenticationService) {
     effect(() => {
       if(!this.visible()) {
         this.formGroup().reset();

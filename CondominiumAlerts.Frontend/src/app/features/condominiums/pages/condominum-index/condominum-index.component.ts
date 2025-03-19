@@ -8,7 +8,7 @@ import { PostService } from '../../../posts/services/post.service';
 import { GetCondominiumsUsersResponse } from '../../../users/models/user.model';
 import { UserService } from '../../../users/services/user.service';
 import { CondominiumService } from '../../services/condominium.service';
-import { GetCondominiumResponse } from '../../models/condominium.model';
+import { GetCondominiumResponse } from "../../models/getCondominium.response";
 import { CondominiumsLayoutComponent } from '../../../../shared/components/condominiums-layout/condominiums-layout.component';
 
 @Component({

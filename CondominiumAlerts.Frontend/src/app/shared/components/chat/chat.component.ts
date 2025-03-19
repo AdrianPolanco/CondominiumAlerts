@@ -1,5 +1,6 @@
 import {
   Component,
+  effect,
   inject,
   input,
   OnDestroy,
@@ -9,10 +10,16 @@ import {
 import { ChatBoxComponent } from '../chat-box/chat-box.component';
 import { ChatBubleComponent } from '../chat-buble/chat-buble.component';
 import { UserService } from '../../../features/users/services/user.service';
-import { Message } from '../../../core/models/index.models';
+import { Message } from '../../../core/models/message.models';
 import { NgFor } from '@angular/common';
 import { AuthService } from '../../../core/auth/services/auth.service';
+import { ChatService } from '../../services/chat.service';
+import { AutoUnsubscribe } from '../../decorators/autounsuscribe.decorator';
+import { Subject, takeUntil } from 'rxjs';
+import { ChatOptions } from './chat.type';
+import { ChatMessageDto } from '../../../core/models/chatMessage.dto';
 
+@AutoUnsubscribe()
 @Component({
   selector: 'app-chat',
   imports: [ChatBoxComponent, ChatBubleComponent, NgFor],
@@ -20,11 +27,15 @@ import { AuthService } from '../../../core/auth/services/auth.service';
   styleUrl: './chat.component.css',
 })
 export class ChatComponent implements OnInit, OnDestroy {
+  private chatService = inject(ChatService);
   private userService = inject(UserService);
   private authService = inject(AuthService);
+  private messageService = inject(ChatService);
+  private destroy$ = new Subject<void>();
+  options = signal<ChatOptions | null>(null);
   currentUser = this.userService.currentCondominiumUserActive;
-
-  messages = signal<Message[]>([
+  messages = signal<ChatMessageDto[]>([]);
+  /*messages = signal<Message[]>([
     {
       id: '1',
       text: 'Hola, ¿cómo están todos en el condominio?',
@@ -65,8 +76,29 @@ export class ChatComponent implements OnInit, OnDestroy {
       createdAt: new Date('2025-03-12T12:08:00Z'),
       updatedAt: new Date('2025-03-12T12:08:00Z'),
     },
-  ]);
+  ]);*/
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.chatService.chatOptions$.pipe(takeUntil(this.destroy$)).subscribe((options) => {
+      // Update the local signal
+      this.options.set(options);
+      
+      // React to the new options value immediately
+      if (options && options.type === 'condominium' && options.condominium) {
+        console.log("COND FROM SUBSCRIPTION", options.condominium.id);
+        this.messageService
+          .getMessagesByCondominium(options.condominium.id)
+          .pipe(takeUntil(this.destroy$))
+          .subscribe((response) => {
+            console.log(response);
+            this.messages.set(response.data);
+          });
+      }
+    });
+
+    effect(() => {
+      console.log("MESSAGES", this.messages())
+    });
+  }
   ngOnDestroy(): void {}
 }

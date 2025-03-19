@@ -36,7 +36,7 @@ export class SingInComponent {
   constructor(
     private authService: AuthService,
     private router: Router,
-    private userService: AuthenticationService,
+    private authenticationService: AuthenticationService,
     private messageService: MessageService
   ) {}
 
@@ -92,7 +92,7 @@ export class SingInComponent {
 
   async loginWithGoogle() {
     try {
-      const user = await this.userService.signUpWithGoogle();
+      const user = await this.authenticationService.signUpWithGoogle();
       console.log('Usuario logueado:', user);
       if (user) {
         this.router.navigateByUrl('/condominium/main-page');

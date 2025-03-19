@@ -4,14 +4,16 @@ export type User = {
     lastName: string
 }
 
-export interface getCondominiumsUsersCommand{
+export interface GetCondominiumsUsersCommand{
     condominiumId: string;
   }
   
-  export interface getCondominiumsUsersResponse{
-     id: string,
-     profilePictureUrl: string,
-     fullName: string,
-     email: string,
+  export interface GetCondominiumsUsersResponse{
+    id: string,
+    profilePictureUrl: string,
+    fullName: string,
+    email: string,
   }
+
+
   

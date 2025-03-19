@@ -5,7 +5,7 @@ namespace CondominiumAlerts.Features.Features.Messages;
 public record ChatMessageDto(
     Guid Id,
     string Text,
-    Guid CondominiumId,
+    Guid? CondominiumId,
     string? ReceiverUserId,
     Guid? MessageBeingRepliedToId,
     DateTime CreatedAt,

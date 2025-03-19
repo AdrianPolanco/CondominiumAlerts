@@ -1,8 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, signal } from '@angular/core';
 import {
-  getCondominiumsUsersCommand,
-  getCondominiumsUsersResponse,
+  GetCondominiumsUsersCommand,
+  GetCondominiumsUsersResponse,
 } from '../models/user.model';
 import { Observable } from 'rxjs';
 
@@ -11,21 +11,21 @@ import { Observable } from 'rxjs';
 })
 export class UserService {
   private readonly _currentCondominiumUserActive = signal<
-    getCondominiumsUsersResponse | undefined
+    GetCondominiumsUsersResponse | undefined
   >(undefined);
   currentCondominiumUserActive =
     this._currentCondominiumUserActive.asReadonly();
 
   constructor(private hhtpClient: HttpClient) {}
 
-  setCurrentCondominiumUser(user: getCondominiumsUsersResponse) {
+  setCurrentCondominiumUser(user: GetCondominiumsUsersResponse) {
     this._currentCondominiumUserActive.set(user);
   }
 
   getCondominiumsUsers(
-    cmd: getCondominiumsUsersCommand
-  ): Observable<Array<getCondominiumsUsersResponse>> {
-    return this.hhtpClient.get<Array<getCondominiumsUsersResponse>>(
+    cmd: GetCondominiumsUsersCommand
+  ): Observable<Array<GetCondominiumsUsersResponse>> {
+    return this.hhtpClient.get<Array<GetCondominiumsUsersResponse>>(
       '/api/user/GetCondominiumUsers',
       { params: { condominiumId: cmd.condominiumId } }
     );

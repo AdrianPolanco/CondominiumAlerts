@@ -11,7 +11,7 @@ namespace CondominiumAlerts.Domain.Aggregates.Entities;
         public string CreatorUserId { get; set; }
         // if receiver user id is null means that the message is for the global chat
         public string? ReceiverUserId { get; set; }
-        public Guid CondominiumId { get; set; }
+        public Guid? CondominiumId { get; set; }
         public Guid? MessageBeingRepliedToId { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }

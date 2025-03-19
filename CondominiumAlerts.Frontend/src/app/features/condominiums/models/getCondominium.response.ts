@@ -1,10 +1,10 @@
-export type Condominium = {
+export interface GetCondominiumResponse {
   id: string;
   name: string;
   address: string;
-  imageUrl: string | null;
+  imageUrl: string;
   code: string;
   token: string;
   tokenExpirationDate: Date;
-  amountOfUsers: number;
+  AmountOfUsers: number;
 }

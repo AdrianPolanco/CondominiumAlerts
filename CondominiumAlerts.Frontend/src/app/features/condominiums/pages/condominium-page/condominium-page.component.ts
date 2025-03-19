@@ -5,7 +5,7 @@ import { SharedFormField } from '../../../../shared/components/form/shared-form-
 import { FormGroup, Validators } from '@angular/forms';
 import { SharedForm } from '../../../../shared/components/form/shared-form.interface';
 import { CondominiumService } from '../../services/condominium.service';
-import { AddCondominiumCommand } from '../../models/condominium.model';
+import { AddCondominiumCommand } from "../../models/addCondominium.command";
 import { Router } from '@angular/router';
 import { Feedback } from '../../../../shared/components/form/feedback.interface';
 import {ButtonDirective} from 'primeng/button';

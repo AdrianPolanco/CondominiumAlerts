@@ -9,7 +9,7 @@ import {Toolbar} from 'primeng/toolbar';
 import {RouterLink} from '@angular/router';
 import {Divider} from 'primeng/divider';
 import {NgOptimizedImage} from '@angular/common';
-import {UserService} from '../../../services/user.service';
+import {AuthenticationService} from '../../../services/authentication.service';
 import {RegisterUserRequest} from '../../models/RegisterUserRequest';
 import {Feedback} from '../../../../shared/components/form/feedback.interface';
 
@@ -21,7 +21,7 @@ import {Feedback} from '../../../../shared/components/form/feedback.interface';
 })
 export class RegisterUserPageComponent {
 
-  constructor(private userService: UserService) { }
+  constructor(private userService: AuthenticationService) { }
 
   private readonly formGroup = signal<FormGroup>(new FormGroup({}));
   formComponent = viewChild(FormComponent);
