@@ -1,8 +1,14 @@
 <section class="chat">
-  <header class="chat-header bg-gray-50 dark:bg-gray-700">
+  <header class="chat-header bg-gray-50 dark:bg-gray-700 flex justify-between items-center p-4">
     <div class="text-xl">
       <i class="fa-solid fa-user"></i> {{ currentUser()?.fullName }}
     </div>
+
+    @if(summarizing()){
+      <p-button icon="pi pi-book" [rounded]="true" label="Resumir" (onClick)="summarizeMessages()" size="small"/>
+    }@else {
+      <p-button icon="pi pi-cog"styleClass="animate-[spin_3s_linear_infinite]" [rounded]="true" (onClick)="summarizeMessages()" size="small"/>
+    }
   </header>
   <section class="chat-content bg-white scroll-invisible w-full flex flex-col gap-4 ">
     <app-chat-buble
