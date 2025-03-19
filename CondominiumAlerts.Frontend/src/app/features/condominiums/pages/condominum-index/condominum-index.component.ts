@@ -43,7 +43,7 @@ export class CondominumIndexComponent implements OnInit {
 
   goToCreatePosts() {
     console.log('Creating a new Posts...');
-    this.router.navigate(['condominium/index/create']);
+    this.router.navigate(['posts/create']);
   }
 
   loadPosts(): void {
