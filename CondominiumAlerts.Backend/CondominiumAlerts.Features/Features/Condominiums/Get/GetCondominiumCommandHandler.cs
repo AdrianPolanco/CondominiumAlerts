@@ -1,4 +1,5 @@
 ﻿using CondominiumAlerts.CrossCutting.CQRS.Interfaces.Handlers;
+using CondominiumAlerts.Domain.Aggregates.Entities;
 using CondominiumAlerts.Domain.Repositories;
 using FluentValidation;
 using LightResults;
@@ -10,18 +11,20 @@ namespace CondominiumAlerts.Features.Features.Condominiums.Get
     public class GetCondominiumCommandHandler : ICommandHandler<GetCondominiumCommand, Result<GetCondominiumResponse>>
     {
         private readonly IRepository<CondominiumEntity, Guid> _condominiumRepository;
+        private readonly IRepository<CondominiumUser, Guid> _condominiumUserRepository;
         private readonly IValidator<GetCondominiumCommand> _validator;
         private readonly ILogger<GetCondominiumCommand> _logger;
 
         public GetCondominiumCommandHandler( 
             IRepository<CondominiumEntity, Guid> condominiumRepository,
             IValidator<GetCondominiumCommand> validator,
-            ILogger<GetCondominiumCommand> logger
-            )
+            ILogger<GetCondominiumCommand> logger,
+            IRepository<CondominiumUser, Guid> condominiumUserRepository)
         {
             _condominiumRepository = condominiumRepository;
             _validator = validator;
             _logger = logger;
+            _condominiumUserRepository = condominiumUserRepository;
         }
 
         public async Task<Result<GetCondominiumResponse>> Handle(GetCondominiumCommand request, CancellationToken cancellationToken)
@@ -41,6 +44,12 @@ namespace CondominiumAlerts.Features.Features.Condominiums.Get
                 _logger.LogWarning("No condominium with the id {request.CondominiumId} was found", request.CondominiumId);
                 return Result.Fail<GetCondominiumResponse>("No condominium was found");
             }
+            
+            var usersJoinedToCondominium = 
+                await _condominiumUserRepository.GetAsync(
+                    cancellationToken: cancellationToken,
+                    filter: cu => cu.CondominiumId == Guid.Parse(request.CondominiumId)
+                );
 
             return Result< GetCondominiumResponse >.Ok(new(
                 condominium.Id,
@@ -50,7 +59,7 @@ namespace CondominiumAlerts.Features.Features.Condominiums.Get
                 condominium.InviteCode, 
                 condominium.LinkToken,
                 condominium.TokenExpirationDate,
-                condominium.Users != null ? condominium.Users.Count : 0));
+                usersJoinedToCondominium.Count));
         }
     }
 }
