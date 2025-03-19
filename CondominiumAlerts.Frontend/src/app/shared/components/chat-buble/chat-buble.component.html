@@ -7,13 +7,9 @@
 >
   <div class="flex gap-2.5 mb-4">
     <img
-      [src]="
-        isCurrentUser()
-          ? 'https://pagedone.io/asset/uploads/1704091591.png'
-          : 'https://pagedone.io/asset/uploads/1710412177.png'
-      "
-      [alt]="isCurrentUser() ? 'Hailey image' : 'Shanay image'"
-      class="w-10 h-11"
+      [src]="message()?.creatorUser?.profilePictureUrl"
+      [alt]="message()?.id"
+      class="w-10 h-11 rounded-full"
     />
     <div>
       <h5 class="text-gray-900 text-sm font-semibold leading-snug pb-1">
