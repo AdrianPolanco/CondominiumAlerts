@@ -6,5 +6,5 @@ namespace CondominiumAlerts.Infrastructure.Services.AI.MessagesSummary;
 
 public interface IAiService
 {
-    Task<Summary?> GenerateSummary(List<MessageDto> messages, User user, Condominium condominium, CancellationToken cancellationToken);
+    Task<Summary?> GenerateSummary(List<MessageSummaryDto> messages, User user, Condominium condominium, CancellationToken cancellationToken);
 }

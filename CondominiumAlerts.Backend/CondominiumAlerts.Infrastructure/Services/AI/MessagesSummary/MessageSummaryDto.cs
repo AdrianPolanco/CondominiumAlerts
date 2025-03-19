@@ -2,7 +2,7 @@
 
 namespace CondominiumAlerts.Infrastructure.Services.AI.MessagesSummary;
 
-public record MessageDto(
+public record MessageSummaryDto(
     Guid Id,
     string Text,
     Guid CondominiumId,

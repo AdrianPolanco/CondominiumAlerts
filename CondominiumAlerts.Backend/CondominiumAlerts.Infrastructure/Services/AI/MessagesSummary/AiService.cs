@@ -19,7 +19,7 @@ public class AiService : IAiService
         _logger = logger;
     }
     
-    public async Task<Summary?> GenerateSummary(List<MessageDto> messages, User user, Condominium condominium, CancellationToken cancellationToken)
+    public async Task<Summary?> GenerateSummary(List<MessageSummaryDto> messages, User user, Condominium condominium, CancellationToken cancellationToken)
     {
         var formattedMessages = messages.Select(m => $"[{m.CreatedAt:yyyy-MM-dd HH:mm:ss}] {m.CreatorUserId} - {m.Text}").ToList();
 

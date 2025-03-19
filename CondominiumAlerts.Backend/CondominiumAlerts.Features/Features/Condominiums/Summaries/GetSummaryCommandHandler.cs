@@ -48,7 +48,7 @@ public class GetSummaryCommandHandler : ICommandHandler<GetSummaryCommand, Resul
         var recoveredMessagesLog = $"Mensajes recuperados exitosamente. CondominiumId: {request.Condominium.Id}. Cantidad de mensajes: {messages.Count}";
         _logger.LogInformation(recoveredMessagesLog);
         
-        var messagesDto = messages.Adapt<List<MessageDto>>();
+        var messagesDto = messages.Adapt<List<MessageSummaryDto>>();
         
         _logger.LogInformation("MessagesDTO: {dto}", messagesDto);
 

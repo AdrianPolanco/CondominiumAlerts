@@ -6,6 +6,7 @@ using CondominiumAlerts.Features.Features.Condominiums.GetCondominiumsJoinedByUs
 using CondominiumAlerts.Features.Features.Condominiums.Get;
 using CondominiumAlerts.Features.Features.Condominiums.Join;
 using CondominiumAlerts.Features.Features.Condominiums.Summaries;
+using CondominiumAlerts.Features.Features.Messages.Condominiums;
 using CondominiumAlerts.Infrastructure.Persistence.Repositories;
 using CondominiumAlerts.Infrastructure.Services.AI.MessagesSummary;
 using Coravel.Queuing.Interfaces;
@@ -29,12 +30,12 @@ namespace CondominiumAlerts.Api.Endpoints
                     Result<JoinCondominiumResponse> result = await sender.Send(command, cancellationToken);
                     if (!result.IsSuccess) return Results.BadRequest(result);
 
-                    var responce = new
+                    var response = new
                     {
                         IsSuccess = result.IsSuccess,
                         Data = result.Value.Adapt<JoinCondominiumResponse>()
                     };
-                    return Results.Ok(responce);
+                    return Results.Ok(response);
                 }).DisableAntiforgery();
 
             app.MapPost("/condominium",
@@ -85,16 +86,19 @@ namespace CondominiumAlerts.Api.Endpoints
                     return Results.Ok(responce);    
                 });
 
-            app.MapGet("/condominiums/{condominiumId}/messages", async (Guid condominiumId, CancellationToken cancellationToken, IRepository<Message, Guid> messagesRepository) =>
+            app.MapGet("/condominiums/{condominiumId}/messages", async (Guid condominiumId, CancellationToken cancellationToken, ISender sender) =>
             {
-                var messages = await messagesRepository.GetAsync(
-                    cancellationToken: cancellationToken,
-                    filter: m => m.CondominiumId == condominiumId
-                );
+                var query = new GetMessagesInCondominiumQuery(condominiumId);
 
-                return Results.Ok(new {
-                    messages
-                });
+                var result = await sender.Send(query, cancellationToken);
+
+                var response = new
+                {
+                    IsSuccess = result.IsSuccess,
+                    Data = result.Value,
+                };
+
+                return Results.Ok(response);
             });
 
             app.MapPost("/condominiums/{condominiumId}/summary/{userId}", 
