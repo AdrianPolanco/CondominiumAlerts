@@ -20,6 +20,7 @@ public class MessagesSummarizationJob : IInvocable, IInvocableWithPayload<Messag
     private readonly IHubContext<SummaryHub> _hubContext;
     private readonly IRepository<User, string> _userRepository;
     private readonly IRepository<Condominium, Guid> _condominiumRepository;
+    private readonly IRepository<CondominiumUser, Guid> _condominiumUserRepository;
     public MessagesSummarizationRequest Payload { get; set; }
     public CancellationToken CancellationToken { get; set; }
     
@@ -30,7 +31,8 @@ public class MessagesSummarizationJob : IInvocable, IInvocableWithPayload<Messag
         IHubContext<SummaryHub> hubContext,
         IRepository<Summary, Guid> summaryRepository,
         IRepository<User, string> userRepository,
-        IRepository<Condominium, Guid> condominiumRepository)
+        IRepository<Condominium, Guid> condominiumRepository,
+        IRepository<CondominiumUser, Guid> condominiumUserRepository)
     {
         _jobCancellationService = jobCancellationService;
         _logger = logger;
@@ -39,11 +41,12 @@ public class MessagesSummarizationJob : IInvocable, IInvocableWithPayload<Messag
         _summaryRepository = summaryRepository;
         _userRepository = userRepository;
         _condominiumRepository = condominiumRepository;
+        _condominiumUserRepository = condominiumUserRepository;
     }
     
     public async Task Invoke()
     {
-        _jobId = _jobCancellationService.RegisterJob();
+        _jobId = Payload.JobId;
         CancellationToken = _jobCancellationService.GetCancellationToken(_jobId);
 
         if (CancellationToken.IsCancellationRequested)
@@ -71,6 +74,20 @@ public class MessagesSummarizationJob : IInvocable, IInvocableWithPayload<Messag
                 var errorMessage = $"Usuario no encontrado. UserId: {Payload.TriggeredBy}";
                 _logger.LogWarning(errorMessage);
                 return;
+            }
+            
+            //Validando que el usuario efectivamente esta en el condominio
+            var condominiumUser = await _condominiumUserRepository.GetAsync(
+                cancellationToken: CancellationToken,
+                filter: cu => cu.UserId == user.Id && cu.CondominiumId == condominium.Id
+                );
+
+
+            if (condominiumUser is null)
+            {
+                var errorMessage = $"El usuario ${user.Username} no pertenece al condominio ${condominium.Name}.";
+                _logger.LogWarning(errorMessage);
+                _hubContext.Clients.Group(Payload.CondominiumId.ToString()).SendAsync("UserNotInCondominium", errorMessage);
             }
             
             _logger.LogInformation($"[Solicitud {_jobId}] Procesando mensajes para el condominio [${condominium.Id} - ${condominium.Name}] por solicitud del usuario [${user.Id} - {user.Username}].");

@@ -1,20 +1,36 @@
 <section class="chat">
   <header class="chat-header bg-gray-50 dark:bg-gray-700 flex justify-between items-center p-4">
     <div class="text-xl">
-      <i class="fa-solid fa-user"></i> {{ currentUser()?.fullName }}
+      <i class="fa-solid fa-user"></i> {{ currentUser?.name }} {{ currentUser?.lastname }}
     </div>
 
     @if(summarizing()){
-      <p-button icon="pi pi-book" [rounded]="true" label="Resumir" (onClick)="summarizeMessages()" size="small"/>
+      <div class="flex justify-center items-center gap-2">
+        <p-button icon="pi pi-cog" styleClass="animate-[spin_3s_linear_infinite]" [rounded]="true" size="small"/>
+        <label class="text-xs">Resumiendo...</label>
+        <div class="flex justify-end items-start">
+          <p-button icon="pi pi-times" [rounded]="true" [text]="true" severity="danger" size="small"  (onClick)="cancelSummary()"/>
+        </div>
+      </div>
     }@else {
-      <p-button icon="pi pi-cog"styleClass="animate-[spin_3s_linear_infinite]" [rounded]="true" (onClick)="summarizeMessages()" size="small"/>
+      <p-button icon="pi pi-book" [rounded]="true" label="Resumir" (onClick)="summarizeMessages()" size="small"/>
     }
   </header>
-  <section class="chat-content bg-white scroll-invisible w-full flex flex-col gap-4 ">
-    <app-chat-buble
-      *ngFor="let message of messages()"
-      [message]="message"
-    ></app-chat-buble>
+  <section>
+    <p-splitter [style]="{ height: '300px' }" styleClass="mb-8" layout="vertical">
+      @if(!summarizing() && summaryResult()){
+        <ng-template #panel>
+          <p>{{summaryResult()}}</p>
+        </ng-template>
+      }
+      <ng-template #panel>
+        <div class="chat-content bg-white scroll-invisible w-full flex flex-col gap-4 ">
+        <app-chat-buble
+          *ngFor="let message of messages()"
+          [message]="message"
+        ></app-chat-buble></div>
+      </ng-template>
+    </p-splitter>
   </section>
   <app-chat-box> </app-chat-box>
 </section>

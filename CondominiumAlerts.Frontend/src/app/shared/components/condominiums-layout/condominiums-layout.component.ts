@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { NgFor, CommonModule, NgOptimizedImage } from '@angular/common';
 import { Router } from '@angular/router';
 import { Toolbar } from 'primeng/toolbar';
@@ -36,6 +36,7 @@ export class CondominiumsLayoutComponent implements OnInit {
   condominiums$ = this.condominiumsSubject.asObservable();
   currentCondominium: Pick<Condominium, 'id' | 'name' | 'imageUrl'| 'address'> | null = null;
   private destroy$ = new Subject<void>();
+  areCondominiumsLoading = signal(true)
 
   notifications = [
     { message: 'Nuevo mensaje de Juan', time: 'Hace 5 minutos' },
@@ -63,6 +64,7 @@ export class CondominiumsLayoutComponent implements OnInit {
     console.log("USERID", this.currentUser?.id)
     this.condominiumService.getCondominiumsJoinedByUser({userId: this.currentUser?.id!}).pipe(takeUntil(this.destroy$)).subscribe((response) => {
       this.condominiumsSubject.next(response.data);
+      this.areCondominiumsLoading.set(false);
     });
   }
 

@@ -1,10 +1,17 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Message } from '../../core/models/message.models';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable, Subject, takeUntil } from 'rxjs';
 import { ChatOptions } from '../components/chat/chat.type';
 import { ChatMessageDto } from '../../core/models/chatMessage.dto';
+import * as signalR from '@microsoft/signalr';
+import { AuthenticationService } from '../../core/services/authentication.service';
+import { AutoUnsubscribe } from '../decorators/autounsuscribe.decorator';
+import { User } from '../../core/auth/layout/auth-layout/user.type';
+import { RequestCondominiumSummaryResponse } from '../../features/condominiums/models/requestCondominiumSummary.response';
+import { HttpTransportType, HubConnectionBuilder } from '@microsoft/signalr';
 
+@AutoUnsubscribe()
 @Injectable({
   providedIn: 'root'
 })
@@ -13,18 +20,187 @@ export class ChatService{
   private chatOptions = new BehaviorSubject<ChatOptions | null>(null);
   chatOptions$ = this.chatOptions.asObservable();
 
-  constructor(private httpClient: HttpClient) { }
+  private hubConnection: signalR.HubConnection | null = null;
+  private processingStatus = new BehaviorSubject<string | null>(null);
+  private summaryResult = new BehaviorSubject<string | null>(null);
+  private processingError = new BehaviorSubject<string | null>(null);
+
+  processingStatus$ = this.processingStatus.asObservable();
+  summaryResult$ = this.summaryResult.asObservable();
+  processingError$ = this.processingError.asObservable();
+
+  token:string | null = null;
+  userData: User | null = null;
+  private destroy$ = new Subject<void>();
+
+  constructor(private httpClient: HttpClient, private authenticationService: AuthenticationService) {
+    this.authenticationService.userToken$.pipe(takeUntil(this.destroy$)).subscribe((token) => {
+      this.token = token;
+    })
+
+    this.authenticationService.userData$.pipe(takeUntil(this.destroy$)).subscribe((userData) => {
+      if(userData) this.userData = userData?.data;
+    });
+  }
 
   setChatOptions(options: ChatOptions) {
     this.chatOptions.next(options);
   }
 
   getMessagesByCondominium(condominiumId: string) {
-    return this.httpClient.get<{ isSuccess: boolean, data: ChatMessageDto[]}>(`api/condominiums/${condominiumId}/messages`);
+    return this.httpClient.get<{ isSuccess: boolean, data: ChatMessageDto[]}>(`api/condominiums/${condominiumId}/messages`, {
+      headers: {
+        Authorization: `Bearer ${this.token}`
+      }
+    });
   }
 
   //TODO: Implement this method and API
   getMessagesByUsers(userId: string, otherUserId: string) {
    // return this.httpClient.get<{ messages: Message[]}>(`api/users/${userId}/messages/${otherUserId}`);
+  }
+
+  // Metodo para solicitar un resumen de los mensajes del condominio
+  requestCondominiumSummary(): Observable<RequestCondominiumSummaryResponse> {
+    const currentOptions = this.chatOptions.value;
+    
+    if (currentOptions?.type !== 'condominium' || !currentOptions.condominium || !this.userData) {
+      throw new Error('Condominio no seleccionado o no disponible');
+    }
+    
+    // Restea los resultados previos
+    this.summaryResult.next(null);
+    this.processingError.next(null);
+
+    console.log("AUTH TOKEN", this.token);
+    console.log("USER DATA", this.userData);
+    
+    // Hace una solicitud al endpoint para empezar un resumen
+    return this.httpClient.post<RequestCondominiumSummaryResponse>(`api/condominiums/${currentOptions.condominium.id}/summary/${this.userData?.id}`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${this.token}`
+        }
+      }
+    );
+  }
+
+  // Metodo para cancelar una solicitud de resumen
+  cancelSummaryRequest(jobId: string): Observable<any> {
+    const currentOptions = this.chatOptions.value;
+
+    if (currentOptions?.type !== 'condominium' || !currentOptions.condominium || !currentOptions.user) {
+      throw new Error('Condominio no seleccionado o no disponible');
+    }
+
+    return this.httpClient.delete<any>(`api/condominiums/${currentOptions.condominium.id}/summary/${this.userData?.id}/cancel/${jobId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${this.token}`
+        }
+      }
+    );
+  }
+
+  // Metodo para conectarse al hub de SignalR para un condominio
+  async connectToCondominiumHub(condominiumId: string, condominiumName: string, userId: string): Promise<void> {
+    try {
+      // Disconnect from any existing hub connection
+      await this.disconnectFromHub();
+      
+      // Create a new hub connection
+      this.hubConnection = new HubConnectionBuilder()
+        .withUrl('/api/condominiums/hubs/summary', {
+          skipNegotiation: true,
+          transport: HttpTransportType.WebSockets,
+          accessTokenFactory: () => this.token || ''
+        })
+        .withAutomaticReconnect()
+        .build();
+  
+      // Set up event handlers
+      this.setupHubEventHandlers();
+  
+      // Start the connection
+      this.hubConnection.start().then(async() => {
+          console.log("FINALMENTE CONECTADO A SIGNALR");
+          if(this.hubConnection) await this.hubConnection.invoke('JoinGroup', condominiumId, condominiumName, userId);
+        })
+        .catch(err => {
+          console.error("Error al conectar a SignalR:", err);
+        });
+
+        console.log("CONECTADO A SIGNALRRR", )
+      
+      // Join the group for this condominium
+
+    } catch (error) {
+      console.error('ERROR AL ESTABLECER CONEXION CON SIGNALR: ', error);
+      // Re-throw the error to ensure the promise is rejected properly
+      throw error;
+    }
+  }
+
+  // Metodo para manejar eventos del hub
+  private setupHubEventHandlers(): void {
+    if (!this.hubConnection) return;
+
+    this.hubConnection.on('NotifyProcessingStarted', (message: string) => {
+      console.log('Processing started: ', message);
+      this.processingStatus.next(message);
+    });
+
+    this.hubConnection.on('SendSummary', (summary: any) => {
+      console.log('Summary received: ', summary);
+      this.summaryResult.next(summary);
+      this.processingStatus.next(null);
+    });
+
+    this.hubConnection.on('NotifyProcessingError', (errorMessage: string) => {
+      console.error('Processing error: ', errorMessage);
+      this.processingError.next(errorMessage);
+      this.processingStatus.next(null);
+    });
+
+    this.hubConnection.on('CancelledProcessing', (message: string) => {
+      console.log('Processing cancelled: ', message);
+      this.processingStatus.next(`Cancelled: ${message}`);
+      this.summaryResult.next(null);
+    });
+
+    this.hubConnection.on("UserNotInCondominium", (errorMessage: string) => {
+      console.log("Processing failed: ", errorMessage);
+      this.processingError.next(errorMessage);
+      this.processingStatus.next(errorMessage)
+      this.summaryResult.next(null)
+    })
+  }
+  
+  // Metodo para desconectarse del hub
+  async disconnectFromHub(): Promise<void> {
+    if (this.hubConnection) {
+      const currentOptions = this.chatOptions.value;
+      
+      if (currentOptions?.type === 'condominium' && currentOptions.condominium) {
+        try {
+          await this.hubConnection.invoke('LeaveGroup', 
+            currentOptions.condominium.id, 
+            currentOptions.condominium.name, 
+            currentOptions.user?.username || 'Unknown');
+        } catch (error) {
+          console.error('Error leaving group: ', error);
+        }
+      }
+      
+      try {
+        await this.hubConnection.stop();
+        console.log('SignalR connection stopped');
+      } catch (error) {
+        console.error('Error stopping connection: ', error);
+      }
+      
+      this.hubConnection = null;
+    }
   }
 }

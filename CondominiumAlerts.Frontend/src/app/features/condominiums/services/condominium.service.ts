@@ -1,23 +1,32 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, Subject, takeUntil } from 'rxjs';
 import { AddCondominiumResponse } from "../models/addCondominium.response";
 import { GetCondominiumsJoinedByUserResponse } from "../models/getCondominiumsJoinedByUser.response";
 import { GetCondominiumsJoinedByUserCommand } from "../models/getCondominiumsJoinedByUser.command";
 import { GetCondominiumResponse } from "../models/getCondominium.response";
 import { GetCondominiumCommand } from "../models/getCondominium.command";
-import { JoinCondominiumResponse } from "../models/joinCondominium.r}esponse";
+import { JoinCondominiumResponse } from "../models/joinCondominium.response";
 import { JoinCondominiumCommand } from "../models/joinCondominium.command";
 import { AddCondominiumCommand } from "../models/addCondominium.command";
+import { AuthenticationService } from '../../../core/services/authentication.service';
+import { AutoUnsubscribe } from '../../../shared/decorators/autounsuscribe.decorator';
 
+@AutoUnsubscribe()
 @Injectable({
   providedIn: 'root'
 })
 export class CondominiumService {
 
-  constructor(
-      private httpClient: HttpClient
-  ) { }
+  constructor(private httpClient: HttpClient, 
+    private authenticationService: AuthenticationService) { 
+      this.authenticationService.userToken$.pipe(takeUntil(this.destroy$)).subscribe((token) => {
+        this.token = token;
+      })
+  }
+
+  private destroy$ = new Subject<void>();
+  private token: string | null = null;
 
 
     create(cmd: AddCondominiumCommand): Observable<AddCondominiumResponse> {
@@ -60,6 +69,6 @@ export class CondominiumService {
             isSuccess:boolean,
             data: GetCondominiumsJoinedByUserResponse[]
           }>(
-        "/api/condominium/GetCondominiumsJoinedByUser",  {params: {userId: cmd.userId}})
+        "/api/condominium/GetCondominiumsJoinedByUser",  {params: {userId: cmd.userId}, headers: {Authorization: `Bearer ${this.token}`}})
     }
 }

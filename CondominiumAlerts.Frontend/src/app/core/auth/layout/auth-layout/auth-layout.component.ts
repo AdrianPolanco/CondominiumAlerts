@@ -38,7 +38,7 @@ import {AutoUnsubscribe} from '../../../../shared/decorators/autounsuscribe.deco
 })
 export class AuthLayoutComponent implements OnInit, OnDestroy{
 
-  constructor(private userService: AuthenticationService) {
+  constructor(private authenticationService: AuthenticationService) {
     effect(() => {
       if(!this.visible()) {
         this.formGroup().reset();
@@ -48,7 +48,7 @@ export class AuthLayoutComponent implements OnInit, OnDestroy{
   }
 
   ngOnInit() {
-    this.userService.userData$
+    this.authenticationService.userData$
       .pipe(takeUntil(this.destroy$)) // Se detiene cuando `destroy$` emite un valor en el @AutoUnsubscribe()
       .subscribe(userData => {
         if(userData) this.userData = userData?.data;
@@ -57,7 +57,7 @@ export class AuthLayoutComponent implements OnInit, OnDestroy{
         if(userData) this.formGroup().patchValue(this.mapUserDataToForm(userData.data));
     });
 
-    this.userService.userToken$
+    this.authenticationService.userToken$
       .pipe(takeUntil(this.destroy$))
       .subscribe(token => this.token = token);
   }
@@ -77,7 +77,7 @@ export class AuthLayoutComponent implements OnInit, OnDestroy{
     const formGroup = this.formGroup();
     const visible = this.visible;
     console.log('VALUE', value)
-    this.userService.editProfile(value, this.token).subscribe({
+    this.authenticationService.editProfile(value, this.token).subscribe({
       next(response) {
 
         const status = response.isSuccess ? "success" : "error";

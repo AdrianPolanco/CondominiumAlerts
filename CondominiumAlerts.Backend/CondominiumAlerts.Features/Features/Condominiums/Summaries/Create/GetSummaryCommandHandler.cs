@@ -34,10 +34,9 @@ public class GetSummaryCommandHandler : ICommandHandler<GetSummaryCommand, Resul
     
     public async Task<Result<GetSummaryCommandResponse>> Handle(GetSummaryCommand request, CancellationToken cancellationToken)
     {
-        // await _hubContext.Clients.Group(request.CondominiumId.ToString()).SendAsync("NotifyProcessingStarted", $"Se inició el procesamiento para el condominio {condominium.Name}.", cancellationToken);
         
         // Validación de mensajes
-        var messages = await _messageRepository.GetAsync(filter: m => m.CondominiumId == request.Condominium.Id && m.CreatedAt > DateTime.UtcNow.AddHours(-24), cancellationToken: cancellationToken);
+        var messages = await _messageRepository.GetAsync(filter: m => m.CondominiumId == request.Condominium.Id /*&& m.CreatedAt > DateTime.UtcNow.AddHours(-24)*/, cancellationToken: cancellationToken);
         if (messages.Count == 0)
         {
             var errorMessage = $"No se encontraron mensajes en el condominio. CondominiumId: {request.Condominium.Id}, Mensajes: 0";

@@ -1,4 +1,5 @@
-﻿using Carter;
+﻿using System.Security.Claims;
+using Carter;
 using CondominiumAlerts.Domain.Aggregates.Entities;
 using CondominiumAlerts.Domain.Repositories;
 using CondominiumAlerts.Features.Features.Condominiums.Add;
@@ -6,9 +7,11 @@ using CondominiumAlerts.Features.Features.Condominiums.GetCondominiumsJoinedByUs
 using CondominiumAlerts.Features.Features.Condominiums.Get;
 using CondominiumAlerts.Features.Features.Condominiums.Join;
 using CondominiumAlerts.Features.Features.Condominiums.Summaries;
+using CondominiumAlerts.Features.Features.Condominiums.Summaries.Cancel;
 using CondominiumAlerts.Features.Features.Messages.Condominiums;
 using CondominiumAlerts.Infrastructure.Persistence.Repositories;
 using CondominiumAlerts.Infrastructure.Services.AI.MessagesSummary;
+using CondominiumAlerts.Infrastructure.Services.Cancellation;
 using Coravel.Queuing.Interfaces;
 using LightResults;
 using Mapster;
@@ -71,9 +74,11 @@ namespace CondominiumAlerts.Api.Endpoints
                 });
 
             app.MapGet("/condominium/GetCondominiumsJoinedByUser",
-                async (ISender sender, [AsParameters] GetCondominiumsJoinedByUserCommand command, CancellationToken cancellationToken) =>
+                async (ISender sender, [AsParameters] GetCondominiumsJoinedByUserCommand command,
+                    CancellationToken cancellationToken) =>
                 {
-                    Result<List<GetCondominiumsJoinedByUserResponse>> result = await sender.Send(command, cancellationToken);
+                    Result<List<GetCondominiumsJoinedByUserResponse>> result =
+                        await sender.Send(command, cancellationToken);
 
                     if (!result.IsSuccess) return Results.BadRequest(result);
 
@@ -83,23 +88,29 @@ namespace CondominiumAlerts.Api.Endpoints
                         Data = result.Value,
                     };
 
-                    return Results.Ok(responce);    
-                });
+                    return Results.Ok(responce);
+                }).RequireAuthorization();
 
-            app.MapGet("/condominiums/{condominiumId}/messages", async (Guid condominiumId, CancellationToken cancellationToken, ISender sender) =>
-            {
-                var query = new GetMessagesInCondominiumQuery(condominiumId);
-
-                var result = await sender.Send(query, cancellationToken);
-
-                var response = new
+            app.MapGet("/condominiums/{condominiumId}/messages",
+                async (Guid condominiumId, CancellationToken cancellationToken, ISender sender) =>
                 {
-                    IsSuccess = result.IsSuccess,
-                    Data = result.Value,
-                };
+                    var query = new GetMessagesInCondominiumQuery(condominiumId);
 
-                return Results.Ok(response);
-            });
+                    var result = await sender.Send(query, cancellationToken);
+
+                    var response = new
+                    {
+                        IsSuccess = result.IsSuccess,
+                        Data = result.Value,
+                    };
+
+                    return Results.Ok(response);
+                }).RequireAuthorization();
+
+            app.MapPost("/auth/test", () =>
+            {
+                return Results.Ok();
+            }).RequireAuthorization();
 
             app.MapPost("/condominiums/{condominiumId}/summary/{userId}", 
                 async (
@@ -107,20 +118,58 @@ namespace CondominiumAlerts.Api.Endpoints
                     string userId, 
                     ISender sender,
                     IQueue queue,
-                    CancellationToken CancellationToken
+                    CancellationToken CancellationToken,
+                    JobCancellationService jobCancellationService,
+                    ILogger<CondominiumModule> logger
                     ) =>
             {
-                MessagesSummarizationRequest request = new(condominiumId, userId);
+                logger.LogInformation($"Summary request received for condominium {condominiumId} from user {userId}");
+                var jobId = jobCancellationService.RegisterJob();
+                MessagesSummarizationRequest request = new(condominiumId, userId, jobId);
 
                 queue.QueueInvocableWithPayload<MessagesSummarizationJob, MessagesSummarizationRequest>(request);
 
                 var response = new
                 {
                     IsSuccess = "pending",
-                    Message = "Tu solicitud para resumir los mensajesdel condominio fue recibida."
+                    Message = "Tu solicitud para resumir los mensajes el condominio fue recibida.",
+                    JobId = jobId
                 };
                 return Results.Accepted("/condominiums/hubs/summary", response);
-            });
+            }).RequireAuthorization();
+            
+            app.MapDelete("/condominiums/{condominiumId}/summary/{userId}/cancel/{jobId}", 
+                async (ISender sender, ClaimsPrincipal claims, Guid condominiumId, string userId, Guid jobId, CancellationToken cancellationToken) => 
+                {
+                    var currentUserId = claims.FindFirst("user_id")?.Value;
+                    
+                    if(currentUserId != userId) return Results.Unauthorized();
+
+                    var command = new CancelSummaryCommand(condominiumId, userId, jobId);
+
+                    var result = await sender.Send(command, cancellationToken);
+
+                    if (!result.IsSuccess)
+                    {
+                        var failedResponse = new
+                        {
+                            IsSuccess = false,
+                            Data = new {
+                                Message = result.Value.Message
+                            }
+                        };
+
+                        return Results.BadRequest(failedResponse);
+                    }
+
+                    var successResponse = new
+                    {
+                        IsSuccess = true,
+                        Data = result.Value
+                    };
+
+                    return Results.Ok(successResponse);
+                }).RequireAuthorization();
 
             app.MapPost("/condominiums/test", async (IRepository<Condominium, Guid> repository) =>
             {

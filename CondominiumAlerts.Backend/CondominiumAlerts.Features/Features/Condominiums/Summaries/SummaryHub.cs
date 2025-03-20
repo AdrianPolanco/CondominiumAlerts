@@ -7,12 +7,11 @@ public class SummaryHub : Hub
 {
     
     //Methods:
+    //CancelledProcessing
     //SendSummary
-    //NotifyProcessingStarted
-    //NotifyProcessingFinished
     //NotifyProcessingError
-    //Metodo para enviar el resumen al cliente despues de haberlo procesado
-
+    //UserNotInCondominium
+    
     //Metodo para unir un condominio al hub
     public async Task JoinGroup(string condominiumId, string condominiumName, string username)
     {
