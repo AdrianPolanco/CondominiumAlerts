@@ -4,4 +4,4 @@ using LightResults;
 
 namespace CondominiumAlerts.Features.Features.Condominiums.Summaries;
 
-public record GetSummaryCommand(Condominium Condominium, User TriggeredByUser): ICommand<Result<GetSummaryCommandResponse>>;
+public record CreateSummaryCommand(Condominium Condominium, User TriggeredByUser): ICommand<Result<CreateSummaryCommandResponse>>;

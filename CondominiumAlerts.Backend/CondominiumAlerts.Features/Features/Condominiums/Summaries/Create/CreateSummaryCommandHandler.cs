@@ -12,15 +12,15 @@ using Message = CondominiumAlerts.Domain.Aggregates.Entities.Message;
 
 namespace CondominiumAlerts.Features.Features.Condominiums.Summaries;
 
-public class GetSummaryCommandHandler : ICommandHandler<GetSummaryCommand, Result<GetSummaryCommandResponse>>
+public class CreateSummaryCommandHandler : ICommandHandler<CreateSummaryCommand, Result<CreateSummaryCommandResponse>>
 {
     private readonly IHubContext<SummaryHub> _hubContext;
-    private readonly ILogger<GetSummaryCommandHandler> _logger;
+    private readonly ILogger<CreateSummaryCommandHandler> _logger;
     private readonly IRepository<Message, Guid> _messageRepository;
     private readonly IAiService _aiService;
 
-    public GetSummaryCommandHandler(
-        ILogger<GetSummaryCommandHandler> logger, 
+    public CreateSummaryCommandHandler(
+        ILogger<CreateSummaryCommandHandler> logger, 
         IRepository<Message, Guid> messageRepository,
         IAiService aiService,
         IHubContext<SummaryHub> hubContext
@@ -32,17 +32,24 @@ public class GetSummaryCommandHandler : ICommandHandler<GetSummaryCommand, Resul
         _hubContext = hubContext;
     }
     
-    public async Task<Result<GetSummaryCommandResponse>> Handle(GetSummaryCommand request, CancellationToken cancellationToken)
+    public async Task<Result<CreateSummaryCommandResponse>> Handle(CreateSummaryCommand request, CancellationToken cancellationToken)
     {
-        
+        var cancellationMessage = "Procesamiento de resumenes cancelado...";
+
+        if (cancellationToken.IsCancellationRequested)
+        {
+            _logger.LogInformation(cancellationMessage);
+            return Result<CreateSummaryCommandResponse>.Fail(cancellationMessage);
+        }
         // Validación de mensajes
         var messages = await _messageRepository.GetAsync(filter: m => m.CondominiumId == request.Condominium.Id /*&& m.CreatedAt > DateTime.UtcNow.AddHours(-24)*/, cancellationToken: cancellationToken);
         if (messages.Count == 0)
         {
             var errorMessage = $"No se encontraron mensajes en el condominio. CondominiumId: {request.Condominium.Id}, Mensajes: 0";
             _logger.LogWarning(errorMessage);
-            return Result.Fail<GetSummaryCommandResponse>(errorMessage);
+            return Result.Fail<CreateSummaryCommandResponse>(errorMessage);
         }
+        
         
         var recoveredMessagesLog = $"Mensajes recuperados exitosamente. CondominiumId: {request.Condominium.Id}. Cantidad de mensajes: {messages.Count}";
         _logger.LogInformation(recoveredMessagesLog);
@@ -50,6 +57,12 @@ public class GetSummaryCommandHandler : ICommandHandler<GetSummaryCommand, Resul
         var messagesDto = messages.Adapt<List<MessageSummaryDto>>();
         
         _logger.LogInformation("MessagesDTO: {dto}", messagesDto);
+        
+        if (cancellationToken.IsCancellationRequested)
+        {
+            _logger.LogInformation(cancellationMessage);
+            return Result<CreateSummaryCommandResponse>.Fail(cancellationMessage);
+        }
 
         /*var summary = await _aiService.GenerateSummary(messagesDto, request.TriggeredByUser, request.Condominium, cancellationToken);
         
@@ -67,10 +80,10 @@ public class GetSummaryCommandHandler : ICommandHandler<GetSummaryCommand, Resul
            TriggeredBy = request.TriggeredByUser.Id,
            User = request.TriggeredByUser
        };
-       var response = new GetSummaryCommandResponse(testSummary);
+       var response = new CreateSummaryCommandResponse(testSummary);
         var successMessage = $"Resumen solicitado exitosamente. CondominiumId: {request.Condominium.Id}, UserId: {request.TriggeredByUser}, Mensajes: {messages.Count}";
         _logger.LogInformation(successMessage);
         
-        return Result.Ok<GetSummaryCommandResponse>(response);
+        return Result.Ok<CreateSummaryCommandResponse>(response);
     }
 }

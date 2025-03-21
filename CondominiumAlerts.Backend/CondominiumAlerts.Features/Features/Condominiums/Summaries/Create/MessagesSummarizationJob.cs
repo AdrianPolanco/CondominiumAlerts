@@ -54,10 +54,19 @@ public class MessagesSummarizationJob : IInvocable, IInvocableWithPayload<Messag
             _logger.LogInformation($"[Solicitud {_jobId}] Solicitud cancelada antes de comenzar.", _jobId);
             _hubContext.Clients.Group(Payload.CondominiumId.ToString())
                 .SendAsync("CancelledProcessing", "Se cancelo el proceso antes de empezar", CancellationToken);
+            return;
         }
 
         try
         {
+            // Verificar cancelación justo antes de terminar
+            if (CancellationToken.IsCancellationRequested)
+            {
+                _logger.LogWarning($"[Solicitud {_jobId}] Cancelando solicitud...");
+                await _hubContext.Clients.Group(Payload.CondominiumId.ToString())
+                    .SendAsync("CancelledProcessing", "Se ha cancelado el proceso.", CancellationToken);
+                return;
+            }
             //Validacion de condominio
             var condominium = await _condominiumRepository.GetByIdAsync(Payload.CondominiumId, CancellationToken);
             if (condominium is null)
@@ -67,6 +76,14 @@ public class MessagesSummarizationJob : IInvocable, IInvocableWithPayload<Messag
                 return;
             }
             
+            // Verificar cancelación justo antes de terminar
+            if (CancellationToken.IsCancellationRequested)
+            {
+                _logger.LogWarning($"[Solicitud {_jobId}] Cancelando solicitud...");
+                await _hubContext.Clients.Group(Payload.CondominiumId.ToString())
+                    .SendAsync("CancelledProcessing", "Se ha cancelado el proceso.", CancellationToken);
+                return;
+            }
             // Validación de usuario
             var user = await _userRepository.GetByIdAsync(Payload.TriggeredBy, CancellationToken);
             if (user is null)
@@ -76,6 +93,15 @@ public class MessagesSummarizationJob : IInvocable, IInvocableWithPayload<Messag
                 return;
             }
             
+            
+            // Verificar cancelación justo antes de terminar
+            if (CancellationToken.IsCancellationRequested)
+            {
+                _logger.LogWarning($"[Solicitud {_jobId}] Cancelando solicitud...");
+                await _hubContext.Clients.Group(Payload.CondominiumId.ToString())
+                    .SendAsync("CancelledProcessing", "Se ha cancelado el proceso.", CancellationToken);
+                return;
+            }
             //Validando que el usuario efectivamente esta en el condominio
             var condominiumUser = await _condominiumUserRepository.GetAsync(
                 cancellationToken: CancellationToken,
@@ -87,12 +113,20 @@ public class MessagesSummarizationJob : IInvocable, IInvocableWithPayload<Messag
             {
                 var errorMessage = $"El usuario ${user.Username} no pertenece al condominio ${condominium.Name}.";
                 _logger.LogWarning(errorMessage);
-                _hubContext.Clients.Group(Payload.CondominiumId.ToString()).SendAsync("UserNotInCondominium", errorMessage);
+                await _hubContext.Clients.Group(Payload.CondominiumId.ToString()).SendAsync("UserNotInCondominium", errorMessage);
             }
             
             _logger.LogInformation($"[Solicitud {_jobId}] Procesando mensajes para el condominio [${condominium.Id} - ${condominium.Name}] por solicitud del usuario [${user.Id} - {user.Username}].");
             
-            var command = new GetSummaryCommand(condominium, user);
+            var command = new CreateSummaryCommand(condominium, user);
+            // Verificar cancelación justo antes de terminar
+            if (CancellationToken.IsCancellationRequested)
+            {
+                _logger.LogWarning($"[Solicitud {_jobId}] Cancelando solicitud...");
+                await _hubContext.Clients.Group(Payload.CondominiumId.ToString())
+                    .SendAsync("CancelledProcessing", "Se ha cancelado el proceso.", CancellationToken);
+                return;
+            }
             var result = await _sender.Send(command, CancellationToken);
 
             if (result.IsSuccess && result.Value is not null)

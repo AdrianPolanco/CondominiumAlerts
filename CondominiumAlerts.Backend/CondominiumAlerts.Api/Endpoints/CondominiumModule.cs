@@ -8,6 +8,7 @@ using CondominiumAlerts.Features.Features.Condominiums.Get;
 using CondominiumAlerts.Features.Features.Condominiums.Join;
 using CondominiumAlerts.Features.Features.Condominiums.Summaries;
 using CondominiumAlerts.Features.Features.Condominiums.Summaries.Cancel;
+using CondominiumAlerts.Features.Features.Condominiums.Summaries.Get;
 using CondominiumAlerts.Features.Features.Messages.Condominiums;
 using CondominiumAlerts.Infrastructure.Persistence.Repositories;
 using CondominiumAlerts.Infrastructure.Services.AI.MessagesSummary;
@@ -118,7 +119,7 @@ namespace CondominiumAlerts.Api.Endpoints
                     string userId, 
                     ISender sender,
                     IQueue queue,
-                    CancellationToken CancellationToken,
+                    CancellationToken cancellationToken,
                     JobCancellationService jobCancellationService,
                     ILogger<CondominiumModule> logger
                     ) =>
@@ -128,7 +129,6 @@ namespace CondominiumAlerts.Api.Endpoints
                 MessagesSummarizationRequest request = new(condominiumId, userId, jobId);
 
                 queue.QueueInvocableWithPayload<MessagesSummarizationJob, MessagesSummarizationRequest>(request);
-
                 var response = new
                 {
                     IsSuccess = "pending",
@@ -171,6 +171,31 @@ namespace CondominiumAlerts.Api.Endpoints
                     return Results.Ok(successResponse);
                 }).RequireAuthorization();
 
+            app.MapGet("/condominiums/{condominiumId}/summary", async (
+                ClaimsPrincipal claims, 
+                Guid condominiumId,
+                ISender sender,
+                CancellationToken cancellationToken) =>
+            {
+                var userId = claims.FindFirst("user_id")?.Value;
+                
+                if(string.IsNullOrEmpty(userId)) return Results.Unauthorized();
+
+                var query = new GetSummaryQuery(userId, condominiumId);
+                
+                var result = await sender.Send(query, cancellationToken);
+                
+                if (!result.IsSuccess) return Results.BadRequest(result);
+
+                var response = new
+                {
+                    IsSuccess = result.IsSuccess,
+                    Data = result.Value.Summary
+                };
+                
+                return Results.Ok(response);
+            }).RequireAuthorization();
+                
             app.MapPost("/condominiums/test", async (IRepository<Condominium, Guid> repository) =>
             {
                 List<Condominium> condominiums = new()
