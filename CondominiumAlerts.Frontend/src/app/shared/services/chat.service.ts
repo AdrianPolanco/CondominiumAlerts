@@ -91,11 +91,11 @@ export class ChatService{
   cancelSummaryRequest(jobId: string): Observable<any> {
     const currentOptions = this.chatOptions.value;
 
-    if (currentOptions?.type !== 'condominium' || !currentOptions.condominium || !currentOptions.user) {
+    if ((currentOptions?.type === 'condominium' && !currentOptions?.condominium?.id) || !this.token) {
       throw new Error('Condominio no seleccionado o no disponible');
     }
 
-    return this.httpClient.delete<any>(`api/condominiums/${currentOptions.condominium.id}/summary/${this.userData?.id}/cancel/${jobId}`,
+    return this.httpClient.delete<any>(`api/condominiums/${currentOptions?.condominium?.id}/summary/${this.userData?.id}/cancel/${jobId}`,
       {
         headers: {
           Authorization: `Bearer ${this.token}`
@@ -166,10 +166,12 @@ export class ChatService{
       this.processingStatus.next(null);
     });
 
-    this.hubConnection.on('CancelledProcessing', (message: string) => {
+    this.hubConnection.on('CancelledProcessing', async (message: string) => {
       console.log('Processing cancelled: ', message);
+      console.log('Summary cancelled');
       this.processingStatus.next(`Cancelled: ${message}`);
       this.summaryResult.next(null);
+      await this.disconnectFromHub()
     });
 
     this.hubConnection.on("UserNotInCondominium", (errorMessage: string) => {
@@ -179,10 +181,10 @@ export class ChatService{
       this.summaryResult.next(null)
     })
 
-    this.hubConnection.on("ProcessingComplete", (message: string) => {
+    this.hubConnection.on("ProcessingComplete", async (message: string) => {
       console.log("Processing complete: ", message);
       this.processingStatus.next("COMPLETED");
-      this.disconnectFromHub();
+      await this.disconnectFromHub();
     })
   }
   

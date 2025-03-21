@@ -13,19 +13,19 @@ public class CancelSummaryCommandHandler : ICommandHandler<CancelSummaryCommand,
     private readonly JobCancellationService _jobCancellationService;
     private readonly IRepository<CondominiumUser, Guid> _condominiumUserRepository;
     private readonly ILogger<CancelSummaryCommandHandler> _logger;
-   // private readonly IHubContext<SummaryHub> _hubContext;
+    private readonly IHubContext<SummaryHub> _hubContext;
 
     public CancelSummaryCommandHandler(
         JobCancellationService jobCancellationService, 
         IRepository<CondominiumUser, Guid> condominiumUserRepository,
-        ILogger<CancelSummaryCommandHandler> logger
-       // IHubContext<SummaryHub> hubContext
+        ILogger<CancelSummaryCommandHandler> logger,
+        IHubContext<SummaryHub> hubContext
         )
     {
         _jobCancellationService = jobCancellationService;
         _condominiumUserRepository = condominiumUserRepository;
         _logger = logger;
-       // _hubContext = hubContext;
+        _hubContext = hubContext;
     }
     
     public async Task<Result<CancelSummaryResponse>> Handle(CancelSummaryCommand request, CancellationToken cancellationToken)
@@ -49,12 +49,13 @@ public class CancelSummaryCommandHandler : ICommandHandler<CancelSummaryCommand,
 
         _logger.LogInformation("[USER-AUTORIZED] El usuario {userId} esta autorizado a cancelar el job {jobId}", request.UserId, request.JobId);
         // 2. Intentar cancelar el trabajo
-        bool cancelado = _jobCancellationService.CancelJob(request.JobId);
-
-        if (cancelado)
+        bool cancelled = _jobCancellationService.CancelJob(request.JobId);
+        _logger.LogInformation("Estado de los trabajos registrados: {0}", _jobCancellationService.GetAllJobs());
+        if (cancelled)
         {
             _logger.LogInformation("[SUMMARY-CANCELLED] El resumen {jobId} fue cancelado exitosamente", request.JobId);
-            
+            await _hubContext.Clients.Group(request.CondominiumId.ToString())
+                .SendAsync("CancelledProcessing", "Se ha cancelado el proceso.", cancellationToken);
             // Si la cancelación fue exitosa, retornar éxito
             return Result<CancelSummaryResponse>.Ok(
                 new CancelSummaryResponse( 

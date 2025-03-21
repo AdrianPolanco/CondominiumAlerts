@@ -11,6 +11,7 @@ public class JobCancellationService
     {
         var jobId = Guid.NewGuid();
         _cancellations[jobId] = new CancellationTokenSource();
+        _cancellations.TryAdd(jobId, _cancellations[jobId]);
         return jobId;
     }
 
@@ -23,14 +24,19 @@ public class JobCancellationService
     // Cancelar Job
     public bool CancelJob(Guid jobId)
     {
-        if (_cancellations.TryRemove(jobId, out var tokenSource))
+        if (_cancellations.TryGetValue(jobId, out var tokenSource))
         {
             tokenSource.Cancel();
             return true;
         }
-        
         return false;
     }
+    
+    public IEnumerable<KeyValuePair<Guid, CancellationTokenSource>> GetAllJobs()
+    {
+        return _cancellations;
+    }
+
 
     public bool RemoveJob(Guid jobId)
     {

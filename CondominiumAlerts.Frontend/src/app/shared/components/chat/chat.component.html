@@ -2,16 +2,19 @@
   <header class="chat-header bg-gray-50 dark:bg-gray-700 flex justify-between items-center p-4">
     <div class="text-xl">
       @if(this.options()?.type == 'condominium'){
-        <div>
-          <i class="fa-solid fa-building"></i> {{ this.options()?.condominium?.name }}
-        <span class="text-xs text-gray-500 dark:text-gray-400 block">({{ this.options()?.condominium?.address }})</span>
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-building"></i>
+          <div class="flex flex-col gap-0 items-start">
+            <p>{{ this.options()?.condominium?.name }}</p>
+            <span class="text-xs text-gray-500 dark:text-gray-400 block">({{ this.options()?.condominium?.address }})</span>
+          </div>
         </div>
       }@else{
         <i class="fa-solid fa-user"></i> {{ this.options()?.user?.name }}
       }
     </div>
 
-    @if(summarizing() == true){
+    @if(summarizing() == true && !isThereSummaryResult()){
       <div class="flex justify-center items-center gap-2">
         <p-button icon="pi pi-cog" styleClass="animate-[spin_3s_linear_infinite]" [rounded]="true" size="small"/>
         <label class="text-xs">Resumiendo...</label>
@@ -19,25 +22,21 @@
           <p-button icon="pi pi-times" [rounded]="true" [text]="true" severity="danger" size="small"  (onClick)="cancelSummary()"/>
         </div>
       </div>
-    }@else {
+    }@else if(!summarizing() && !isThereSummaryResult()){
       <p-button icon="pi pi-book" [rounded]="true" label="Resumir" (onClick)="summarizeMessages()" size="small"/>
+    }@else if(isThereSummaryResult()){
+      <p-button icon="pi pi-eye" [rounded]="true" label="Ver resumen" (onClick)="showSummaryResult()" size="small"/>
     }
   </header>
   <section class="chat-content bg-white scroll-invisible w-full flex flex-col gap-4">
-    <p-splitter [style]="{ height: 'full' }" layout="vertical">
-      @if(!summarizing() && summaryResult()){
-        <ng-template #panel>
-          <p>{{summaryResult()?.content}}</p>
-        </ng-template>
-      }
-      <ng-template #panel>
         <div class="chat-content bg-white scroll-invisible w-full flex flex-col gap-4 ">
         <app-chat-buble
           *ngFor="let message of messages()"
           [message]="message"
         ></app-chat-buble></div>
-      </ng-template>
-    </p-splitter>
   </section>
   <app-chat-box> </app-chat-box>
 </section>
+<p-dialog header="Resumen" [modal]="true" [(visible)]="showSummary" [style]="{ width: '50rem' }" [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }" [maximizable]="true">
+  <p>{{summaryResult()?.content}} Lorem ipsum dolor sit amet consectetur adipisicing elit. Dignissimos nihil optio fuga deserunt aperiam sunt quas, saepe, accusantium obcaecati rem aut odit voluptatum, provident molestiae perferendis quia enim quae similique. Lorem ipsum dolor sit amet consectetur, adipisicing elit. Necessitatibus cumque harum possimus veritatis cum corrupti eveniet fugiat doloribus quia nisi. Corporis quia ducimus inventore. Perferendis vitae ipsa impedit odio consectetur. Lorem, ipsum dolor sit amet consectetur adipisicing elit. Laborum deserunt adipisci odit magnam cumque voluptas quidem debitis, culpa id nemo voluptate modi fuga architecto sit natus iusto voluptatem vero nesciunt.</p>
+</p-dialog>

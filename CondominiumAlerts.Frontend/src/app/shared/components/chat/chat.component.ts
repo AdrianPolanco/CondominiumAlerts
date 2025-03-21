@@ -25,12 +25,13 @@ import { AuthenticationService } from '../../../core/services/authentication.ser
 import { User } from '../../../core/auth/layout/auth-layout/user.type';
 import { SplitterModule } from 'primeng/splitter';
 import { SummaryResult } from '../../../features/condominiums/models/summaryResult';
+import { Dialog } from 'primeng/dialog';
 
 
 @AutoUnsubscribe()
 @Component({
   selector: 'app-chat',
-  imports: [ChatBoxComponent, ChatBubleComponent, NgFor, FormsModule, Button, SplitterModule, NgClass],
+  imports: [ChatBoxComponent, ChatBubleComponent, NgFor, FormsModule, Button, SplitterModule, Dialog],
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.css',
 })
@@ -46,6 +47,8 @@ export class ChatComponent implements OnInit, OnDestroy {
   summarizing = signal(false)
   summaryResult = signal<SummaryResult | null>(null);
   summaryJobId: string | null = null;
+  isThereSummaryResult = signal(false);
+  showSummary = false
 
   isCondominium = this.options()?.type === "condominium";
 
@@ -69,6 +72,7 @@ export class ChatComponent implements OnInit, OnDestroy {
           });
       }
     });
+      
   }
 
   async summarizeMessages() {
@@ -105,11 +109,12 @@ export class ChatComponent implements OnInit, OnDestroy {
           });
         
         // Suscribirse a los resultados del resumen
-        const summaryResultSubscription = this.chatService.summaryResult$
+        this.chatService.summaryResult$
           .pipe(takeUntil(this.destroy$))
           .subscribe(async(summary) => {
             if(!summary) return;
             this.summaryResult.set(summary);
+            this.isThereSummaryResult.set(true);
            // summaryResultSubscription.unsubscribe();
             //await this.chatService.disconnectFromHub();
           });
@@ -142,17 +147,18 @@ export class ChatComponent implements OnInit, OnDestroy {
           });
         }
 
-        console.log("RESUMEN SOLICITADO")
+        
       
   }
 
   cancelSummary() {
     if (this.summaryJobId) {
+      console.log("CANCELLING SUMMARY...")
+      console.log("JOBID", this.summaryJobId)
       this.chatService.cancelSummaryRequest(this.summaryJobId)
         .pipe(takeUntil(this.destroy$))
         .subscribe({
           next: async() => {
-            console.log('Summary cancelled');
             this.summarizing.set(false);
             this.summaryJobId = null;
             //await this.chatService.disconnectFromHub();
@@ -161,6 +167,12 @@ export class ChatComponent implements OnInit, OnDestroy {
             console.error('Error cancelling summary', err);
           }
         });
+    }
+  }
+
+  showSummaryResult(){
+    if(this.isThereSummaryResult() && this.summaryResult()?.content) {
+      this.showSummary = true
     }
   }
 
