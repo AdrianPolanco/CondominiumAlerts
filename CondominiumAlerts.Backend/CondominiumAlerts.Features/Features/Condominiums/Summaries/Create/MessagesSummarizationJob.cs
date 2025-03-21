@@ -98,7 +98,7 @@ public class MessagesSummarizationJob : IInvocable, IInvocableWithPayload<Messag
             if (result.IsSuccess && result.Value is not null)
             {
                 await _hubContext.Clients.Group(command.Condominium.Id.ToString()).SendAsync("SendSummary", result.Value.Summary, CancellationToken);
-                await _summaryRepository.CreateAsync(result.Value.Summary, CancellationToken);
+               // await _summaryRepository.CreateAsync(result.Value.Summary, CancellationToken);
             }
             else
             {
@@ -132,6 +132,7 @@ public class MessagesSummarizationJob : IInvocable, IInvocableWithPayload<Messag
         finally
         {
             _jobCancellationService.RemoveJob(_jobId);
+            await _hubContext.Clients.Group(Payload.CondominiumId.ToString()).SendAsync("ProcessingComplete", "Proceso completado con éxito");
         }
     }
     

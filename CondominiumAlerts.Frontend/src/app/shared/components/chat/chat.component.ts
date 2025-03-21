@@ -1,4 +1,5 @@
 import {
+  ChangeDetectorRef,
   Component,
   effect,
   inject,
@@ -11,7 +12,7 @@ import { ChatBoxComponent } from '../chat-box/chat-box.component';
 import { ChatBubleComponent } from '../chat-buble/chat-buble.component';
 import { UserService } from '../../../features/users/services/user.service';
 import { Message } from '../../../core/models/message.models';
-import { NgFor } from '@angular/common';
+import { NgClass, NgFor } from '@angular/common';
 import { AuthService } from '../../../core/auth/services/auth.service';
 import { ChatService } from '../../services/chat.service';
 import { AutoUnsubscribe } from '../../decorators/autounsuscribe.decorator';
@@ -23,26 +24,30 @@ import { Button } from 'primeng/button';
 import { AuthenticationService } from '../../../core/services/authentication.service';
 import { User } from '../../../core/auth/layout/auth-layout/user.type';
 import { SplitterModule } from 'primeng/splitter';
+import { SummaryResult } from '../../../features/condominiums/models/summaryResult';
 
 
 @AutoUnsubscribe()
 @Component({
   selector: 'app-chat',
-  imports: [ChatBoxComponent, ChatBubleComponent, NgFor, FormsModule, Button, SplitterModule],
+  imports: [ChatBoxComponent, ChatBubleComponent, NgFor, FormsModule, Button, SplitterModule, NgClass],
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.css',
 })
 export class ChatComponent implements OnInit, OnDestroy {
   private chatService = inject(ChatService);
   private authenticationService = inject(AuthenticationService);
+  private cdr = inject(ChangeDetectorRef);
 
   private destroy$ = new Subject<void>();
   options = signal<ChatOptions | null>(null);
   currentUser: User | null = null;
   messages = signal<ChatMessageDto[]>([]);
   summarizing = signal(false)
-  summaryResult = signal<string | null>(null);
+  summaryResult = signal<SummaryResult | null>(null);
   summaryJobId: string | null = null;
+
+  isCondominium = this.options()?.type === "condominium";
 
   ngOnInit(): void {
     this.authenticationService.userData$.pipe(takeUntil(this.destroy$)).subscribe((userData) => {
@@ -77,6 +82,7 @@ export class ChatComponent implements OnInit, OnDestroy {
     };
 
     this.summarizing.set(true);
+    this.cdr.detectChanges();
 
     const options = this.options();
 
@@ -90,35 +96,33 @@ export class ChatComponent implements OnInit, OnDestroy {
         this.summarizing.set(false);
       }
 
-
-
-      console.log("CONEXION SIGNALR ESTABLECIDA EXITOSAMENTE");
         // Tras conectarse, se suscribe a los mensajes
       this.chatService.processingStatus$
           .pipe(takeUntil(this.destroy$))
           .subscribe(status => {
-            if (status === null) this.summarizing.set(false); 
+            if(status === "COMPLETED") this.summarizing.set(false);
+            //if (status === null) this.summarizing.set(false); 
           });
         
         // Suscribirse a los resultados del resumen
         const summaryResultSubscription = this.chatService.summaryResult$
           .pipe(takeUntil(this.destroy$))
-          .subscribe(summary => {
+          .subscribe(async(summary) => {
             if(!summary) return;
             this.summaryResult.set(summary);
-            summaryResultSubscription.unsubscribe();
-            this.chatService.disconnectFromHub();
+           // summaryResultSubscription.unsubscribe();
+            //await this.chatService.disconnectFromHub();
           });
         
         // Subscrirse a los errores
         const processingErrorSubscription = this.chatService.processingError$
           .pipe(takeUntil(this.destroy$))
-          .subscribe(error => {
+          .subscribe(async(error) => {
             if (error) {
               // Handle error (could add error handling state to your component)
-              this.summarizing.set(false);
+              //this.summarizing.set(false);
               processingErrorSubscription.unsubscribe();
-              this.chatService.disconnectFromHub();
+              //await this.chatService.disconnectFromHub();
               console.log('Error processing summary', error);
             }
           });
@@ -134,7 +138,6 @@ export class ChatComponent implements OnInit, OnDestroy {
             error: (err) => {
               console.error('Error requesting summary', err);
               this.summarizing.set(false);
-              this.chatService.disconnectFromHub();
             }
           });
         }
@@ -148,13 +151,11 @@ export class ChatComponent implements OnInit, OnDestroy {
       this.chatService.cancelSummaryRequest(this.summaryJobId)
         .pipe(takeUntil(this.destroy$))
         .subscribe({
-          next: () => {
+          next: async() => {
             console.log('Summary cancelled');
             this.summarizing.set(false);
             this.summaryJobId = null;
-            
-            // Desconectar del hub después de cancelar
-            this.chatService.disconnectFromHub();
+            //await this.chatService.disconnectFromHub();
           },
           error: (err) => {
             console.error('Error cancelling summary', err);

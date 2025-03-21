@@ -10,6 +10,7 @@ import { AutoUnsubscribe } from '../decorators/autounsuscribe.decorator';
 import { User } from '../../core/auth/layout/auth-layout/user.type';
 import { RequestCondominiumSummaryResponse } from '../../features/condominiums/models/requestCondominiumSummary.response';
 import { HttpTransportType, HubConnectionBuilder } from '@microsoft/signalr';
+import { SummaryResult } from '../../features/condominiums/models/summaryResult';
 
 @AutoUnsubscribe()
 @Injectable({
@@ -22,7 +23,7 @@ export class ChatService{
 
   private hubConnection: signalR.HubConnection | null = null;
   private processingStatus = new BehaviorSubject<string | null>(null);
-  private summaryResult = new BehaviorSubject<string | null>(null);
+  private summaryResult = new BehaviorSubject<SummaryResult | null>(null);
   private processingError = new BehaviorSubject<string | null>(null);
 
   processingStatus$ = this.processingStatus.asObservable();
@@ -109,13 +110,14 @@ export class ChatService{
       // Disconnect from any existing hub connection
       await this.disconnectFromHub();
       
+      console.log("Intentando conectar a SignalR...");
       // Create a new hub connection
       this.hubConnection = new HubConnectionBuilder()
         .withUrl('/api/condominiums/hubs/summary', {
-          skipNegotiation: true,
-          transport: HttpTransportType.WebSockets,
+          transport: HttpTransportType.ServerSentEvents,
           accessTokenFactory: () => this.token || ''
         })
+        .configureLogging(signalR.LogLevel.Debug)
         .withAutomaticReconnect()
         .build();
   
@@ -130,8 +132,6 @@ export class ChatService{
         .catch(err => {
           console.error("Error al conectar a SignalR:", err);
         });
-
-        console.log("CONECTADO A SIGNALRRR", )
       
       // Join the group for this condominium
 
@@ -144,7 +144,10 @@ export class ChatService{
 
   // Metodo para manejar eventos del hub
   private setupHubEventHandlers(): void {
+    console.log("Trying to set up hub event handlers...");
     if (!this.hubConnection) return;
+
+    console.log("Setting up hub event handlers...");
 
     this.hubConnection.on('NotifyProcessingStarted', (message: string) => {
       console.log('Processing started: ', message);
@@ -175,6 +178,12 @@ export class ChatService{
       this.processingStatus.next(errorMessage)
       this.summaryResult.next(null)
     })
+
+    this.hubConnection.on("ProcessingComplete", (message: string) => {
+      console.log("Processing complete: ", message);
+      this.processingStatus.next("COMPLETED");
+      this.disconnectFromHub();
+    })
   }
   
   // Metodo para desconectarse del hub
@@ -182,25 +191,28 @@ export class ChatService{
     if (this.hubConnection) {
       const currentOptions = this.chatOptions.value;
       
-      if (currentOptions?.type === 'condominium' && currentOptions.condominium) {
-        try {
+      try {
+        // Check connection state before attempting to leave group
+        if (this.hubConnection.state === signalR.HubConnectionState.Connected && 
+            currentOptions?.type === 'condominium' && 
+            currentOptions.condominium) {
+          
           await this.hubConnection.invoke('LeaveGroup', 
             currentOptions.condominium.id, 
             currentOptions.condominium.name, 
             currentOptions.user?.username || 'Unknown');
-        } catch (error) {
-          console.error('Error leaving group: ', error);
         }
-      }
-      
-      try {
-        await this.hubConnection.stop();
-        console.log('SignalR connection stopped');
+        
+        // Only stop if not already disconnected
+        if (this.hubConnection.state !== signalR.HubConnectionState.Disconnected) {
+          await this.hubConnection.stop();
+          console.log('SignalR connection stopped');
+        }
       } catch (error) {
-        console.error('Error stopping connection: ', error);
+        console.error('Error during hub disconnection: ', error);
+      } finally {
+        this.hubConnection = null;
       }
-      
-      this.hubConnection = null;
     }
   }
 }

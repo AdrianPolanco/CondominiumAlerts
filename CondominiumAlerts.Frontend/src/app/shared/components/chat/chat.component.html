@@ -1,10 +1,17 @@
 <section class="chat">
   <header class="chat-header bg-gray-50 dark:bg-gray-700 flex justify-between items-center p-4">
     <div class="text-xl">
-      <i class="fa-solid fa-user"></i> {{ currentUser?.name }} {{ currentUser?.lastname }}
+      @if(this.options()?.type == 'condominium'){
+        <div>
+          <i class="fa-solid fa-building"></i> {{ this.options()?.condominium?.name }}
+        <span class="text-xs text-gray-500 dark:text-gray-400 block">({{ this.options()?.condominium?.address }})</span>
+        </div>
+      }@else{
+        <i class="fa-solid fa-user"></i> {{ this.options()?.user?.name }}
+      }
     </div>
 
-    @if(summarizing()){
+    @if(summarizing() == true){
       <div class="flex justify-center items-center gap-2">
         <p-button icon="pi pi-cog" styleClass="animate-[spin_3s_linear_infinite]" [rounded]="true" size="small"/>
         <label class="text-xs">Resumiendo...</label>
@@ -16,11 +23,11 @@
       <p-button icon="pi pi-book" [rounded]="true" label="Resumir" (onClick)="summarizeMessages()" size="small"/>
     }
   </header>
-  <section>
-    <p-splitter [style]="{ height: '300px' }" styleClass="mb-8" layout="vertical">
+  <section class="chat-content bg-white scroll-invisible w-full flex flex-col gap-4">
+    <p-splitter [style]="{ height: 'full' }" layout="vertical">
       @if(!summarizing() && summaryResult()){
         <ng-template #panel>
-          <p>{{summaryResult()}}</p>
+          <p>{{summaryResult()?.content}}</p>
         </ng-template>
       }
       <ng-template #panel>

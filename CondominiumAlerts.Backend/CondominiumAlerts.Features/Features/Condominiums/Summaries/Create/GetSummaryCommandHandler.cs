@@ -51,12 +51,23 @@ public class GetSummaryCommandHandler : ICommandHandler<GetSummaryCommand, Resul
         
         _logger.LogInformation("MessagesDTO: {dto}", messagesDto);
 
-        var summary = await _aiService.GenerateSummary(messagesDto, request.TriggeredByUser, request.Condominium, cancellationToken);
+        /*var summary = await _aiService.GenerateSummary(messagesDto, request.TriggeredByUser, request.Condominium, cancellationToken);
         
         if(summary is null) return Result.Fail<GetSummaryCommandResponse>("Hubo un error al resumir la conversacion.");
-        
-        var response = new GetSummaryCommandResponse(summary);
-        
+        */
+       // var response = new GetSummaryCommandResponse(summary);
+
+       var testSummary = new Summary()
+       {
+           CondominiumId = request.Condominium.Id,
+           Condominium = request.Condominium,
+           Content = "ESTE ES UN MENSAJE DE PRUEBA PARA SIGNALR",
+           CreatedAt = DateTime.UtcNow,
+           Id = Guid.NewGuid(),
+           TriggeredBy = request.TriggeredByUser.Id,
+           User = request.TriggeredByUser
+       };
+       var response = new GetSummaryCommandResponse(testSummary);
         var successMessage = $"Resumen solicitado exitosamente. CondominiumId: {request.Condominium.Id}, UserId: {request.TriggeredByUser}, Mensajes: {messages.Count}";
         _logger.LogInformation(successMessage);
         
