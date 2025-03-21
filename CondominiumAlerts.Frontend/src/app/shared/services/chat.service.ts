@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { Message } from '../../core/models/message.models';
 import { BehaviorSubject, Observable, Subject, takeUntil } from 'rxjs';
 import { ChatOptions } from '../components/chat/chat.type';
@@ -11,10 +11,11 @@ import { User } from '../../core/auth/layout/auth-layout/user.type';
 import { RequestCondominiumSummaryResponse } from '../../features/condominiums/models/requestCondominiumSummary.response';
 import { HttpTransportType, HubConnectionBuilder } from '@microsoft/signalr';
 import { SummaryResult } from '../../features/condominiums/models/summaryResult';
+import { MessageService } from 'primeng/api';
 
 @AutoUnsubscribe()
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ChatService{
 
@@ -33,6 +34,10 @@ export class ChatService{
   token:string | null = null;
   userData: User | null = null;
   private destroy$ = new Subject<void>();
+  private messageService = inject(MessageService)
+
+  private summarizingSubject = new BehaviorSubject<boolean>(false);
+  summarizing$ = this.summarizingSubject.asObservable();
 
   constructor(private httpClient: HttpClient, private authenticationService: AuthenticationService) {
     this.authenticationService.userToken$.pipe(takeUntil(this.destroy$)).subscribe((token) => {
@@ -54,6 +59,25 @@ export class ChatService{
         Authorization: `Bearer ${this.token}`
       }
     });
+  }
+
+  getCurrentSummaryResult() {
+    return this.httpClient.get<{isSuccess: boolean, data:SummaryResult}>(`api/condominiums/${this.chatOptions.value?.condominium?.id}/summary`, {
+      headers: {
+        Authorization: `Bearer ${this.token}`
+      }
+    });
+  }
+
+  
+
+  formatText(text: string): string[] {
+    return text
+      .replace(/\*\*(.*?)\*\*/g, '$1')  // Elimina negritas (**texto** -> texto)
+      .replace(/- /g, '• ')  // Convierte guiones en viñetas
+      .split(/\n+/)  // Divide en líneas por saltos de línea
+      .map(line => line.trim())  // Elimina espacios innecesarios
+      .filter(line => line);  // Elimina líneas vacías
   }
 
   //TODO: Implement this method and API
@@ -185,6 +209,10 @@ export class ChatService{
       console.log("Processing complete: ", message);
       this.processingStatus.next("COMPLETED");
       await this.disconnectFromHub();
+    })
+
+    this.hubConnection.on("NoNewMessages", (message: string) => {
+      this.messageService.add({severity:'error', summary:'No hay mensajes nuevos', detail: message});
     })
   }
   

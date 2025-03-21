@@ -24,7 +24,7 @@
       </div>
     }@else if(!summarizing() && !isThereSummaryResult()){
       <p-button icon="pi pi-book" [rounded]="true" label="Resumir" (onClick)="summarizeMessages()" size="small"/>
-    }@else if(isThereSummaryResult()){
+    }@else if(isThereSummaryResult() && summaryResult()?.content){
       <p-button icon="pi pi-eye" [rounded]="true" label="Ver resumen" (onClick)="showSummaryResult()" size="small"/>
     }
   </header>
@@ -37,6 +37,11 @@
   </section>
   <app-chat-box> </app-chat-box>
 </section>
-<p-dialog header="Resumen" [modal]="true" [(visible)]="showSummary" [style]="{ width: '50rem' }" [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }" [maximizable]="true">
-  <p>{{summaryResult()?.content}} Lorem ipsum dolor sit amet consectetur adipisicing elit. Dignissimos nihil optio fuga deserunt aperiam sunt quas, saepe, accusantium obcaecati rem aut odit voluptatum, provident molestiae perferendis quia enim quae similique. Lorem ipsum dolor sit amet consectetur, adipisicing elit. Necessitatibus cumque harum possimus veritatis cum corrupti eveniet fugiat doloribus quia nisi. Corporis quia ducimus inventore. Perferendis vitae ipsa impedit odio consectetur. Lorem, ipsum dolor sit amet consectetur adipisicing elit. Laborum deserunt adipisci odit magnam cumque voluptas quidem debitis, culpa id nemo voluptate modi fuga architecto sit natus iusto voluptatem vero nesciunt.</p>
+@if(isThereSummaryResult() && showSummary && summaryResult()?.content){
+  <p-dialog header="Resumen" [modal]="true" [(visible)]="showSummary" [style]="{ width: '50rem' }" [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }" [maximizable]="true">
+  <ul>
+    <li *ngFor="let item of formatSummary()">{{ item }}</li>
+  </ul>
 </p-dialog>
+}
+<p-toast/>

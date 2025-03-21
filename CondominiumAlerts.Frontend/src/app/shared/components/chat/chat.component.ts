@@ -16,7 +16,7 @@ import { NgClass, NgFor } from '@angular/common';
 import { AuthService } from '../../../core/auth/services/auth.service';
 import { ChatService } from '../../services/chat.service';
 import { AutoUnsubscribe } from '../../decorators/autounsuscribe.decorator';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, take, takeUntil } from 'rxjs';
 import { ChatOptions } from './chat.type';
 import { ChatMessageDto } from '../../../core/models/chatMessage.dto';
 import { FormsModule } from '@angular/forms';
@@ -26,20 +26,30 @@ import { User } from '../../../core/auth/layout/auth-layout/user.type';
 import { SplitterModule } from 'primeng/splitter';
 import { SummaryResult } from '../../../features/condominiums/models/summaryResult';
 import { Dialog } from 'primeng/dialog';
+import { MessageService } from 'primeng/api';
+import { Toast } from 'primeng/toast';
+import { Ripple } from 'primeng/ripple';
 
 
 @AutoUnsubscribe()
 @Component({
   selector: 'app-chat',
-  imports: [ChatBoxComponent, ChatBubleComponent, NgFor, FormsModule, Button, SplitterModule, Dialog],
+  imports: [
+    ChatBoxComponent, 
+    ChatBubleComponent, 
+    NgFor, 
+    FormsModule, 
+    Button, 
+    Toast,
+    Ripple,
+    Dialog],
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.css',
+  providers: [MessageService]
 })
 export class ChatComponent implements OnInit, OnDestroy {
   private chatService = inject(ChatService);
   private authenticationService = inject(AuthenticationService);
-  private cdr = inject(ChangeDetectorRef);
-
   private destroy$ = new Subject<void>();
   options = signal<ChatOptions | null>(null);
   currentUser: User | null = null;
@@ -70,9 +80,21 @@ export class ChatComponent implements OnInit, OnDestroy {
             console.log(response);
             this.messages.set(response.data);
           });
+
+          this.chatService.getCurrentSummaryResult().pipe(takeUntil(this.destroy$)).subscribe((summary) => {
+            console.log("SUMMARY FROM SUBSCRIPTION", summary);
+            if(summary.data.content) {
+              this.summaryResult.set(summary.data);
+              this.isThereSummaryResult.set(true);
+            }
+          });
       }
     });
       
+  }
+
+  formatSummary(){
+    return this.chatService.formatText(this.summaryResult()?.content!);
   }
 
   async summarizeMessages() {
@@ -86,7 +108,6 @@ export class ChatComponent implements OnInit, OnDestroy {
     };
 
     this.summarizing.set(true);
-    this.cdr.detectChanges();
 
     const options = this.options();
 
@@ -145,10 +166,7 @@ export class ChatComponent implements OnInit, OnDestroy {
               this.summarizing.set(false);
             }
           });
-        }
-
-        
-      
+        }  
   }
 
   cancelSummary() {
@@ -177,7 +195,9 @@ export class ChatComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if (this.summarizing()) this.chatService.disconnectFromHub();
+    if (this.summarizing()){ 
+      this.chatService.disconnectFromHub()
+    };
   }
 
 }

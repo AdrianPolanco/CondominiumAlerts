@@ -47,6 +47,7 @@ public class CreateSummaryCommandHandler : ICommandHandler<CreateSummaryCommand,
         {
             var errorMessage = $"No se encontraron mensajes en el condominio. CondominiumId: {request.Condominium.Id}, Mensajes: 0";
             _logger.LogWarning(errorMessage);
+            _hubContext.Clients.Group(request.Condominium.Id.ToString()).SendAsync("NoNewMessages", "No se encontraron nuevos mensajes en las ultimas 24 horas.", cancellationToken);
             return Result.Fail<CreateSummaryCommandResponse>(errorMessage);
         }
         
@@ -64,13 +65,12 @@ public class CreateSummaryCommandHandler : ICommandHandler<CreateSummaryCommand,
             return Result<CreateSummaryCommandResponse>.Fail(cancellationMessage);
         }
 
-        /*var summary = await _aiService.GenerateSummary(messagesDto, request.TriggeredByUser, request.Condominium, cancellationToken);
+        var summary = await _aiService.GenerateSummary(messagesDto, request.TriggeredByUser, request.Condominium, cancellationToken);
         
-        if(summary is null) return Result.Fail<GetSummaryCommandResponse>("Hubo un error al resumir la conversacion.");
-        */
-       // var response = new GetSummaryCommandResponse(summary);
+        if(summary is null) return Result.Fail<CreateSummaryCommandResponse>("Hubo un error al resumir la conversacion.");
+        var response = new CreateSummaryCommandResponse(summary);
 
-       var testSummary = new Summary()
+      /* var testSummary = new Summary()
        {
            CondominiumId = request.Condominium.Id,
            Condominium = request.Condominium,
@@ -80,7 +80,8 @@ public class CreateSummaryCommandHandler : ICommandHandler<CreateSummaryCommand,
            TriggeredBy = request.TriggeredByUser.Id,
            User = request.TriggeredByUser
        };
-       var response = new CreateSummaryCommandResponse(testSummary);
+       var response = new CreateSummaryCommandResponse(testSummary);*/
+       
         var successMessage = $"Resumen solicitado exitosamente. CondominiumId: {request.Condominium.Id}, UserId: {request.TriggeredByUser}, Mensajes: {messages.Count}";
         _logger.LogInformation(successMessage);
         

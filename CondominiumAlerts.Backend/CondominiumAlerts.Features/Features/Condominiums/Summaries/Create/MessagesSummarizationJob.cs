@@ -132,7 +132,7 @@ public class MessagesSummarizationJob : IInvocable, IInvocableWithPayload<Messag
             if (result.IsSuccess && result.Value is not null)
             {
                 await _hubContext.Clients.Group(command.Condominium.Id.ToString()).SendAsync("SendSummary", result.Value.Summary, CancellationToken);
-               // await _summaryRepository.CreateAsync(result.Value.Summary, CancellationToken);
+                await _summaryRepository.CreateAsync(result.Value.Summary, CancellationToken);
             }
             else
             {
