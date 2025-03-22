@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { NgFor, CommonModule, NgOptimizedImage } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router'; // Asegúrate de importar ActivatedRoute
 import { Toolbar } from 'primeng/toolbar';
 import { Button } from 'primeng/button';
 import { PostService } from '../../../posts/services/post.service';

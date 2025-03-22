@@ -92,6 +92,7 @@ export class CondominiumsMainPageComponent {
     this.router.navigate(['/condominium/index', id]);
   }
 
+
   changeModalState() {
     this.isModalOpen = !this.isModalOpen;
     this.errorText = '';

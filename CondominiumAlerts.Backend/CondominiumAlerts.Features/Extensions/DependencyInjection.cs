@@ -6,6 +6,7 @@ using CondominiumAlerts.Features.Features.Condominiums.Get;
 using CondominiumAlerts.Features.Features.Condominiums.GetCondominiumsJoinedByUser;
 using CondominiumAlerts.Features.Features.Condominiums.Join;
 using CondominiumAlerts.Features.Features.Condominiums.Summaries;
+using CondominiumAlerts.Features.Features.Posts.Create;
 using CondominiumAlerts.Features.Features.Posts.Get;
 using CondominiumAlerts.Features.Features.Users.GetCondominiumsUsers;
 using CondominiumAlerts.Features.Features.Users.Register;
@@ -38,6 +39,8 @@ public static class DependencyInjection
         services.AddScoped<IValidator<GetCondominiumsUsersCommand>, GetCondominiumsUsersValidator>();
 
         services.AddScoped<IRequestHandler<GetPostsCommand, Result<List<GetPostsResponse>>>, GetPostsHandler>();
+        services.AddScoped<IValidator<CreatePostCommand>, CreatePostValidator>();
+
 
         services.AddTransient<EmailConfirmationJob>();
         services.AddTransient<MessagesSummarizationJob>();

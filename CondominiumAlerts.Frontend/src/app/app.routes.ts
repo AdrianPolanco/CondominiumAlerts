@@ -86,11 +86,14 @@ export const routes: Routes = [
       ).then((c) => c.CondominiumsMainPageComponent),
   },
   {
-    path: 'condominium/index/:condominiumId',
-    loadComponent: () =>
-      import(
-        './features/condominiums/pages/condominum-index/condominum-index.component'
-      ).then((c) => c.CondominumIndexComponent),
+    path: "condominium/index",
+    loadComponent: () => import('./features/condominiums/pages/condominum-index/condominum-index.component')
+      .then(c => c.CondominumIndexComponent)
+  },
+  {
+    path: "posts/create",
+    loadComponent: () => import('./features/posts/create-post-page/create-post-page.component')
+      .then(c => c.PostPageComponent)
   },
   {
     path: '',
