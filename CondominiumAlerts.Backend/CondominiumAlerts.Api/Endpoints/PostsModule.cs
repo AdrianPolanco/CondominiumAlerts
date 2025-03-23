@@ -1,5 +1,4 @@
 ﻿using Carter;
-using CondominiumAlerts.Features.Features.Condominium.Add;
 using CondominiumAlerts.Features.Features.Posts.Create;
 using CondominiumAlerts.Features.Features.Posts.Get;
 using LightResults;

@@ -89,7 +89,7 @@ export class CondominiumsMainPageComponent {
   }
   viewCondominium(id: string) {
     console.log(`Viewing condominium ID: ${id}`);
-    this.router.navigate(['/condominium/index', id]);
+    this.router.navigate([`/condominium/index/${id}`]); 
   }
 
 

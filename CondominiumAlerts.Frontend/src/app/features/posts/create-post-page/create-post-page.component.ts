@@ -1,12 +1,12 @@
-import { Component, signal, viewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, signal } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { FormGroup, Validators } from '@angular/forms';
+import { PostService } from '../../posts/services/post.service';
+import { AuthService } from '../../../core/auth/services/auth.service';
+import { CreatePostCommand } from '../models/posts.model';
 import { FormComponent } from '../../../shared/components/form/form.component';
 import { SharedFormField } from '../../../shared/components/form/shared-form-field.interface';
-import { FormGroup, Validators } from '@angular/forms';
 import { SharedForm } from '../../../shared/components/form/shared-form.interface';
-import { PostService } from '../../posts/services/post.service'
-import { CreatePostCommand } from '../models/posts.model'
-import { Router } from '@angular/router';
-import { Feedback } from '../../../shared/components/form/feedback.interface';
 import { ButtonDirective } from 'primeng/button';
 
 @Component({
@@ -15,16 +15,10 @@ import { ButtonDirective } from 'primeng/button';
   styleUrls: ['./create-post-page.component.css'],
   imports: [FormComponent, ButtonDirective]
 })
-export class PostPageComponent {
+export class PostPageComponent implements OnInit {
+  condominiumId: string | null = null;
 
-  constructor(private PostService: PostService, private router: Router) { }
-
-  // Signal for the form group
-  private readonly formGroup = signal<FormGroup>(new FormGroup({}));
-
-  // Reference to the form component
-  formComponent = viewChild(FormComponent);
-
+  // Form fields definition
   postsFormFields = signal<SharedFormField[]>([
     {
       name: 'title',
@@ -32,7 +26,7 @@ export class PostPageComponent {
       type: 'text',
       validators: [Validators.required],
       errorMessages: {
-        required: 'El nombre es requerido.'
+        required: 'El título es requerido.'
       }
     },
     {
@@ -41,11 +35,11 @@ export class PostPageComponent {
       type: 'text',
       validators: [Validators.required],
       errorMessages: {
-        required: 'La dirección es requerida.'
+        required: 'La descripción es requerida.'
       }
     },
     {
-      name: 'imageUrl',
+      name: 'imageFile',
       label: 'Subir imagen',
       type: 'file',
       filetype: 'image/*',
@@ -53,7 +47,7 @@ export class PostPageComponent {
         if (event.files.length > 0) {
           const file = event.files[0];
           this.formGroup().patchValue({
-            imageUrl: file, 
+            imageFile: file,
           });
         }
       }
@@ -61,37 +55,59 @@ export class PostPageComponent {
   ]);
 
   postsFormSettings = signal<SharedForm>({
-    fields: this.postsFormFields(),  // Cambia a .() para obtener el valor reactivo
+    fields: this.postsFormFields(),
     baseButtonLabel: 'Enviar',
     submittedButtonLabel: '¡Enviado satisfactoriamente!'
   });
 
+  private readonly formGroup = signal<FormGroup>(new FormGroup({}));
 
+  formComponent = ViewChild(FormComponent);
+
+  constructor(
+    private postService: PostService,
+    private router: Router,
+    private authService: AuthService,
+    private route: ActivatedRoute
+  ) { }
+
+  ngOnInit(): void {
+    this.condominiumId = this.route.snapshot.paramMap.get('condominiumId');
+    console.log('Condominium ID:', this.condominiumId);
+
+    if (!this.condominiumId) {
+      console.error('No se encontró el condominiumId en la URL');
+      // Redirigir si no se encuentra el condominiumId
+      this.router.navigate(['']);
+    }
+  }
 
   onFormCreated(form: FormGroup) {
     this.formGroup.set(form);
   }
 
-  goToMainPage() {
-    this.router.navigate(["condominium/index"])
-  }
-
   onSubmit(value: CreatePostCommand) {
-    const formComponent = this.formComponent();
-    this.PostService.createPost(value).subscribe({
-      next: (response) => {
-        formComponent?.resetForm({
-          status: 'success',
-          message: '¡Post creado satisfactoriamente!',
-        });
-        this.goToMainPage();
-      },
-      error: (err) => {
-        formComponent?.resetForm({
-          status: 'error',
-          message: err.error?.message || 'Ha ocurrido un error mientras se creaba el Post.',
-        });
-      }
-    });
+    const userId = this.authService.currentUser?.uid;
+    if (!userId) {
+      console.error('Usuario no autenticado');
+      return;
+    }
+    const formData: CreatePostCommand = {
+      ...value,
+      userId: userId,
+    };
+    if (this.condominiumId) {
+      this.postService.createPost(formData, this.condominiumId).subscribe({
+        next: (response) => {
+          console.log('Post creado satisfactoriamente', response);
+          this.router.navigate(['/condominium/index']);
+        },
+        error: (err) => {
+          console.error('Error al crear el post', err);
+        }
+      });
+    } else {
+      console.error('No se encontró el condominiumId');
+    }
   }
 }

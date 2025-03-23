@@ -5,6 +5,8 @@ import { map } from 'rxjs/operators';
 import { environment } from '../../../../enviroments/environment';
 import { CreatePostCommand } from '../models/posts.model';
 import { CreatePostsResponse } from '../models/posts.model';
+import { AuthService } from '../../../core/auth/services/auth.service';
+import { user } from '@angular/fire/auth';
 
 @Injectable({
   providedIn: 'root',
@@ -12,7 +14,11 @@ import { CreatePostsResponse } from '../models/posts.model';
 export class PostService {
   private apiUrl = `${environment.backBaseUrl}/posts`;
 
-  constructor(private http: HttpClient) { }
+
+  constructor(
+    private http: HttpClient,
+    private authService: AuthService
+  ) { }
 
   getPosts(condominiumId: string): Observable<any[]> {
     const params = new HttpParams().set('condominiumId', condominiumId);
@@ -25,12 +31,26 @@ export class PostService {
     );
   }
 
-  createPost(cmd: CreatePostCommand): Observable<CreatePostsResponse> {
+  createPost(cmd: CreatePostCommand, condominiumId: string): Observable<CreatePostsResponse> {
     const fb = new FormData();
+
+    const userId = this.authService.currentUser?.uid ?? '';
+    if (!userId) {
+      throw new Error('Usuario no autenticado.');
+    }
+
+    const fixedLevelOfPriorityId = 'fc279d15-da6d-4e8e-9407-74dc73b4a628';
     fb.append('title', cmd.title);
     fb.append('description', cmd.description);
-    fb.append('imageUrl', cmd.ImageUrl);
+    fb.append('imageFile', cmd.imageFile);
+    fb.append('CondominiumId', condominiumId);
+    fb.append('userId', userId);
+    fb.append('levelOfPriorityId', fixedLevelOfPriorityId);
 
-    return this.http.post<CreatePostsResponse>("/api/posts", fb);
+    console.log('User ID:', userId);
+    console.log('LevelOfPriorityId:', fixedLevelOfPriorityId);
+
+    // Envía la solicitud al backend
+    return this.http.post<CreatePostsResponse>('/api/posts', fb);
   }
 }

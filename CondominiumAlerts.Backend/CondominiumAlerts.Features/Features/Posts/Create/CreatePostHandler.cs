@@ -9,38 +9,46 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System.Security.Claims;
 using PostsEntity = CondominiumAlerts.Domain.Aggregates.Entities;
-using CondominiumAlerts.Features.Features.Condominium.Add;
+using CondominiumAlerts.Domain.Aggregates.Entities;
+using CondominiumAlerts.Features.Features.Condominiums.Add;
 
 public class CreatePostHandler : ICommandHandler<CreatePostCommand, Result<CreatePostResponse>>
 {
     private readonly Cloudinary _cloudinary;
     private readonly IPostsRepository _postsRepository;
+    private readonly IRepository<User, string> _userRepository;  
     private readonly ILogger<CreatePostHandler> _logger;
     private readonly IValidator<CreatePostCommand> _validator;
-    private readonly IHttpContextAccessor _httpContextAccessor; 
 
     public CreatePostHandler(Cloudinary cloudinary,
                             IPostsRepository postsRepository,
+                            IRepository<User, string> userRepository,
                             ILogger<CreatePostHandler> logger,
-                            IValidator<CreatePostCommand> validator,
-                            IHttpContextAccessor httpContextAccessor) 
+                            IValidator<CreatePostCommand> validator)
     {
         _cloudinary = cloudinary;
         _postsRepository = postsRepository;
+        _userRepository = userRepository;
         _logger = logger;
         _validator = validator;
-        _httpContextAccessor = httpContextAccessor; 
     }
 
     public async Task<Result<CreatePostResponse>> Handle(CreatePostCommand request, CancellationToken cancellationToken)
     {
-        // Obtener el ID del usuario logueado
-        var userId = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        // Obtener el ID del usuario desde el request
+        var userId = request.UserId;
 
         if (string.IsNullOrEmpty(userId))
         {
-            _logger.LogError("No se pudo obtener el ID del usuario logueado.");
+            _logger.LogError("No se pudo obtener el ID del usuario desde la solicitud.");
             return Result.Fail<CreatePostResponse>("Usuario no autenticado.");
+        }
+
+        // Verificar que el usuario existe en la base de datos
+        if (!await _userRepository.AnyAsync(u => u.Id == userId, cancellationToken))
+        {
+            _logger.LogError($"El usuario con ID {userId} no existe en la base de datos.");
+            return Result.Fail<CreatePostResponse>("El usuario no existe.");
         }
 
         // Validar el comando
@@ -52,17 +60,18 @@ public class CreatePostHandler : ICommandHandler<CreatePostCommand, Result<Creat
             return Result.Fail<CreatePostResponse>(string.Join(", ", errors));
         }
 
-        // Subir la imagen a Cloudinary
-        var imageUploadResult = await _cloudinary.UploadAsync(new ImageUploadParams()
+        ImageUploadResult imageUploadResult = await _cloudinary.UploadAsync(new ImageUploadParams()
         {
             File = new FileDescription(Guid.NewGuid().ToString(), request.ImageFile.OpenReadStream()),
         });
-
         if (imageUploadResult.Error?.Message is { } message)
         {
             _logger.LogTrace("Failed to upload image, error with message {Error}.", message);
             return Result.Fail<CreatePostResponse>(message);
         }
+
+
+        _logger.LogInformation($"CondominiumId recibido: {request.CondominiumId}");
 
         PostsEntity.Post posts = await _postsRepository.CreateAsync(new PostsEntity.Post()
         {
@@ -71,9 +80,12 @@ public class CreatePostHandler : ICommandHandler<CreatePostCommand, Result<Creat
             Description = request.Description,
             ImageUrl = imageUploadResult.SecureUrl.ToString(),
             UserId = userId,
-            CreatedAt = DateTime.UtcNow, 
-            UpdatedAt = DateTime.UtcNow 
+            LevelOfPriorityId = request.LevelOfPriorityId,
+            CondominiumId = request.CondominiumId,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
         }, cancellationToken);
+
         return new CreatePostResponse()
         {
             Id = posts.Id,
@@ -83,8 +95,8 @@ public class CreatePostHandler : ICommandHandler<CreatePostCommand, Result<Creat
             CondominiumId = posts.CondominiumId,
             UserId = posts.UserId,
             LevelOfPriorityId = posts.LevelOfPriorityId,
-            CreatedAt = posts.CreatedAt, 
-            UpdatedAt = posts.UpdatedAt 
+            CreatedAt = posts.CreatedAt,
+            UpdatedAt = posts.UpdatedAt
         };
     }
 }
