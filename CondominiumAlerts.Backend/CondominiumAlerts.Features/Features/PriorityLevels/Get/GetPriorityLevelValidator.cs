@@ -1,9 +1,4 @@
-﻿
-using CondominiumAlerts.Domain.Aggregates.Entities;
-using CondominiumAlerts.Domain.Repositories;
-using CondominiumAlerts.Infrastructure.Persistence.Repositories;
-using FluentValidation;
-using Microsoft.Extensions.DependencyInjection;
+﻿using FluentValidation;
 
 namespace CondominiumAlerts.Features.Features.PriorityLevels.Get
 {

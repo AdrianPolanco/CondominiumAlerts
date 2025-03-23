@@ -1,6 +1,7 @@
 ﻿using Carter;
 using CondominiumAlerts.Features.Features.PriorityLevels.Add;
 using CondominiumAlerts.Features.Features.PriorityLevels.Get;
+using CondominiumAlerts.Features.Features.PriorityLevels.Update;
 using LightResults;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -47,7 +48,26 @@ namespace CondominiumAlerts.Api.Endpoints
                     Data = result.Value,
                 };
 
-                return Results.NotFound(responce);
+                return Results.Ok(responce);
+
+            });
+
+            app.MapPut(GetEndpointPattern("update"), async (ISender sender, [FromBody] UpdatePriorityLevelCommand request) =>
+            {
+                Result<UpdatePriorityLevelResponse> result = await sender.Send(request);
+
+                if (result.IsFailed)
+                {
+                    return Results.BadRequest(result);
+                }
+
+                var responce = new
+                {
+                    IsSuccess = result.IsSuccess,
+                    Data = result.Value,
+                };
+
+                return Results.Ok(responce);
 
             });
         }

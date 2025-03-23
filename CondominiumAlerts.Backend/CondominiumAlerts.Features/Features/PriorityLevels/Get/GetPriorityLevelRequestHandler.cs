@@ -54,17 +54,19 @@ namespace CondominiumAlerts.Features.Features.PriorityLevels.Get
             if (request.PageNumber > 1)
             {
                 return Result<GetPriorityLevelResponce>.Ok(
-                    new(request.PageNumber,
+                  new(request.PageNumber,
                   request.PageSize,
                   levels.Count,
                   levels.Skip((request.PageSize * request.PageNumber) - 1)
-                      .Take(request.PageSize).Select(l => (PriorityDto)l).ToList()));
+                        .Take(request.PageSize).Select(l => (PriorityDto)l).ToList()
+                  ));
             }
 
             return Result<GetPriorityLevelResponce>.Ok(new(request.PageNumber,
                 request.PageSize,
                 levels.Count,
-                levels.Take(request.PageSize).Select(l => (PriorityDto)l).ToList()));
+                levels.Take(request.PageSize).Select(l => (PriorityDto)l).ToList()
+                ));
 
         }
     }
