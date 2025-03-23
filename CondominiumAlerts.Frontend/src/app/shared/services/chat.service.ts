@@ -1,17 +1,17 @@
-import { HttpClient } from '@angular/common/http';
-import { inject, Injectable } from '@angular/core';
-import { Message } from '../../core/models/message.models';
-import { BehaviorSubject, Observable, Subject, takeUntil } from 'rxjs';
-import { ChatOptions } from '../components/chat/chat.type';
-import { ChatMessageDto } from '../../core/models/chatMessage.dto';
+import {HttpClient} from '@angular/common/http';
+import {inject, Injectable} from '@angular/core';
+import {BehaviorSubject, Observable, Subject, takeUntil} from 'rxjs';
+import {ChatOptions} from '../components/chat/chat.type';
+import {ChatMessageDto} from '../../core/models/chatMessage.dto';
 import * as signalR from '@microsoft/signalr';
-import { AuthenticationService } from '../../core/services/authentication.service';
-import { AutoUnsubscribe } from '../decorators/autounsuscribe.decorator';
-import { User } from '../../core/auth/layout/auth-layout/user.type';
-import { RequestCondominiumSummaryResponse } from '../../features/condominiums/models/requestCondominiumSummary.response';
-import { HttpTransportType, HubConnectionBuilder } from '@microsoft/signalr';
-import { SummaryResult } from '../../features/condominiums/models/summaryResult';
-import { MessageService } from 'primeng/api';
+import {HttpTransportType, HubConnectionBuilder} from '@microsoft/signalr';
+import {AuthenticationService} from '../../core/services/authentication.service';
+import {AutoUnsubscribe} from '../decorators/autounsuscribe.decorator';
+import {User} from '../../core/auth/layout/auth-layout/user.type';
+import {RequestCondominiumSummaryResponse} from '../../features/condominiums/models/requestCondominiumSummary.response';
+import {SummaryResult} from '../../features/condominiums/models/summaryResult';
+import {MessageService} from 'primeng/api';
+import {SummaryStatus} from '../../features/condominiums/models/summaryStatus.enum';
 
 @AutoUnsubscribe()
 @Injectable({
@@ -24,12 +24,14 @@ export class ChatService{
 
   private hubConnection: signalR.HubConnection | null = null;
   private processingStatus = new BehaviorSubject<string | null>(null);
+  private summaryStatus = new BehaviorSubject<SummaryStatus>(SummaryStatus.Queued);
   private summaryResult = new BehaviorSubject<SummaryResult | null>(null);
   private processingError = new BehaviorSubject<string | null>(null);
 
   processingStatus$ = this.processingStatus.asObservable();
   summaryResult$ = this.summaryResult.asObservable();
   processingError$ = this.processingError.asObservable();
+  summaryStatus$ = this.summaryStatus.asObservable();
 
   token:string | null = null;
   userData: User | null = null;
@@ -69,7 +71,7 @@ export class ChatService{
     });
   }
 
-  
+
 
   formatText(text: string): string[] {
     return text
@@ -88,18 +90,18 @@ export class ChatService{
   // Metodo para solicitar un resumen de los mensajes del condominio
   requestCondominiumSummary(): Observable<RequestCondominiumSummaryResponse> {
     const currentOptions = this.chatOptions.value;
-    
+
     if (currentOptions?.type !== 'condominium' || !currentOptions.condominium || !this.userData) {
       throw new Error('Condominio no seleccionado o no disponible');
     }
-    
+
     // Restea los resultados previos
     this.summaryResult.next(null);
     this.processingError.next(null);
 
     console.log("AUTH TOKEN", this.token);
     console.log("USER DATA", this.userData);
-    
+
     // Hace una solicitud al endpoint para empezar un resumen
     return this.httpClient.post<RequestCondominiumSummaryResponse>(`api/condominiums/${currentOptions.condominium.id}/summary/${this.userData?.id}`,
       {},
@@ -133,7 +135,7 @@ export class ChatService{
     try {
       // Disconnect from any existing hub connection
       await this.disconnectFromHub();
-      
+
       console.log("Intentando conectar a SignalR...");
       // Create a new hub connection
       this.hubConnection = new HubConnectionBuilder()
@@ -144,10 +146,10 @@ export class ChatService{
         .configureLogging(signalR.LogLevel.Debug)
         .withAutomaticReconnect()
         .build();
-  
+
       // Set up event handlers
       this.setupHubEventHandlers();
-  
+
       // Start the connection
       this.hubConnection.start().then(async() => {
           console.log("FINALMENTE CONECTADO A SIGNALR");
@@ -156,7 +158,7 @@ export class ChatService{
         .catch(err => {
           console.error("Error al conectar a SignalR:", err);
         });
-      
+
       // Join the group for this condominium
 
     } catch (error) {
@@ -214,25 +216,30 @@ export class ChatService{
     this.hubConnection.on("NoNewMessages", (message: string) => {
       this.messageService.add({severity:'error', summary:'No hay mensajes nuevos', detail: message});
     })
+
+    this.hubConnection.on("UpdateSummaryStatus", (status: SummaryStatus) => {
+        console.log("Summary status updated: ", status);
+        this.summaryStatus.next(status);
+    })
   }
-  
+
   // Metodo para desconectarse del hub
   async disconnectFromHub(): Promise<void> {
     if (this.hubConnection) {
       const currentOptions = this.chatOptions.value;
-      
+
       try {
         // Check connection state before attempting to leave group
-        if (this.hubConnection.state === signalR.HubConnectionState.Connected && 
-            currentOptions?.type === 'condominium' && 
+        if (this.hubConnection.state === signalR.HubConnectionState.Connected &&
+            currentOptions?.type === 'condominium' &&
             currentOptions.condominium) {
-          
-          await this.hubConnection.invoke('LeaveGroup', 
-            currentOptions.condominium.id, 
-            currentOptions.condominium.name, 
+
+          await this.hubConnection.invoke('LeaveGroup',
+            currentOptions.condominium.id,
+            currentOptions.condominium.name,
             currentOptions.user?.username || 'Unknown');
         }
-        
+
         // Only stop if not already disconnected
         if (this.hubConnection.state !== signalR.HubConnectionState.Disconnected) {
           await this.hubConnection.stop();

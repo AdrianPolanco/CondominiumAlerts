@@ -18,22 +18,27 @@ public class CreateSummaryCommandHandler : ICommandHandler<CreateSummaryCommand,
     private readonly ILogger<CreateSummaryCommandHandler> _logger;
     private readonly IRepository<Message, Guid> _messageRepository;
     private readonly IAiService _aiService;
+    private readonly SummaryStatusService _summaryStatusService;
 
     public CreateSummaryCommandHandler(
         ILogger<CreateSummaryCommandHandler> logger, 
         IRepository<Message, Guid> messageRepository,
         IAiService aiService,
-        IHubContext<SummaryHub> hubContext
+        IHubContext<SummaryHub> hubContext,
+        SummaryStatusService summaryStatusService
         )
     {
         _logger = logger;
         _messageRepository = messageRepository;
         _aiService = aiService;
         _hubContext = hubContext;
+        _summaryStatusService = summaryStatusService;
     }
     
     public async Task<Result<CreateSummaryCommandResponse>> Handle(CreateSummaryCommand request, CancellationToken cancellationToken)
     {
+        await _summaryStatusService.SetSummaryStatus(request.Condominium.Id.ToString(), SummaryStatus.Processing); 
+        
         var cancellationMessage = "Procesamiento de resumenes cancelado...";
 
         if (cancellationToken.IsCancellationRequested)
@@ -45,9 +50,10 @@ public class CreateSummaryCommandHandler : ICommandHandler<CreateSummaryCommand,
         var messages = await _messageRepository.GetAsync(filter: m => m.CondominiumId == request.Condominium.Id /*&& m.CreatedAt > DateTime.UtcNow.AddHours(-24)*/, cancellationToken: cancellationToken);
         if (messages.Count == 0)
         {
+            await _summaryStatusService.SetSummaryStatus(request.Condominium.Id.ToString(), SummaryStatus.Failed);
             var errorMessage = $"No se encontraron mensajes en el condominio. CondominiumId: {request.Condominium.Id}, Mensajes: 0";
             _logger.LogWarning(errorMessage);
-            _hubContext.Clients.Group(request.Condominium.Id.ToString()).SendAsync("NoNewMessages", "No se encontraron nuevos mensajes en las ultimas 24 horas.", cancellationToken);
+            await _hubContext.Clients.Group(request.Condominium.Id.ToString()).SendAsync("NoNewMessages", "No se encontraron nuevos mensajes en las ultimas 24 horas.", cancellationToken);
             return Result.Fail<CreateSummaryCommandResponse>(errorMessage);
         }
         
@@ -61,13 +67,18 @@ public class CreateSummaryCommandHandler : ICommandHandler<CreateSummaryCommand,
         
         if (cancellationToken.IsCancellationRequested)
         {
+            _summaryStatusService.SetSummaryStatus(request.Condominium.Id.ToString(), SummaryStatus.Cancelled);
             _logger.LogInformation(cancellationMessage);
             return Result<CreateSummaryCommandResponse>.Fail(cancellationMessage);
         }
 
         var summary = await _aiService.GenerateSummary(messagesDto, request.TriggeredByUser, request.Condominium, cancellationToken);
         
-        if(summary is null) return Result.Fail<CreateSummaryCommandResponse>("Hubo un error al resumir la conversacion.");
+        if(summary is null)
+        {
+            await _summaryStatusService.SetSummaryStatus(request.Condominium.Id.ToString(), SummaryStatus.Failed);
+            return Result.Fail<CreateSummaryCommandResponse>("Hubo un error al resumir la conversacion.");
+        }
         var response = new CreateSummaryCommandResponse(summary);
 
       /* var testSummary = new Summary()

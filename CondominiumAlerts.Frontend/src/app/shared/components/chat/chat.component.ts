@@ -1,47 +1,33 @@
-import {
-  ChangeDetectorRef,
-  Component,
-  effect,
-  inject,
-  input,
-  OnDestroy,
-  OnInit,
-  signal,
-} from '@angular/core';
-import { ChatBoxComponent } from '../chat-box/chat-box.component';
-import { ChatBubleComponent } from '../chat-buble/chat-buble.component';
-import { UserService } from '../../../features/users/services/user.service';
-import { Message } from '../../../core/models/message.models';
-import { NgClass, NgFor } from '@angular/common';
-import { AuthService } from '../../../core/auth/services/auth.service';
-import { ChatService } from '../../services/chat.service';
-import { AutoUnsubscribe } from '../../decorators/autounsuscribe.decorator';
-import { Subject, take, takeUntil } from 'rxjs';
-import { ChatOptions } from './chat.type';
-import { ChatMessageDto } from '../../../core/models/chatMessage.dto';
-import { FormsModule } from '@angular/forms';
-import { Button } from 'primeng/button';
-import { AuthenticationService } from '../../../core/services/authentication.service';
-import { User } from '../../../core/auth/layout/auth-layout/user.type';
-import { SplitterModule } from 'primeng/splitter';
-import { SummaryResult } from '../../../features/condominiums/models/summaryResult';
-import { Dialog } from 'primeng/dialog';
-import { MessageService } from 'primeng/api';
-import { Toast } from 'primeng/toast';
-import { Ripple } from 'primeng/ripple';
+import {Component, inject, OnDestroy, OnInit, signal,} from '@angular/core';
+import {ChatBoxComponent} from '../chat-box/chat-box.component';
+import {ChatBubleComponent} from '../chat-buble/chat-buble.component';
+import {NgFor} from '@angular/common';
+import {ChatService} from '../../services/chat.service';
+import {AutoUnsubscribe} from '../../decorators/autounsuscribe.decorator';
+import {Subject, takeUntil} from 'rxjs';
+import {ChatOptions} from './chat.type';
+import {ChatMessageDto} from '../../../core/models/chatMessage.dto';
+import {FormsModule} from '@angular/forms';
+import {Button} from 'primeng/button';
+import {AuthenticationService} from '../../../core/services/authentication.service';
+import {User} from '../../../core/auth/layout/auth-layout/user.type';
+import {SummaryResult} from '../../../features/condominiums/models/summaryResult';
+import {Dialog} from 'primeng/dialog';
+import {MessageService} from 'primeng/api';
+import {Toast} from 'primeng/toast';
+import {SummaryStatus} from '../../../features/condominiums/models/summaryStatus.enum';
 
 
 @AutoUnsubscribe()
 @Component({
   selector: 'app-chat',
   imports: [
-    ChatBoxComponent, 
-    ChatBubleComponent, 
-    NgFor, 
-    FormsModule, 
-    Button, 
+    ChatBoxComponent,
+    ChatBubleComponent,
+    NgFor,
+    FormsModule,
+    Button,
     Toast,
-    Ripple,
     Dialog],
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.css',
@@ -59,7 +45,8 @@ export class ChatComponent implements OnInit, OnDestroy {
   summaryJobId: string | null = null;
   isThereSummaryResult = signal(false);
   showSummary = false
-
+  summaryStatus: SummaryStatus|null = null;
+  SummaryStatusEnum = SummaryStatus;
   isCondominium = this.options()?.type === "condominium";
 
   ngOnInit(): void {
@@ -69,7 +56,7 @@ export class ChatComponent implements OnInit, OnDestroy {
     this.chatService.chatOptions$.pipe(takeUntil(this.destroy$)).subscribe((options) => {
       // Actualizar la opción de chat actual
       this.options.set(options);
-      
+
       // Reaccionar a nuevas opciones de chat
       if (options && options.type === 'condominium' && options.condominium) {
         console.log("COND FROM SUBSCRIPTION", options.condominium.id);
@@ -82,15 +69,20 @@ export class ChatComponent implements OnInit, OnDestroy {
           });
 
           this.chatService.getCurrentSummaryResult().pipe(takeUntil(this.destroy$)).subscribe((summary) => {
-            console.log("SUMMARY FROM SUBSCRIPTION", summary);
+            console.log("SUMMARY", summary);
             if(summary.data.content) {
               this.summaryResult.set(summary.data);
               this.isThereSummaryResult.set(true);
             }
           });
+
+          this.chatService.summaryStatus$.pipe(takeUntil(this.destroy$)).subscribe((status) => {
+            console.log("SUMMARY STATUS FROM SUBSCRIPTION", status);
+            if(status === SummaryStatus.Processing) this.summarizing.set(true);
+          });
       }
     });
-      
+
   }
 
   formatSummary(){
@@ -126,9 +118,9 @@ export class ChatComponent implements OnInit, OnDestroy {
           .pipe(takeUntil(this.destroy$))
           .subscribe(status => {
             if(status === "COMPLETED") this.summarizing.set(false);
-            //if (status === null) this.summarizing.set(false); 
+            //if (status === null) this.summarizing.set(false);
           });
-        
+
         // Suscribirse a los resultados del resumen
         this.chatService.summaryResult$
           .pipe(takeUntil(this.destroy$))
@@ -139,7 +131,7 @@ export class ChatComponent implements OnInit, OnDestroy {
            // summaryResultSubscription.unsubscribe();
             //await this.chatService.disconnectFromHub();
           });
-        
+
         // Subscrirse a los errores
         const processingErrorSubscription = this.chatService.processingError$
           .pipe(takeUntil(this.destroy$))
@@ -152,7 +144,7 @@ export class ChatComponent implements OnInit, OnDestroy {
               console.log('Error processing summary', error);
             }
           });
-        
+
         // Solicitar el resumen
         this.chatService.requestCondominiumSummary()
           .pipe(takeUntil(this.destroy$))
@@ -166,7 +158,7 @@ export class ChatComponent implements OnInit, OnDestroy {
               this.summarizing.set(false);
             }
           });
-        }  
+        }
   }
 
   cancelSummary() {
@@ -194,10 +186,11 @@ export class ChatComponent implements OnInit, OnDestroy {
     }
   }
 
-  ngOnDestroy(): void {
-    if (this.summarizing()){ 
-      this.chatService.disconnectFromHub()
+  async ngOnDestroy() {
+    if (this.summarizing()){
+      await this.chatService.disconnectFromHub()
     };
   }
 
+  protected readonly Number = Number;
 }

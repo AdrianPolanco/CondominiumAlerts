@@ -29,8 +29,8 @@ public class GetSummaryQueryHandler : IQueryHandler<GetSummaryQuery, Result<GetS
         var summaries = await _summaryRepository.GetAsync(
             cancellationToken: cancellationToken,
             filter: s => s.CondominiumId == request.CondominiumId 
-                         /*&& s.CreatedAt >= DateTime.UtcNow.AddHours(-24) 
-                         && s.CreatedAt < DateTime.UtcNow*/
+                         && s.CreatedAt >= DateTime.UtcNow.AddHours(-24) 
+                         && s.CreatedAt < DateTime.UtcNow
             );
 
         var summary = summaries.LastOrDefault();

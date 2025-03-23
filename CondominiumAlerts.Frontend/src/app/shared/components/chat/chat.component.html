@@ -22,6 +22,14 @@
           <p-button icon="pi pi-times" [rounded]="true" [text]="true" severity="danger" size="small"  (onClick)="cancelSummary()"/>
         </div>
       </div>
+    }@else if(summarizing() && !isThereSummaryResult() && Number(summaryStatus) === SummaryStatusEnum.Queued){
+      <div class="flex justify-center items-center gap-2">
+        <p-button icon="pi pi-arrow-circle-right" [rounded]="true" size="small"/>
+        <label class="text-xs">En cola</label>
+        <div class="flex justify-end items-start">
+          <p-button icon="pi pi-times" [rounded]="true" [text]="true" severity="danger" size="small"  (onClick)="cancelSummary()"/>
+        </div>
+      </div>
     }@else if(!summarizing() && !isThereSummaryResult()){
       <p-button icon="pi pi-book" [rounded]="true" label="Resumir" (onClick)="summarizeMessages()" size="small"/>
     }@else if(isThereSummaryResult() && summaryResult()?.content){
