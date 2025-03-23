@@ -4,6 +4,7 @@ using CondominiumAlerts.Domain.Aggregates.ValueObjects;
 using CondominiumAlerts.Features.Features.Condominiums.Add;
 using CondominiumAlerts.Features.Features.Condominiums.Join;
 using CondominiumAlerts.Features.Features.Posts.Get;
+using CondominiumAlerts.Features.Features.PriorityLevels.Add;
 using CondominiumAlerts.Features.Features.PriorityLevels.Get;
 using CondominiumAlerts.Features.Features.Users.Register;
 using CondominiumAlerts.Features.Features.Users.Update;
@@ -31,6 +32,7 @@ public static class DependencyInjection
         services.AddScoped<IValidator<AddCondominiumCommand>, AddCondominiumValidator>();
         services.AddScoped<IValidator<UpdateUserCommand>, UpdateUserValidator>();
         services.AddScoped<IValidator<GetPriorityLevelsQuery>, GetPriorityLevelValidator>();
+        services.AddScoped<IValidator<AddPriorityLevelCommand>, AddPriorityLevelValidator>();
         services.AddScoped<IValidator<Address>, AddressValidator>();
 
         services.AddScoped<IRequestHandler<GetPostsCommand, Result<List<GetPostsResponse>>>, GetPostsHandler>();

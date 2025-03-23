@@ -1,7 +1,10 @@
 ﻿using Carter;
+using CondominiumAlerts.Features.Features.PriorityLevels.Add;
 using CondominiumAlerts.Features.Features.PriorityLevels.Get;
 using LightResults;
 using MediatR;
+using Microsoft.AspNetCore.Mvc;
+
 
 namespace CondominiumAlerts.Api.Endpoints
 {
@@ -19,7 +22,27 @@ namespace CondominiumAlerts.Api.Endpoints
                     return Results.BadRequest(result);
                 }
 
-                var responce = new {
+                var responce = new
+                {
+                    IsSuccess = result.IsSuccess,
+                    Data = result.Value,
+                };
+
+                return Results.NotFound(responce);
+
+            });
+
+            app.MapPost(GetEndpointPattern("add"), async (ISender sender, [FromBody] AddPriorityLevelCommand request, CancellationToken cancellationToken) =>
+            {
+                Result<AddPriorityLevelResponse> result = await sender.Send(request, cancellationToken);
+
+                if (result.IsFailed)
+                {
+                    return Results.BadRequest(result);
+                }
+
+                var responce = new
+                {
                     IsSuccess = result.IsSuccess,
                     Data = result.Value,
                 };
@@ -29,9 +52,12 @@ namespace CondominiumAlerts.Api.Endpoints
             });
         }
 
+        #region private Methods 
         private string GetEndpointPattern(string name)
         {
             return mainPath + name;
         }
+
+        #endregion
     }
 }

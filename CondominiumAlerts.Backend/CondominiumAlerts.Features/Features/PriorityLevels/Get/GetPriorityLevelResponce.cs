@@ -6,19 +6,20 @@ namespace CondominiumAlerts.Features.Features.PriorityLevels.Get
 
 
     public record PriorityDto(Guid Id,
-    string Title,
-    string Description,
-    int Priority,
-    Guid? CondominiumId,
-    DateTime CreatedAt)
+    string Title, 
+    int Priority
+//    string Description,
+ //   Guid? CondominiumId,
+   // DateTime CreatedAt
+        )
     {
         public static implicit operator PriorityDto(LevelOfPriority levelOfPriority) => new(
             levelOfPriority.Id,
             levelOfPriority.Title,
-            levelOfPriority.Description,
-            levelOfPriority.Priority,
-            levelOfPriority.CondominiumId,
-            levelOfPriority.CreatedAt
+            levelOfPriority.Priority
+         //   levelOfPriority.Description,
+       //     levelOfPriority.CondominiumId,      
+       //  levelOfPriority.CreatedAt
         );
     };
 }

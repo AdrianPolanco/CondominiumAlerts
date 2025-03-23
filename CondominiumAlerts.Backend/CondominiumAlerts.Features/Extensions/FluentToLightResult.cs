@@ -1,23 +1,33 @@
 ﻿
 using FluentValidation.Results;
 using LightResults;
+using Microsoft.Extensions.Logging;
+using Serilog.Core;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Model;
 
 namespace CondominiumAlerts.Features.Extensions
 {
     public static class FluentToLightResult
     {
-         public static Result<T> ToLightResult<T>(this ValidationResult result, T request = default)
-         {
+        public static Result<T> ToLightResult<T>(this ValidationResult result, ILogger? logger = default, T request = default)
+        {
+
             if (result.IsValid)
             {
                 return Result<T>.Ok(request);
             }
-               
+
             string errors = string.Join(", ", result.Errors.Select(e => e.ErrorMessage));
+
+            if (logger != default)
+            {
+                logger.LogWarning($"Validation failed {errors}");
+            }
+
             return Result<T>.Fail(errors);
         }
 
-        public static Result ToLightResult(this ValidationResult result)
+        public static Result ToLightResult(this ValidationResult result, ILogger? logger = default)
         {
             if (result.IsValid)
             {
@@ -25,6 +35,12 @@ namespace CondominiumAlerts.Features.Extensions
             }
 
             string errors = string.Join(", ", result.Errors.Select(e => e.ErrorMessage));
+
+            if (logger != default)
+            {
+                logger.LogWarning($"Validation failed {errors}");
+            }
+
             return Result.Fail(errors);
         }
     }

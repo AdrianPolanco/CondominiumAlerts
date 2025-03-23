@@ -32,8 +32,7 @@ namespace CondominiumAlerts.Features.Features.PriorityLevels.Get
 
             if (!validation.IsValid)
             {
-                _logger.LogWarning($"Validation failed {validation.Errors}");
-                return validation.ToLightResult<GetPriorityLevelResponce>();
+                return validation.ToLightResult<GetPriorityLevelResponce>(_logger);
             }
 
             if (!await _condominiumrepository.AnyAsync(c => c.Id == request.CondominiumId,cancellationToken))
