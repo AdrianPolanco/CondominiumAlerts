@@ -26,7 +26,6 @@ import { isUser } from '../../helpers/isUser.helper';
 })
 export class CondominiumsLayoutComponent implements OnInit {
   private authService = inject(AuthService);
-  private userService = inject(UserService);
   private condominiumService = inject(CondominiumService)
   private authenticationService = inject(AuthenticationService);
   private chatService = inject(ChatService);
