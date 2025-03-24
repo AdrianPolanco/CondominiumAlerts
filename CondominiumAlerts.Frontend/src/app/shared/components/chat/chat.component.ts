@@ -96,6 +96,12 @@ export class ChatComponent implements OnInit, OnDestroy {
       
       this.summaryStatus.set(status);
       
+      this.summaryState$
+    .pipe(takeUntil(this.destroy$))
+    .subscribe(({ status, result, canShowSummary }) => {
+      // Comprehensive state management
+      this.summaryStatus.set(status);
+      
       switch (status) {
         case SummaryStatus.Cancelled:
           this.summarizing.set(false);
@@ -117,6 +123,7 @@ export class ChatComponent implements OnInit, OnDestroy {
           this.summarizing.set(false);
           this.isThereSummaryResult.set(false);
       }
+    });
     });
 
         // Conectar automáticamente al SignalR hub para recibir actualizaciones en tiempo real
@@ -228,6 +235,10 @@ private loadSummaryState() {
             next: (response) => {
               console.log('Summary requested successfully', response);
               this.summaryJobId = response.jobId;
+
+              this.summarizing.set(true);
+              this.summaryStatus.set(SummaryStatus.Created);
+              this.isThereSummaryResult.set(false);
             },
             error: (err) => {
               console.error('Error requesting summary', err);
@@ -245,8 +256,8 @@ private loadSummaryState() {
         .pipe(takeUntil(this.destroy$))
         .subscribe({
           next: () => {
-            this.summarizing.set(false);
-            this.summaryJobId = null;
+           /* this.summarizing.set(false);
+            this.summaryJobId = null;*/
             //await this.chatService.disconnectFromHub();
           },
           error: (err) => {

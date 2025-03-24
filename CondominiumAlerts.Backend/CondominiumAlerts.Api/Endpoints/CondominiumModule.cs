@@ -19,13 +19,14 @@ using LightResults;
 using Mapster;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Message = CondominiumAlerts.Domain.Aggregates.Entities.Message;
 
 namespace CondominiumAlerts.Api.Endpoints
 {
     public class CondominiumModule : ICarterModule
     {
-        public static string CondominiumId = "22f0abf5-f9fc-4730-b982-674f80d9b712";
+        public static string CondominiumId = "a8a9cb31-4e0e-43e0-9f92-93ad6f0d1de3";
         public static string UserId = "gqm3lFdtECVIek1p23aFD5SqSTs2";
         public void AddRoutes(IEndpointRouteBuilder app)
         {
@@ -123,9 +124,11 @@ namespace CondominiumAlerts.Api.Endpoints
                     CancellationToken cancellationToken,
                     JobCancellationService jobCancellationService,
                     ILogger<CondominiumModule> logger,
-                    SummaryStatusService summaryStatusService
+                    SummaryStatusService summaryStatusService,
+                    IHubContext<SummaryHub> hubContext
                     ) =>
             {
+                await hubContext.Clients.Group(condominiumId.ToString()).SendAsync("RequestNewSummary", cancellationToken);
                 logger.LogInformation($"Summary request received for condominium {condominiumId} from user {userId}");
                 var jobId = jobCancellationService.RegisterJob();
                 MessagesSummarizationRequest request = new(condominiumId, userId, jobId);

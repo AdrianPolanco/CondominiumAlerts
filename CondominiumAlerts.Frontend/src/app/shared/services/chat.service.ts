@@ -1,6 +1,6 @@
 import {HttpClient} from '@angular/common/http';
 import {inject, Injectable} from '@angular/core';
-import {BehaviorSubject, catchError, Observable, Subject, takeUntil, throwError} from 'rxjs';
+import {BehaviorSubject, catchError, Observable, Subject, takeUntil, tap, throwError} from 'rxjs';
 import {ChatOptions} from '../components/chat/chat.type';
 import {ChatMessageDto} from '../../core/models/chatMessage.dto';
 import * as signalR from '@microsoft/signalr';
@@ -113,9 +113,7 @@ export class ChatService{
     // Restea los resultados previos
     this.summaryResult.next(null);
     this.processingError.next(null);
-
-    console.log("AUTH TOKEN", this.token);
-    console.log("USER DATA", this.userData);
+    this.summaryStatus.next(SummaryStatus.Created); 
 
     // Hace una solicitud al endpoint para empezar un resumen
     return this.httpClient.post<RequestCondominiumSummaryResponse>(`api/condominiums/${currentOptions.condominium.id}/summary/${this.userData?.id}`,
@@ -142,6 +140,17 @@ export class ChatService{
           Authorization: `Bearer ${this.token}`
         }
       }
+    ).pipe(
+      tap(() => {
+        // Immediately update local state
+        this.summaryStatus.next(SummaryStatus.Cancelled);
+        this.summaryResult.next(null);
+        this.processingStatus.next(null);
+      }),
+      catchError(error => {
+        console.error('Cancellation error', error);
+        return throwError(() => error);
+      })
     );
   }
 
@@ -207,6 +216,13 @@ export class ChatService{
 
     console.log("Setting up hub event handlers...");
 
+    this.hubConnection.on('RequestNewSummary', () => {
+      // Broadcast that a new summary request has been initiated
+      this.summaryStatus.next(SummaryStatus.Created);
+      this.summaryResult.next(null);
+      this.processingStatus.next(null);
+    });
+
     this.hubConnection.on('NotifyProcessingStarted', (message: string) => {
       console.log('Processing started: ', message);
       this.processingStatus.next(message);
@@ -223,6 +239,8 @@ export class ChatService{
       this.processingError.next(errorMessage);
       this.processingStatus.next(null);
     });
+
+    this.hubConnection.off('CancelledProcessing');
 
     this.hubConnection.on('CancelledProcessing', async (message: string) => {
       console.log('Processing cancelled: ', message);

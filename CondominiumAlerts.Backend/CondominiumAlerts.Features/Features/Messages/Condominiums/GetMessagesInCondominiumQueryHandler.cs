@@ -23,7 +23,7 @@ public class GetMessagesInCondominiumQueryHandler : IQueryHandler<GetMessagesInC
             includes: [m => m.CreatorUser]
         );
 
-        if (!messages.Any()) return Result.Fail<List<ChatMessageDto>>("No se encontraron mensajes para el condominio dado.");
+       // if (!messages.Any()) return Result.Fail<List<ChatMessageDto>>("No se encontraron mensajes para el condominio dado.");
         
         var result = messages.Adapt<List<ChatMessageDto>>();
         result = result.OrderBy(r => r.CreatedAt).ToList();

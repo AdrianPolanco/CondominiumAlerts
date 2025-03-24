@@ -3,7 +3,11 @@
     <div class="text-xl">
       @if(this.options()?.type == 'condominium'){
         <div class="flex items-center gap-2">
-          <i class="fa-solid fa-building"></i>
+          <img
+            [src]="this.options()?.condominium?.imageUrl"
+            [alt]="this.options()?.condominium?.id"
+            class="w-10 h-11 rounded-full"
+          />
           <div class="flex flex-col gap-0 items-start">
             <p>{{ this.options()?.condominium?.name }}</p>
             <span class="text-xs text-gray-500 dark:text-gray-400 block">({{ this.options()?.condominium?.address }})</span>
@@ -85,7 +89,13 @@
         <app-chat-buble
           *ngFor="let message of messages()"
           [message]="message"
-        ></app-chat-buble></div>
+        ></app-chat-buble>
+        @if(messages().length === 0){
+          <div class="flex flex-col justify-center items-center text-gray-400 gap-1">
+            <p>¡Sé el primero en mandar un mensaje!</p>
+          </div>
+        }
+  </div>
   </section>
   <app-chat-box> </app-chat-box>
 </section>
