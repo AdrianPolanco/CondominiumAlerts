@@ -1,10 +1,10 @@
-import {Component, inject, OnDestroy, OnInit, signal,} from '@angular/core';
+import {ChangeDetectorRef, Component, inject, OnDestroy, OnInit, signal,} from '@angular/core';
 import {ChatBoxComponent} from '../chat-box/chat-box.component';
 import {ChatBubleComponent} from '../chat-buble/chat-buble.component';
 import {NgFor} from '@angular/common';
 import {ChatService} from '../../services/chat.service';
 import {AutoUnsubscribe} from '../../decorators/autounsuscribe.decorator';
-import {Subject, takeUntil} from 'rxjs';
+import {combineLatest, firstValueFrom, map, shareReplay, Subject, takeUntil} from 'rxjs';
 import {ChatOptions} from './chat.type';
 import {ChatMessageDto} from '../../../core/models/chatMessage.dto';
 import {FormsModule} from '@angular/forms';
@@ -45,21 +45,36 @@ export class ChatComponent implements OnInit, OnDestroy {
   summaryJobId: string | null = null;
   isThereSummaryResult = signal(false);
   showSummary = false
-  summaryStatus: SummaryStatus|null = null;
+  summaryStatus = signal<SummaryStatus | null>(null);
   SummaryStatusEnum = SummaryStatus;
   isCondominium = this.options()?.type === "condominium";
+ // Combina los observables para manejar el estado del resumen
+ summaryState$ = combineLatest([
+    this.chatService.summaryStatus$,
+    this.chatService.summaryResult$
+  ]).pipe(
+    map(([status, result]) => ({
+      status,
+      result,
+      canShowSummary: status === SummaryStatus.Completed && !!result?.content
+    })),
+    shareReplay(1)
+  );
 
   ngOnInit(): void {
     this.authenticationService.userData$.pipe(takeUntil(this.destroy$)).subscribe((userData) => {
       if(userData) this.currentUser = userData?.data;
     });
+    
     this.chatService.chatOptions$.pipe(takeUntil(this.destroy$)).subscribe((options) => {
       // Actualizar la opción de chat actual
       this.options.set(options);
-
+  
       // Reaccionar a nuevas opciones de chat
       if (options && options.type === 'condominium' && options.condominium) {
         console.log("COND FROM SUBSCRIPTION", options.condominium.id);
+        
+        // Cargar mensajes
         this.chatService
           .getMessagesByCondominium(options.condominium.id)
           .pipe(takeUntil(this.destroy$))
@@ -67,23 +82,90 @@ export class ChatComponent implements OnInit, OnDestroy {
             console.log(response);
             this.messages.set(response.data);
           });
+  
+        // Cargar el estado del resumen y el resultado al inicializar
+        this.loadSummaryState();
+        
+        // Suscribirse a actualizaciones
+         // Suscripción para manejar el estado del resumen
+    this.summaryState$
+    .pipe(takeUntil(this.destroy$))
+    .subscribe(({ status, result, canShowSummary }) => {
+      // Actualiza las señales basadas en el estado
+      this.summaryStatus.set(status);
+      
+      if (status === SummaryStatus.Processing || 
+          status === SummaryStatus.Created || 
+          status === SummaryStatus.Queued) {
+        this.summarizing.set(true);
+        this.isThereSummaryResult.set(false);
+      } else if (status === SummaryStatus.Completed) {
+        this.summarizing.set(false);
+        this.summaryResult.set(result);
+        this.isThereSummaryResult.set(canShowSummary);
+      } else {
+        this.summarizing.set(false);
+        this.isThereSummaryResult.set(false);
+      }
+    });
 
-          this.chatService.getCurrentSummaryResult().pipe(takeUntil(this.destroy$)).subscribe((summary) => {
-            console.log("SUMMARY", summary);
-            if(summary.data.content) {
-              this.summaryResult.set(summary.data);
-              this.isThereSummaryResult.set(true);
-            }
+        // Conectar automáticamente al SignalR hub para recibir actualizaciones en tiempo real
+        if (this.currentUser?.id) {
+          this.chatService.connectToCondominiumHub(
+            options.condominium.id, 
+            options.condominium.name, 
+            this.currentUser.id
+          ).catch(error => {
+            console.error("Error connecting to hub during initialization", error);
           });
-
-          this.chatService.summaryStatus$.pipe(takeUntil(this.destroy$)).subscribe((status) => {
-            console.log("SUMMARY STATUS FROM SUBSCRIPTION", status);
-            if(status === SummaryStatus.Processing) this.summarizing.set(true);
-          });
+        }
+          
       }
     });
 
   }
+
+  // Nuevo método para cargar el estado del resumen
+private loadSummaryState() {
+  // Cargar estado
+  this.chatService.loadCurrentSummaryStatus();
+  
+  // Cargar resultado si existe
+  this.chatService.getCurrentSummaryResult()
+    .pipe(takeUntil(this.destroy$))
+    .subscribe({
+      next: (summary) => {
+        console.log("LOADED SUMMARY", summary);
+        if (summary.data?.content) {
+          this.summaryResult.set(summary.data);
+          this.isThereSummaryResult.set(true);
+          this.summarizing.set(false);
+        } else {
+          this.isThereSummaryResult.set(false);
+        }
+      },
+      error: (err) => {
+        console.error("Error loading summary:", err);
+        this.isThereSummaryResult.set(false);
+      }
+    });
+}
+
+// Método para cargar el contenido del resumen
+private loadSummaryContent() {
+  if (!this.summaryResult()?.content) {
+    this.chatService.getCurrentSummaryResult()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (summary) => {
+          if (summary.data?.content) {
+            this.summaryResult.set(summary.data);
+            this.isThereSummaryResult.set(true);
+          }
+        }
+      });
+  }
+}
 
   formatSummary(){
     return this.chatService.formatText(this.summaryResult()?.content!);
@@ -168,8 +250,8 @@ export class ChatComponent implements OnInit, OnDestroy {
       this.chatService.cancelSummaryRequest(this.summaryJobId)
         .pipe(takeUntil(this.destroy$))
         .subscribe({
-          next: async() => {
-            this.summarizing.set(false);
+          next: () => {
+            //this.summarizing.set(false);
             this.summaryJobId = null;
             //await this.chatService.disconnectFromHub();
           },
@@ -180,9 +262,23 @@ export class ChatComponent implements OnInit, OnDestroy {
     }
   }
 
-  showSummaryResult(){
-    if(this.isThereSummaryResult() && this.summaryResult()?.content) {
-      this.showSummary = true
+  async showSummaryResult(){
+    if (this.isThereSummaryResult()) {
+      try {
+        // Siempre intentar cargar el resumen fresco desde el servidor
+        const summary = await firstValueFrom(this.chatService.getCurrentSummaryResult());
+        
+        if (summary && summary.data?.content) {
+          // Actualiza el resumen local con los datos del servidor
+          this.summaryResult.set(summary.data);
+          // Muestra el modal con el contenido actualizado
+          this.showSummary = true;
+        } else {
+          console.error('No se pudo obtener el contenido del resumen');
+        }
+      } catch (error) {
+        console.error('Error al cargar el resumen:', error);
+      }
     }
   }
 
@@ -190,6 +286,8 @@ export class ChatComponent implements OnInit, OnDestroy {
     if (this.summarizing()){
       await this.chatService.disconnectFromHub()
     };
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   protected readonly Number = Number;

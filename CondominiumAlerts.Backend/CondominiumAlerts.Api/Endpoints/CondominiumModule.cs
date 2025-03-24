@@ -9,6 +9,7 @@ using CondominiumAlerts.Features.Features.Condominiums.Join;
 using CondominiumAlerts.Features.Features.Condominiums.Summaries;
 using CondominiumAlerts.Features.Features.Condominiums.Summaries.Cancel;
 using CondominiumAlerts.Features.Features.Condominiums.Summaries.Get;
+using CondominiumAlerts.Features.Features.Condominiums.Summaries.Status;
 using CondominiumAlerts.Features.Features.Messages.Condominiums;
 using CondominiumAlerts.Infrastructure.Persistence.Repositories;
 using CondominiumAlerts.Infrastructure.Services.AI.MessagesSummary;
@@ -121,13 +122,14 @@ namespace CondominiumAlerts.Api.Endpoints
                     IQueue queue,
                     CancellationToken cancellationToken,
                     JobCancellationService jobCancellationService,
-                    ILogger<CondominiumModule> logger
+                    ILogger<CondominiumModule> logger,
+                    SummaryStatusService summaryStatusService
                     ) =>
             {
                 logger.LogInformation($"Summary request received for condominium {condominiumId} from user {userId}");
                 var jobId = jobCancellationService.RegisterJob();
                 MessagesSummarizationRequest request = new(condominiumId, userId, jobId);
-
+                await summaryStatusService.SetSummaryStatus(condominiumId.ToString(), SummaryStatus.Created);
                 queue.QueueInvocableWithPayload<MessagesSummarizationJob, MessagesSummarizationRequest>(request);
                 var response = new
                 {
@@ -195,6 +197,13 @@ namespace CondominiumAlerts.Api.Endpoints
                 
                 return Results.Ok(response);
             }).RequireAuthorization();
+
+            app.MapGet("/condominiums/{condominiumId}/summary/status", (SummaryStatusService summaryStatusService, Guid condominiumId) =>
+            {
+                var status = summaryStatusService.GetSummaryStatus(condominiumId.ToString());
+                var response = new GetSummaryStatusResponse(condominiumId, status);
+                return Results.Ok(response);
+            });
                 
             app.MapPost("/condominiums/test", async (IRepository<Condominium, Guid> repository) =>
             {

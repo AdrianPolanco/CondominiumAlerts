@@ -5,14 +5,13 @@ import {
   inject,
   input,
 } from '@angular/core';
-import { Message } from '../../../core/models/message.models';
 import { AuthService } from '../../../core/auth/services/auth.service';
-import { NgClass, NgOptimizedImage } from '@angular/common';
+import { NgClass } from '@angular/common';
 import { ChatMessageDto } from '../../../core/models/chatMessage.dto';
 
 @Component({
   selector: 'app-chat-buble',
-  imports: [NgClass, NgOptimizedImage],
+  imports: [NgClass],
   templateUrl: './chat-buble.component.html',
   styleUrl: './chat-buble.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

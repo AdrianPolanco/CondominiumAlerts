@@ -49,7 +49,7 @@ public class MessagesSummarizationJob : IInvocable, IInvocableWithPayload<Messag
     
     public async Task Invoke()
     {
-        _summaryStatusService.SetSummaryStatus(Payload.CondominiumId.ToString(), SummaryStatus.Queued);
+        await _summaryStatusService.SetSummaryStatus(Payload.CondominiumId.ToString(), SummaryStatus.Queued);
         await _hubContext.Clients.Group(Payload.CondominiumId.ToString()).SendAsync(
             "UpdateSummaryStatus", 
             _summaryStatusService.GetSummaryStatus(Payload.CondominiumId.ToString()), 
@@ -128,7 +128,7 @@ public class MessagesSummarizationJob : IInvocable, IInvocableWithPayload<Messag
                 var errorMessage = $"El usuario ${user.Username} no pertenece al condominio ${condominium.Name}.";
                 _logger.LogWarning(errorMessage);
                 await _summaryStatusService.SetSummaryStatus(Payload.CondominiumId.ToString(), SummaryStatus.Failed);                
-                await _hubContext.Clients.Group(Payload.CondominiumId.ToString()).SendAsync("UserNotInCondominium", errorMessage);
+                await _hubContext.Clients.Group(Payload.CondominiumId.ToString()).SendAsync("UserNotInCondominium", errorMessage, CancellationToken);
             }
             
             _logger.LogInformation($"[Solicitud {_jobId}] Procesando mensajes para el condominio [${condominium.Id} - ${condominium.Name}] por solicitud del usuario [${user.Id} - {user.Username}].");
@@ -163,7 +163,7 @@ public class MessagesSummarizationJob : IInvocable, IInvocableWithPayload<Messag
             {
                 _logger.LogWarning($"[Solicitud {_jobId}] Cancelando solicitud...");
                 await _summaryStatusService.SetSummaryStatus(Payload.CondominiumId.ToString(), SummaryStatus.Cancelled);
-                _hubContext.Clients.Group(Payload.CondominiumId.ToString())
+                await _hubContext.Clients.Group(Payload.CondominiumId.ToString())
                     .SendAsync("CancelledProcessing", "Se ha cancelado el proceso.");
                 return;
             }
@@ -174,7 +174,7 @@ public class MessagesSummarizationJob : IInvocable, IInvocableWithPayload<Messag
         {
             _logger.LogWarning($"[Job {_jobId}] Se canceló correctamente.", _jobId);
             await _summaryStatusService.SetSummaryStatus(Payload.CondominiumId.ToString(), SummaryStatus.Cancelled);
-            _hubContext.Clients.Group(Payload.CondominiumId.ToString())
+            await _hubContext.Clients.Group(Payload.CondominiumId.ToString())
                 .SendAsync("CancelledProcessing", "Se cancelo el proceso antes de empezar", CancellationToken);
         }
         catch(Exception ex)
@@ -187,7 +187,8 @@ public class MessagesSummarizationJob : IInvocable, IInvocableWithPayload<Messag
         finally
         {
             _jobCancellationService.RemoveJob(_jobId);
-            await _hubContext.Clients.Group(Payload.CondominiumId.ToString()).SendAsync("ProcessingComplete", "Proceso completado con éxito");
+            _summaryStatusService.CleanupCompletedStatuses(Payload.CondominiumId.ToString());
+            await _hubContext.Clients.Group(Payload.CondominiumId.ToString()).SendAsync("ProcessingComplete", "Proceso completado con éxito", CancellationToken);
         }
     }
     

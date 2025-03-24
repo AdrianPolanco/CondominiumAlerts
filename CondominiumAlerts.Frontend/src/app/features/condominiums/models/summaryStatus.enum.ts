@@ -3,5 +3,6 @@ export enum SummaryStatus {
   Processing = 1,
   Completed = 2,
   Cancelled = 3,
-  Failed = 4
+  Failed = 4,
+  Created = 5
 }

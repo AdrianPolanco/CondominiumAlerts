@@ -6,5 +6,6 @@ public enum SummaryStatus
     Processing,
     Completed,
     Cancelled,
-    Failed
+    Failed,
+    Created
 }
