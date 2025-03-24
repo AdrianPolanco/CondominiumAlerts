@@ -1,10 +1,8 @@
 ﻿
-
 using CondominiumAlerts.Domain.Aggregates.Entities;
-
-namespace CondominiumAlerts.Features.Features.PriorityLevels.Update
+namespace CondominiumAlerts.Features.Features.PriorityLevels.Delete
 {
-    public record UpdatePriorityLevelResponse(
+    public record DeletePriorityLevelResponse(
            Guid Id,
            string Title,
            int Priority,
@@ -13,7 +11,7 @@ namespace CondominiumAlerts.Features.Features.PriorityLevels.Update
            DateTime UpdatedAt
         )
     {
-        public static implicit operator UpdatePriorityLevelResponse(LevelOfPriority levelOfPriority) => new(
+        public static implicit operator DeletePriorityLevelResponse(LevelOfPriority levelOfPriority) => new(
             levelOfPriority.Id,
             levelOfPriority.Title,
             levelOfPriority.Priority,

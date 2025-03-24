@@ -49,7 +49,7 @@ namespace CondominiumAlerts.Features.Features.PriorityLevels.Update
 
             if (level == null)
             {
-                _logger.LogWarning("Error while updating the level with the folowing request {@request}: ", request);
+                _logger.LogWarning("Error while updating the level with the folowing request: {@request} ", request);
                 return Result<UpdatePriorityLevelResponse>.Fail("Error while updating the Priority level");
             }
 

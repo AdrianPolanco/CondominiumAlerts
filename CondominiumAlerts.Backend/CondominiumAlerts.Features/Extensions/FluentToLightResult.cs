@@ -2,8 +2,7 @@
 using FluentValidation.Results;
 using LightResults;
 using Microsoft.Extensions.Logging;
-using Serilog.Core;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Model;
+
 
 namespace CondominiumAlerts.Features.Extensions
 {
