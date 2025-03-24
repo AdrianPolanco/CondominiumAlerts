@@ -2,6 +2,7 @@
 using CondominiumAlerts.Features.Features.PriorityLevels.Add;
 using CondominiumAlerts.Features.Features.PriorityLevels.Delete;
 using CondominiumAlerts.Features.Features.PriorityLevels.Get;
+using CondominiumAlerts.Features.Features.PriorityLevels.GetById;
 using CondominiumAlerts.Features.Features.PriorityLevels.Update;
 using LightResults;
 using MediatR;
@@ -72,9 +73,30 @@ namespace CondominiumAlerts.Api.Endpoints
 
             });
 
+            //TODO : Make the condominiumId come from the request claims in the user token
             app.MapDelete(GetEndpointPattern("delete"), async (ISender sender, [FromBody] DeletePriorityLevelCommand request, CancellationToken cancellationToken) =>
             {
                 Result<DeletePriorityLevelResponse> result = await sender.Send(request, cancellationToken);
+
+                if (result.IsFailed)
+                {
+                    return Results.BadRequest(result);
+                }
+
+                var response = new
+                {
+                    IsSuccess = result.IsSuccess,
+                    Data = result.Value,
+                };
+
+                return Results.Ok(response);
+
+            });
+
+            //TODO : Make the condominiumId come from the request claims in the user token
+            app.MapGet(GetEndpointPattern("getById"), async (ISender sender, [AsParameters] GetByIdPriorityLevelQuery request, CancellationToken cancellationToken) =>
+            {
+                Result<GetByIdPriorityLevelResponse> result = await sender.Send(request, cancellationToken);
 
                 if (result.IsFailed)
                 {

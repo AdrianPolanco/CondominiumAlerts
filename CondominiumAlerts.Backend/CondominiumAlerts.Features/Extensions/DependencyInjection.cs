@@ -7,6 +7,7 @@ using CondominiumAlerts.Features.Features.Posts.Get;
 using CondominiumAlerts.Features.Features.PriorityLevels.Add;
 using CondominiumAlerts.Features.Features.PriorityLevels.Delete;
 using CondominiumAlerts.Features.Features.PriorityLevels.Get;
+using CondominiumAlerts.Features.Features.PriorityLevels.GetById;
 using CondominiumAlerts.Features.Features.PriorityLevels.Update;
 using CondominiumAlerts.Features.Features.Users.Register;
 using CondominiumAlerts.Features.Features.Users.Update;
@@ -37,6 +38,7 @@ public static class DependencyInjection
         services.AddScoped<IValidator<AddPriorityLevelCommand>, AddPriorityLevelValidator>();
         services.AddScoped<IValidator<UpdatePriorityLevelCommand>, UpdatePriorityLevelValidator>();
         services.AddScoped<IValidator<DeletePriorityLevelCommand>, DeletePriorityLevelValidator>();
+        services.AddScoped<IValidator<GetByIdPriorityLevelQuery>, GetByIdPriorityLevelValidator>();
         services.AddScoped<IValidator<Address>, AddressValidator>();
 
         services.AddScoped<IRequestHandler<GetPostsCommand, Result<List<GetPostsResponse>>>, GetPostsHandler>();
