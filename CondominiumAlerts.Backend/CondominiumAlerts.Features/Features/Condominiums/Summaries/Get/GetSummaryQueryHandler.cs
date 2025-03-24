@@ -2,7 +2,6 @@
 using CondominiumAlerts.Domain.Aggregates.Entities;
 using CondominiumAlerts.Domain.Repositories;
 using LightResults;
-using Microsoft.AspNetCore.Http;
 
 namespace CondominiumAlerts.Features.Features.Condominiums.Summaries.Get;
 

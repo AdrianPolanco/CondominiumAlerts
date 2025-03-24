@@ -14,7 +14,7 @@
       }
     </div>
 
-    @if(summaryStatus() !== null){
+    @if(summaryStatus() !== null && summarizing()){
       @switch (summaryStatus()) {
         @case (SummaryStatusEnum.Created) {  
           <div class="flex justify-center items-center gap-2">
@@ -50,9 +50,17 @@
           (onClick)="showSummaryResult()" 
           size="small"
         />
+        }@case (SummaryStatusEnum.Cancelled) {
+          <p-button 
+          icon="pi pi-book" 
+          [rounded]="true" 
+          label="Resumir" 
+          (onClick)="summarizeMessages()" 
+          size="small"
+        />
         }
       }
-    }@else{
+    }@else if(!summaryStatus || !summarizing()){
       @if(isThereSummaryResult()){
         <p-button 
           icon="pi pi-eye" 

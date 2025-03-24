@@ -94,18 +94,28 @@ export class ChatComponent implements OnInit, OnDestroy {
       // Actualiza las señales basadas en el estado
       this.summaryStatus.set(status);
       
-      if (status === SummaryStatus.Processing || 
-          status === SummaryStatus.Created || 
-          status === SummaryStatus.Queued) {
-        this.summarizing.set(true);
-        this.isThereSummaryResult.set(false);
-      } else if (status === SummaryStatus.Completed) {
-        this.summarizing.set(false);
-        this.summaryResult.set(result);
-        this.isThereSummaryResult.set(canShowSummary);
-      } else {
-        this.summarizing.set(false);
-        this.isThereSummaryResult.set(false);
+      this.summaryStatus.set(status);
+      
+      switch (status) {
+        case SummaryStatus.Cancelled:
+          this.summarizing.set(false);
+          this.summaryResult.set(null);
+          this.summaryJobId = null;
+          break;
+        case SummaryStatus.Processing:
+        case SummaryStatus.Created:
+        case SummaryStatus.Queued:
+          this.summarizing.set(true);
+          this.isThereSummaryResult.set(false);
+          break;
+        case SummaryStatus.Completed:
+          this.summarizing.set(false);
+          this.summaryResult.set(result);
+          this.isThereSummaryResult.set(canShowSummary);
+          break;
+        default:
+          this.summarizing.set(false);
+          this.isThereSummaryResult.set(false);
       }
     });
 
@@ -149,22 +159,6 @@ private loadSummaryState() {
         this.isThereSummaryResult.set(false);
       }
     });
-}
-
-// Método para cargar el contenido del resumen
-private loadSummaryContent() {
-  if (!this.summaryResult()?.content) {
-    this.chatService.getCurrentSummaryResult()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (summary) => {
-          if (summary.data?.content) {
-            this.summaryResult.set(summary.data);
-            this.isThereSummaryResult.set(true);
-          }
-        }
-      });
-  }
 }
 
   formatSummary(){
@@ -251,7 +245,7 @@ private loadSummaryContent() {
         .pipe(takeUntil(this.destroy$))
         .subscribe({
           next: () => {
-            //this.summarizing.set(false);
+            this.summarizing.set(false);
             this.summaryJobId = null;
             //await this.chatService.disconnectFromHub();
           },

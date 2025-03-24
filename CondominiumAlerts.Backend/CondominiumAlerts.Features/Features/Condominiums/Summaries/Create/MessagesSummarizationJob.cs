@@ -155,8 +155,6 @@ public class MessagesSummarizationJob : IInvocable, IInvocableWithPayload<Messag
             {
                 // Notificar que hubo un error en el procesamiento
                 await _summaryStatusService.SetSummaryStatus(Payload.CondominiumId.ToString(), SummaryStatus.Failed);
-                await _hubContext.Clients.Group(command.Condominium.Id.ToString())
-                    .SendAsync("NotifyProcessingError", $"Error en el procesamiento: {result.Error}", CancellationToken);
             }
             
             if (CancellationToken.IsCancellationRequested)
@@ -181,8 +179,6 @@ public class MessagesSummarizationJob : IInvocable, IInvocableWithPayload<Messag
         {
             _logger.LogError($"[Job {_jobId}] Error: {ex.Message}.");
             await _summaryStatusService.SetSummaryStatus(Payload.CondominiumId.ToString(), SummaryStatus.Failed);
-            await _hubContext.Clients.Group(Payload.CondominiumId.ToString())
-                .SendAsync("NotifyProcessingError", $"Error en el procesamiento: {ex.Message}", CancellationToken);
         }
         finally
         {

@@ -227,7 +227,8 @@ export class ChatService{
     this.hubConnection.on('CancelledProcessing', async (message: string) => {
       console.log('Processing cancelled: ', message);
       console.log('Summary cancelled');
-      this.processingStatus.next(`Cancelled: ${message}`);
+      this.processingStatus.next(null);
+      this.summaryStatus.next(SummaryStatus.Cancelled);
       this.summaryResult.next(null);
       await this.disconnectFromHub()
     });
@@ -278,6 +279,11 @@ export class ChatService{
         next: (response) => {
           console.log('Summary status loaded successfully', response);
           this.summaryStatus.next(response.data.status);
+
+          if (response.data.status === SummaryStatus.Cancelled) {
+            this.summaryResult.next(null);
+            this.processingStatus.next(null);
+          }
         },
         error: (err) => {
           console.error('Error loading summary status', err);
