@@ -76,8 +76,9 @@ export class CondominiumsLayoutComponent implements OnInit {
     return this.authService.currentUser?.displayName;
   }
 
-  goHome(): void {
-    this.router.navigate(['']);
+  async goHome() {
+    await this.authenticationService.logOut();
+    this.router.navigate(['/home']);
   }
 
   getUserCondominiums(): void {
