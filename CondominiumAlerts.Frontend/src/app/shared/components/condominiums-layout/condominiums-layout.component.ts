@@ -16,11 +16,12 @@ import { GetCondominiumsJoinedByUserResponse } from "../../../features/condomini
 import { ChatService } from '../../services/chat.service';
 import { Condominium } from '../../../features/condominiums/models/condominium.model';
 import { isUser } from '../../helpers/isUser.helper';
+import { Dialog } from 'primeng/dialog';
 
 @AutoUnsubscribe()
 @Component({
   selector: 'app-condominiums-layout',
-  imports: [Toolbar, NgFor, CommonModule, Button, NgOptimizedImage],
+  imports: [Toolbar, NgFor, CommonModule, Button, NgOptimizedImage, Dialog],
   templateUrl: './condominiums-layout.component.html',
   styleUrl: './condominiums-layout.component.css',
 })
@@ -36,6 +37,7 @@ export class CondominiumsLayoutComponent implements OnInit {
   currentCondominium: Pick<Condominium, 'id' | 'name' | 'imageUrl'| 'address'> | null = null;
   private destroy$ = new Subject<void>();
   areCondominiumsLoading = signal(true)
+  showNotifications = false;
 
   notifications = [
     { message: 'Nuevo mensaje de Juan', time: 'Hace 5 minutos' },
@@ -49,6 +51,10 @@ export class CondominiumsLayoutComponent implements OnInit {
       // Solo llamamos getUserCondominiums() cuando this.currentUser está definido
       if (this.currentUser?.id) this.getUserCondominiums(); 
     });
+  }
+
+  showNotificationsDialog(): void {
+    this.showNotifications = true;
   }
 
   getLoggedUsername() {
