@@ -18,69 +18,71 @@
       }
     </div>
 
-    @if(summaryStatus() !== null && summarizing()){
-      @switch (summaryStatus()) {
-        @case (SummaryStatusEnum.Created) {  
-          <div class="flex justify-center items-center gap-2">
-            <p-button icon="pi pi-cog" styleClass="animate-[spin_3s_linear_infinite]" [rounded]="true" size="small"/>
-            <label class="text-xs">Preparando...</label>
-            <div class="flex justify-end items-start">
-              <p-button icon="pi pi-times" [rounded]="true" [text]="true" severity="danger" size="small" (onClick)="cancelSummary()"/>
-            </div>
-          </div> 
+    @if(wasLastMessageToday()){
+      @if(summaryStatus() !== null && summarizing()){
+        @switch (summaryStatus()) {
+          @case (SummaryStatusEnum.Created) {  
+            <div class="flex justify-center items-center gap-2">
+              <p-button icon="pi pi-cog" styleClass="animate-[spin_3s_linear_infinite]" [rounded]="true" size="small"/>
+              <label class="text-xs">Preparando...</label>
+              <div class="flex justify-end items-start">
+                <p-button icon="pi pi-times" [rounded]="true" [text]="true" severity="danger" size="small" (onClick)="cancelSummary()"/>
+              </div>
+            </div> 
+          }
+          @case (SummaryStatusEnum.Queued) {
+            <div class="flex justify-center items-center gap-2">
+              <p-button icon="pi pi-arrow-circle-right" styleClass="animate-[spin_3s_linear_infinite]" [rounded]="true" size="small"/>
+              <label class="text-xs">En cola...</label>
+              <div class="flex justify-end items-start">
+                <p-button icon="pi pi-times" [rounded]="true" [text]="true" severity="danger" size="small" (onClick)="cancelSummary()"/>
+              </div>
+            </div> 
+          }
+          @case (SummaryStatusEnum.Processing) { 
+            <div class="flex justify-center items-center gap-2">
+              <p-button icon="pi pi-cog" styleClass="animate-[spin_3s_linear_infinite]" [rounded]="true" size="small"/>
+              <label class="text-xs">Resumiendo...</label>
+              <div class="flex justify-end items-start">
+                <p-button icon="pi pi-times" [rounded]="true" [text]="true" severity="danger" size="small" (onClick)="cancelSummary()"/>
+              </div>
+            </div> 
+          }@case (SummaryStatusEnum.Completed){
+            <p-button 
+            icon="pi pi-eye" 
+            [rounded]="true" 
+            label="Ver resumen" 
+            (onClick)="showSummaryResult()" 
+            size="small"
+          />
+          }@case (SummaryStatusEnum.Cancelled) {
+            <p-button 
+            icon="pi pi-book" 
+            [rounded]="true" 
+            label="Resumir" 
+            (onClick)="summarizeMessages()" 
+            size="small"
+          />
+          }
         }
-        @case (SummaryStatusEnum.Queued) {
-          <div class="flex justify-center items-center gap-2">
-            <p-button icon="pi pi-arrow-circle-right" styleClass="animate-[spin_3s_linear_infinite]" [rounded]="true" size="small"/>
-            <label class="text-xs">En cola...</label>
-            <div class="flex justify-end items-start">
-              <p-button icon="pi pi-times" [rounded]="true" [text]="true" severity="danger" size="small" (onClick)="cancelSummary()"/>
-            </div>
-          </div> 
-        }
-        @case (SummaryStatusEnum.Processing) { 
-          <div class="flex justify-center items-center gap-2">
-            <p-button icon="pi pi-cog" styleClass="animate-[spin_3s_linear_infinite]" [rounded]="true" size="small"/>
-            <label class="text-xs">Resumiendo...</label>
-            <div class="flex justify-end items-start">
-              <p-button icon="pi pi-times" [rounded]="true" [text]="true" severity="danger" size="small" (onClick)="cancelSummary()"/>
-            </div>
-          </div> 
-        }@case (SummaryStatusEnum.Completed){
+      }@else if(!summaryStatus || !summarizing()){
+        @if(isThereSummaryResult()){
           <p-button 
-          icon="pi pi-eye" 
-          [rounded]="true" 
-          label="Ver resumen" 
-          (onClick)="showSummaryResult()" 
-          size="small"
-        />
-        }@case (SummaryStatusEnum.Cancelled) {
+            icon="pi pi-eye" 
+            [rounded]="true" 
+            label="Ver resumen" 
+            (onClick)="showSummaryResult()" 
+            size="small"
+          />
+        }@else {
           <p-button 
-          icon="pi pi-book" 
-          [rounded]="true" 
-          label="Resumir" 
-          (onClick)="summarizeMessages()" 
-          size="small"
-        />
+            icon="pi pi-book" 
+            [rounded]="true" 
+            label="Resumir" 
+            (onClick)="summarizeMessages()" 
+            size="small"
+          />
         }
-      }
-    }@else if(!summaryStatus || !summarizing()){
-      @if(isThereSummaryResult()){
-        <p-button 
-          icon="pi pi-eye" 
-          [rounded]="true" 
-          label="Ver resumen" 
-          (onClick)="showSummaryResult()" 
-          size="small"
-        />
-      }@else {
-        <p-button 
-          icon="pi pi-book" 
-          [rounded]="true" 
-          label="Resumir" 
-          (onClick)="summarizeMessages()" 
-          size="small"
-        />
       }
     }
   </header>

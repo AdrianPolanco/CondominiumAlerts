@@ -1,4 +1,4 @@
-import {ChangeDetectorRef, Component, inject, OnDestroy, OnInit, signal,} from '@angular/core';
+import {ChangeDetectorRef, Component, computed, inject, OnDestroy, OnInit, signal,} from '@angular/core';
 import {ChatBoxComponent} from '../chat-box/chat-box.component';
 import {ChatBubleComponent} from '../chat-buble/chat-buble.component';
 import {NgFor} from '@angular/common';
@@ -48,6 +48,19 @@ export class ChatComponent implements OnInit, OnDestroy {
   summaryStatus = signal<SummaryStatus | null>(null);
   SummaryStatusEnum = SummaryStatus;
   isCondominium = this.options()?.type === "condominium";
+  lastMessage = signal<ChatMessageDto | null>(null);
+  wasLastMessageToday = computed(() => {
+    const message = this.lastMessage();
+    if (!message || !message.createdAt) {
+      return false;
+    }
+
+    const messageDate = new Date(message.createdAt);
+    const now = new Date();
+    const diffInHours = (now.getTime() - messageDate.getTime()) / (1000 * 60 * 60);
+
+    return diffInHours <= 24
+  });
  // Combina los observables para manejar el estado del resumen
  summaryState$ = combineLatest([
     this.chatService.summaryStatus$,
@@ -64,6 +77,7 @@ export class ChatComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.authenticationService.userData$.pipe(takeUntil(this.destroy$)).subscribe((userData) => {
       if(userData) this.currentUser = userData?.data;
+      console.log("TOKEN", this.currentUser);
     });
     
     this.chatService.chatOptions$.pipe(takeUntil(this.destroy$)).subscribe((options) => {
@@ -79,8 +93,10 @@ export class ChatComponent implements OnInit, OnDestroy {
           .getMessagesByCondominium(options.condominium.id)
           .pipe(takeUntil(this.destroy$))
           .subscribe((response) => {
-            console.log(response);
+            console.log("MESSAGES RECOVERED: ", response);
             this.messages.set(response.data);
+            this.lastMessage.set(response.data[response.data.length - 1]);
+            console.log("LAST MESSAGE", this.lastMessage())
           });
   
         // Cargar el estado del resumen y el resultado al inicializar
