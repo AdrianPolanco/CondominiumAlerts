@@ -4,19 +4,21 @@
   <p-toolbar styleClass="rounded-none w-full flex justify-between fixed top-0 left-0 w-full border-b border-gray-200 shadow-sm z-50 ">
     <ng-template #start>
       <div class="flex justify-start">
-        <img ngSrc="images/condominiumAlertsLogo.jpg"
-             alt="Condominium Alerts Logo"
-             width="40"
-             height="40"
-             class="ml-19" />
+        <img 
+          ngSrc="images/condominiumAlertsLogo.jpg"
+          alt="Condominium Alerts Logo"
+          width="40"
+          height="40"
+          class="ml-19" 
+        />
       </div>
     </ng-template>
     <ng-template #end>
       <div class="flex items-center space-x-4 mr-19">
-        <a href="/login">
-          <p-button label="Iniciar Sesión" icon="pi pi-sign-in" class="mr-2" severity="secondary" />
+          <a routerLink="/login">
+            <p-button label="Iniciar Sesión" icon="pi pi-sign-in" class="mr-2" severity="secondary" />
           </a>
-          <a href="/register">
+          <a routerLink="/register">
             <p-button label="Registrarse" icon="pi pi-user-plus" severity="danger" />
           </a>
       </div>
