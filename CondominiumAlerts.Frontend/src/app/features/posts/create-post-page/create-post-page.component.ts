@@ -77,7 +77,6 @@ export class PostPageComponent implements OnInit {
 
     if (!this.condominiumId) {
       console.error('No se encontró el condominiumId en la URL');
-      // Redirigir si no se encuentra el condominiumId
       this.router.navigate(['']);
     }
   }
@@ -100,7 +99,7 @@ export class PostPageComponent implements OnInit {
       this.postService.createPost(formData, this.condominiumId).subscribe({
         next: (response) => {
           console.log('Post creado satisfactoriamente', response);
-          this.router.navigate(['/condominium/index']);
+          this.router.navigate(['/condominium/index', this.condominiumId]);
         },
         error: (err) => {
           console.error('Error al crear el post', err);

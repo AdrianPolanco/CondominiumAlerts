@@ -50,7 +50,6 @@ export class PostService {
     console.log('User ID:', userId);
     console.log('LevelOfPriorityId:', fixedLevelOfPriorityId);
 
-    // Envía la solicitud al backend
     return this.http.post<CreatePostsResponse>('/api/posts', fb);
   }
 }

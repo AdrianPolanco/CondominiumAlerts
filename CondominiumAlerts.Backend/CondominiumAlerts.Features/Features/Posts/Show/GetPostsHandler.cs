@@ -18,6 +18,7 @@ namespace CondominiumAlerts.Features.Features.Posts.Get
         {
             var posts = await _context.Posts
                 .Where(p => p.CondominiumId == request.CondominiumId)
+                .OrderByDescending(p => p.CreatedAt)
                 .Select(p => new GetPostsResponse
                 {
                     Id = p.Id,
