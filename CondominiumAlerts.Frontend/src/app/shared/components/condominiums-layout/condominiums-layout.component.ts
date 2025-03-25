@@ -18,6 +18,7 @@ import { Condominium } from '../../../features/condominiums/models/condominium.m
 import { isUser } from '../../helpers/isUser.helper';
 import { Dialog } from 'primeng/dialog';
 import { DrawerModule } from 'primeng/drawer';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 
 @AutoUnsubscribe()
 @Component({
@@ -40,6 +41,8 @@ export class CondominiumsLayoutComponent implements OnInit {
   areCondominiumsLoading = signal(true)
   showNotifications = false;
   showDrawer = false;
+  private breakpointObserver = inject(BreakpointObserver);
+  isMobile = false;
 
   notifications = [
     { message: 'Nuevo mensaje de Juan', time: 'Hace 5 minutos' },
@@ -48,6 +51,12 @@ export class CondominiumsLayoutComponent implements OnInit {
   ];
 
   ngOnInit(): void {
+    this.breakpointObserver.observe([Breakpoints.Handset])
+    .pipe(takeUntil(this.destroy$))
+    .subscribe(result => {
+      this.isMobile = result.matches;
+    });
+
     this.authenticationService.userData$.pipe(takeUntil(this.destroy$)).subscribe((userData) => {
       this.currentUser = userData?.data!;
       // Solo llamamos getUserCondominiums() cuando this.currentUser está definido

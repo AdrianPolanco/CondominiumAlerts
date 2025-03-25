@@ -7,25 +7,35 @@
           width="55"
           height="55"
         />
-        <p class="text-lg font-bold m-0">{{ getLoggedUsername() }}</p>
+        @if(!isMobile){
+          <p class="text-lg font-bold m-0">{{ getLoggedUsername() }}</p>
+        }
       </div>
     </ng-template>
     <ng-template #end>
-      <nav class="flex gap-7 items-center">
+      <nav class="flex gap-4 items-center">
         <i class="pi pi-bell" style="font-size: 1.2rem" (click)="showNotificationsDialog()"></i>
         <a (click)="goHome()" class="font-bold">
-          <p-button
-            label="Cerrar sesión"
-            icon="pi pi-sign-out"
-            class="mr-2"
-            severity="danger"
-          />
+          @if(!isMobile){
+            <p-button
+              label="Cerrar sesión"
+              icon="pi pi-sign-out"
+              class="mr-2"
+              severity="danger"
+            />
+          }@else {
+            <p-button
+              icon="pi pi-sign-out"
+              class="mr-2"
+              severity="danger"
+            />
+          }
         </a>
       </nav>
     </ng-template>
   </p-toolbar>
 
-  <p-drawer [(visible)]="showDrawer" header="Conversaciones">
+  <p-drawer [(visible)]="showDrawer" header="Conversaciones" position="full">
     <div class="flex container-height">
       <div class="w-full p-5">
         <div class="text-lg font-semibold mb-4 text-center border-b pb-4 border-primary-200">
@@ -80,11 +90,6 @@
     </div>
   </p-drawer>
   <div class="flex-1 bg-gray-900 h-svh">
-    <!--<div (click)="showDrawerDialog()" class="fixed bottom-5 right-5 rounded-full shadow-md p-1 transition bg-white h-14 w-14 flex justify-center items-center cursor-pointer text-sm">
-      <div class="flex items-center justify-center bg-primary p-1 rounded">
-        <i class="pi pi-align-left text-white" style="font-size: 1.7rem"></i>
-      </div>
-    </div>-->
     <p-button 
       (click)="showDrawerDialog()"
       icon="pi pi-align-left" 
@@ -95,7 +100,7 @@
     @if(!currentCondominium){
       <section class="bg-gray-50 h-full w-full">
         <div class="flex justify-center items-center h-full">
-          <p class="text-lg text-gray-400">Selecciona un condominio o un contacto para comenzar a chatear</p>
+          <p class="text-sm lg:text-lg text-gray-400 text-center">Selecciona un condominio o un contacto para comenzar a chatear</p>
         </div>
       </section>
     }@else{
