@@ -17,11 +17,12 @@ import { ChatService } from '../../services/chat.service';
 import { Condominium } from '../../../features/condominiums/models/condominium.model';
 import { isUser } from '../../helpers/isUser.helper';
 import { Dialog } from 'primeng/dialog';
+import { DrawerModule } from 'primeng/drawer';
 
 @AutoUnsubscribe()
 @Component({
   selector: 'app-condominiums-layout',
-  imports: [Toolbar, NgFor, CommonModule, Button, NgOptimizedImage, Dialog],
+  imports: [Toolbar, NgFor, CommonModule, Button, NgOptimizedImage, Dialog, DrawerModule],
   templateUrl: './condominiums-layout.component.html',
   styleUrl: './condominiums-layout.component.css',
 })
@@ -38,6 +39,7 @@ export class CondominiumsLayoutComponent implements OnInit {
   private destroy$ = new Subject<void>();
   areCondominiumsLoading = signal(true)
   showNotifications = false;
+  showDrawer = false;
 
   notifications = [
     { message: 'Nuevo mensaje de Juan', time: 'Hace 5 minutos' },
@@ -55,6 +57,10 @@ export class CondominiumsLayoutComponent implements OnInit {
 
   showNotificationsDialog(): void {
     this.showNotifications = true;
+  }
+
+  showDrawerDialog(): void {
+    this.showDrawer = true;
   }
 
   getLoggedUsername() {
