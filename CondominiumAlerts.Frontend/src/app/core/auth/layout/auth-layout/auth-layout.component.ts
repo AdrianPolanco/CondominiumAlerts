@@ -38,6 +38,7 @@ import {AutoUnsubscribe} from '../../../../shared/decorators/autounsuscribe.deco
 })
 export class AuthLayoutComponent implements OnInit, OnDestroy{
 
+  
   constructor(private authenticationService: AuthenticationService) {
     effect(() => {
       if(!this.visible()) {

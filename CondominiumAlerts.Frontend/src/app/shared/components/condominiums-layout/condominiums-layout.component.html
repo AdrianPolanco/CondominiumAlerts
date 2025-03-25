@@ -11,14 +11,18 @@
     </div>
   </ng-template>
   <ng-template #end>
-    <a (click)="goHome()" class="font-bold">
-      <p-button
-        label="logOut"
-        icon="pi pi-sign-out"
-        class="mr-2"
-        severity="danger"
-      />
-    </a>
+    <nav class="flex gap-7 items-center">
+      <i class="pi pi-bell" style="font-size: 1.2rem" (click)="showNotificationsDialog()"></i>
+      <a (click)="goHome()" class="font-bold">
+        <p-button
+          label="Cerrar sesión"
+          icon="pi pi-sign-out"
+          class="mr-2"
+          severity="danger"
+        />
+      </a>
+    </nav>
+
   </ng-template>
 </p-toolbar>
 
@@ -75,11 +79,21 @@
   </div>
 
   <div class="flex-1 bg-gray-900">
-    <ng-content></ng-content>
+    <!--TODO: Add the same logic here when working with individual user chat-->
+    @if(!currentCondominium){
+      <section class="bg-gray-50 h-full w-full">
+        <div class="flex justify-center items-center h-full">
+          <p class="text-lg text-gray-400">Selecciona un condominio o un contacto para comenzar a chatear</p>
+        </div>
+      </section>
+    }@else{
+      <ng-content></ng-content>
+    }
+
   </div>
 
-  <div class="w-50 bg-gray-800 text-white p-5">
-    <div class="text-lg font-semibold mb-5">Notifications</div>
+  <p-dialog header="Notificaciones" [modal]="true" [(visible)]="showNotifications" [style]="{ width: '50rem' }" [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }" [maximizable]="true">
+  <div class="w-50 p-5">
     <div *ngFor="let notification of notifications" class="mb-3">
       <div class="flex items-center space-x-2">
         <i class="pi pi-bell text-red-500"></i>
@@ -88,4 +102,5 @@
       <span class="text-xs text-gray-400">{{ notification.time }}</span>
     </div>
   </div>
+</p-dialog>
 </div>
