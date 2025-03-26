@@ -81,21 +81,25 @@ export class CondominiumsMainPageComponent {
     });
   }
 
+  private setCurrentCondominium(condominium: GetCondominiumsJoinedByUserResponse) {
+    this.condominiumService.setCondominium(condominium);
+  }
+
   getBackgroundImage(imageUrl: string | null): string {
     return imageUrl ? `url('${imageUrl}')` : 'none';
   }
 
   goToCreateCondominium() {
-    console.log('Creating a new condominium...');
     this.router.navigate(['/condominium/create']);
   }
   goHome() {
     this.authenticationService.logOut();
     this.router.navigate(['']);
   }
-  viewCondominium(id: string) {
-    console.log(`Viewing condominium ID: ${id}`);
-    this.router.navigate(['/condominium/index', id]);
+  viewCondominium(condominium: GetCondominiumsJoinedByUserResponse) {
+    console.log(`Viewing condominium ID: ${condominium.id}`);
+    this.setCurrentCondominium(condominium)
+    this.router.navigate(['/condominium/index', condominium.id]);
   }
 
   changeModalState() {

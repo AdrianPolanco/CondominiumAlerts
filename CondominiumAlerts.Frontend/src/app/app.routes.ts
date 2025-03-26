@@ -41,7 +41,7 @@ export const routes: Routes = [
               import(
                 './features/condominiums/pages/condominiums-main-page/condominiums-main-page.component'
               ).then((c) => c.CondominiumsMainPageComponent),
-          },
+          }
         ],
       },
     ],
@@ -59,14 +59,6 @@ export const routes: Routes = [
       import(
         './features/condominiums/pages/condominium-chat/condominium-chat.component'
       ).then((c) => c.CondominiumChatComponent),
-  },
-
-  {
-    path: 'condominium/main-page',
-    loadComponent: () =>
-      import(
-        './features/condominiums/pages/condominiums-main-page/condominiums-main-page.component'
-      ).then((c) => c.CondominiumsMainPageComponent),
   },
   {
     path: 'condominium/index/:condominiumId',

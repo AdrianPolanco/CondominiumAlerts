@@ -1,10 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { NgFor, CommonModule, NgOptimizedImage } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Toolbar } from 'primeng/toolbar';
-import { Button } from 'primeng/button';
 import { PostService } from '../../../posts/services/post.service';
-
 import { GetCondominiumsUsersResponse } from '../../../users/models/user.model';
 import { UserService } from '../../../users/services/user.service';
 import { CondominiumService } from '../../services/condominium.service';
@@ -12,7 +9,7 @@ import { GetCondominiumResponse } from "../../models/getCondominium.response";
 import { CondominiumsLayoutComponent } from '../../../../shared/components/condominiums-layout/condominiums-layout.component';
 
 @Component({
-  selector: 'app-condominum-index',
+  selector: 'app-condominium-index',
   imports: [
     NgFor,
     CommonModule,
@@ -54,9 +51,6 @@ export class CondominumIndexComponent implements OnInit {
    this.condominiumId =  this.route.snapshot.paramMap.get("condominiumId")
    console.log(this.condominiumId);
    this.getCondominiumData();
-   if (this.condominium === null) {
-    this.router.navigate(['condominium/main-page']);
-   }
     this.loadPosts();
     this.loadUsers();
 
@@ -88,6 +82,10 @@ export class CondominumIndexComponent implements OnInit {
   }
 
   getCondominiumData(): void {
+    if(this.condominiumId === null) {
+      console.log("ID DE CONDOMINIO NULO")
+      this.router.navigate(['/condominiums']);
+    }
     this.condominiumService
       .get({ condominiumId: this.condominiumId ?? '' })
       .subscribe({
@@ -97,6 +95,7 @@ export class CondominumIndexComponent implements OnInit {
         },
         error: (err) => {
           console.log(err);
+          this.router.navigate(['/condominiums']);
         },
       });
   }

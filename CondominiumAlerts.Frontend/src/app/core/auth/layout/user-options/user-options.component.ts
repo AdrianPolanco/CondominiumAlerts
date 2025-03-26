@@ -1,6 +1,6 @@
 import {Component, effect, OnDestroy, OnInit, signal, viewChild} from '@angular/core';
 import {Toolbar} from 'primeng/toolbar';
-import {RouterOutlet} from '@angular/router';
+import {Router, RouterOutlet} from '@angular/router';
 import {NgFor, NgOptimizedImage} from '@angular/common';
 import {Avatar} from 'primeng/avatar';
 import {Dialog, DialogModule} from 'primeng/dialog';
@@ -54,12 +54,19 @@ menuItems: MenuItem[] = [
           command: () => {
             this.authenticationService.logOut()
           }
+        },
+        {
+          label: "Mis condominios",
+          icon: 'pi pi-home',
+          command: () => {
+            this.router.navigate(['/condominiums'])
+          }
         }
         ]
     }
   ]
   
-  constructor(private authenticationService: AuthenticationService) {
+  constructor(private authenticationService: AuthenticationService, private router: Router) {
     effect(() => {
       if(!this.visible()) {
         this.formGroup().reset();

@@ -11,6 +11,7 @@ import { JoinCondominiumCommand } from "../models/joinCondominium.command";
 import { AddCondominiumCommand } from "../models/addCondominium.command";
 import { AuthenticationService } from '../../../core/services/authentication.service';
 import { AutoUnsubscribe } from '../../../shared/decorators/autounsuscribe.decorator';
+import { Condominium } from '../models/condominium.model';
 
 @AutoUnsubscribe()
 @Injectable({
@@ -27,7 +28,11 @@ export class CondominiumService {
 
   private destroy$ = new Subject<void>();
   private token: string | null = null;
+  private current: GetCondominiumsJoinedByUserResponse | null = null;
 
+  get currentCondominium(): GetCondominiumsJoinedByUserResponse | null{
+    return this.current;
+  }
 
     create(cmd: AddCondominiumCommand): Observable<AddCondominiumResponse> {
         const fb = new FormData();
@@ -43,6 +48,10 @@ export class CondominiumService {
             "/api/condominium",
             fb,
         )
+    }
+
+    setCondominium(condominium: GetCondominiumsJoinedByUserResponse): void{
+      this.current = condominium;
     }
 
     join(cmd: JoinCondominiumCommand): Observable<JoinCondominiumResponse>{

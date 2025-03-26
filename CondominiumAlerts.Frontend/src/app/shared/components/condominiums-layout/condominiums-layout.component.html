@@ -3,9 +3,11 @@
   </p-header>
 
   <div class="flex-1 bg-gray-900 h-svh">
-    <shared-chats-drawer (onCondominiumSelected)="onCondominiumSelected($event)"/>
+    @if(showChatDrawer()){
+      <shared-chats-drawer (onCondominiumSelected)="onCondominiumSelected($event)"/>
+    }
     <!--TODO: Add the same logic here when working with individual user chat-->
-    @if(!currentCondominium){
+    @if(!currentCondominium && showChatDrawer()){
       <section class="bg-gray-50 h-full w-full">
         <div class="flex justify-center items-center h-full">
           <p class="text-sm lg:text-lg text-gray-400 text-center">Selecciona un condominio o un contacto para comenzar a chatear</p>

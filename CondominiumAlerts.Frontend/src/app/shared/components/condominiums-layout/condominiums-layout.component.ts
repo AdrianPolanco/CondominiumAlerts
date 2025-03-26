@@ -1,7 +1,6 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, input, OnInit, signal } from '@angular/core';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { Router } from '@angular/router';
-import { Toolbar } from 'primeng/toolbar';
 import { GetCondominiumsUsersResponse } from '../../../features/users/models/user.model';
 import { AuthService } from '../../../core/auth/services/auth.service';
 import { BehaviorSubject, Subject, takeUntil } from 'rxjs';
@@ -19,7 +18,7 @@ import { UserOptionsComponent } from "../../../core/auth/layout/user-options/use
 
 @AutoUnsubscribe()
 @Component({
-  selector: 'app-condominiums-layout',
+  selector: 'shared-condominiums-layout',
   imports: [
     CommonModule, 
     DrawerModule, 
@@ -30,8 +29,8 @@ import { UserOptionsComponent } from "../../../core/auth/layout/user-options/use
   styleUrl: './condominiums-layout.component.css',
 })
 export class CondominiumsLayoutComponent implements OnInit {
-  private authService = inject(AuthService);
   private condominiumService = inject(CondominiumService)
+  private authService = inject(AuthService);
   private authenticationService = inject(AuthenticationService);
   private chatService = inject(ChatService);
   private router = inject(Router);
@@ -46,6 +45,8 @@ export class CondominiumsLayoutComponent implements OnInit {
   private breakpointObserver = inject(BreakpointObserver);
   isMobile = false;
 
+  showChatDrawer = input(false);
+
   notifications = [
     { message: 'Nuevo mensaje de Juan', time: 'Hace 5 minutos' },
     { message: 'Carlos ha publicado algo nuevo', time: 'Hace 1 hora' },
@@ -58,6 +59,8 @@ export class CondominiumsLayoutComponent implements OnInit {
     .subscribe(result => {
       this.isMobile = result.matches;
     });
+
+    this.currentCondominium = this.condominiumService.currentCondominium;
   }
 
   showNotificationsDialog(): void {
@@ -76,7 +79,8 @@ export class CondominiumsLayoutComponent implements OnInit {
   onCondominiumSelected(condominium: Pick<Condominium, 'id' | 'name' | 'imageUrl'| 'address'> | null): void {
     if(condominium) {
       console.log("ACTUALIZANDO CHAT OPTIONS")
-      this.chatService.setChatOptions({ type: 'condominium', condominium, user: null });}
+      this.chatService.setChatOptions({ type: 'condominium', condominium, user: null });
+    }
     this.currentCondominium = condominium;
   }
 
