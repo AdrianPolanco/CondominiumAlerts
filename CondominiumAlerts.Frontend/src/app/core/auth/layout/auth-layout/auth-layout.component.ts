@@ -4,9 +4,9 @@ import {IconField} from 'primeng/iconfield';
 import {InputIcon} from 'primeng/inputicon';
 import {RouterOutlet} from '@angular/router';
 import {InputText} from 'primeng/inputtext';
-import {NgOptimizedImage} from '@angular/common';
+import {NgFor, NgOptimizedImage} from '@angular/common';
 import {Avatar} from 'primeng/avatar';
-import {Dialog} from 'primeng/dialog';
+import {Dialog, DialogModule} from 'primeng/dialog';
 import {SharedFormField} from '../../../../shared/components/form/shared-form-field.interface';
 import {FormGroup, Validators} from '@angular/forms';
 import {SharedForm} from '../../../../shared/components/form/shared-form.interface';
@@ -15,8 +15,9 @@ import {Feedback} from '../../../../shared/components/form/feedback.interface';
 import {AuthenticationService} from '../../../services/authentication.service';
 import {Image} from 'primeng/image';
 import {User} from './user.type';
-import {delay, Subject, takeUntil, tap} from 'rxjs';
+import {Subject, takeUntil, tap} from 'rxjs';
 import {AutoUnsubscribe} from '../../../../shared/decorators/autounsuscribe.decorator';
+import {BadgeModule} from 'primeng/badge';
 
 @AutoUnsubscribe()
 @Component({
@@ -31,7 +32,10 @@ import {AutoUnsubscribe} from '../../../../shared/decorators/autounsuscribe.deco
     Avatar,
     Dialog,
     FormComponent,
-    Image
+    Image,
+    DialogModule,
+    NgFor,
+    BadgeModule
   ],
   templateUrl: './auth-layout.component.html',
   styleUrl: './auth-layout.component.css'
@@ -70,8 +74,14 @@ export class AuthLayoutComponent implements OnInit, OnDestroy{
   userData: User | null = null;
   token: string | null = null;
   imageUrl = signal(this.userData?.profilePictureUrl)
-
+  showNotifications = false;
+  showDrawer = false;
   userProfileFormFields = signal<SharedFormField[]>([]);
+  notifications = [
+    { message: 'Nuevo mensaje de Juan', time: 'Hace 5 minutos' },
+    { message: 'Carlos ha publicado algo nuevo', time: 'Hace 1 hora' },
+    { message: 'María ha reaccionado a tu publicación', time: 'Hace 2 horas' },
+  ];
 
   onSubmit(value: any) {
     const formComponent = this.formComponent();
@@ -108,6 +118,14 @@ export class AuthLayoutComponent implements OnInit, OnDestroy{
     });
   }
 
+
+  showNotificationsDialog(): void {
+    this.showNotifications = true;
+  }
+
+  showDrawerDialog(): void {
+    this.showDrawer = true;
+  }
   profileFormSettings = signal<SharedForm>({
     fields: this.userProfileFormFields(),
     baseButtonLabel: 'Editar perfil',
