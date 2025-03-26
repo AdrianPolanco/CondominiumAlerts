@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -9,17 +9,20 @@ import { CondominiumService } from '../../services/condominium.service';
 import { NgFor, CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { Button } from 'primeng/button';
-import { Toolbar } from 'primeng/toolbar';
-import { NgOptimizedImage } from '@angular/common';
-import { AuthService } from '../../../../core/auth/services/auth.service';
 import { GetCondominiumsJoinedByUserResponse } from "../../models/getCondominiumsJoinedByUser.response";
+import { AuthenticationService } from '../../../../core/services/authentication.service';
+import { User } from '../../../../core/auth/layout/auth-layout/user.type';
+import { Subject, takeUntil } from 'rxjs';
+import { AutoUnsubscribe } from '../../../../shared/decorators/autounsuscribe.decorator';
 
+@AutoUnsubscribe()
 @Component({
   selector: 'app-condominiums-main-page',
   imports: [
     NgFor,
     CommonModule,
     ReactiveFormsModule,
+    Button
   ],
   templateUrl: './condominiums-main-page.component.html',
   styleUrls: ['./condominiums-main-page.component.css'],
@@ -28,34 +31,36 @@ export class CondominiumsMainPageComponent {
   form: FormGroup;
   isModalOpen: boolean = false;
   errorText: string = '';
+  user: User|null = null
+  destroy$ = new Subject<void>();
+
   constructor(
     private fb: FormBuilder,
     private condominiumService: CondominiumService,
     private router: Router,
-    private authService: AuthService
+    private authenticationService: AuthenticationService
   ) {
     // console.log(this.authService.currentUser?.uid)
     this.form = this.fb.group({
       condominiumCode: ['', Validators.required],
       userId: [''],
     });
+
+    this.authenticationService.userData$.pipe(takeUntil(this.destroy$)).subscribe((userData) => {
+      if(userData?.data) {
+        this.user = userData?.data
+        this.loadUserCondominiums();
+      };
+    })
   }
 
-  condominiums: Array<GetCondominiumsJoinedByUserResponse> = [
-    {
-      id: '2d2c3c52-de6d-4697-8634-4e460f9d9516',
-      name: 'Sunset Villas',
-      address: 'Miami, FL',
-      imageUrl: 'cadf546w65',
-    },
-  ];
-
+  condominiums: Array<GetCondominiumsJoinedByUserResponse> = [];
 
   joinCondominium() {
     console.log('Joining a condominium...');
     //  console.log(this.authService.currentUser?.uid);
     this.form.patchValue({
-      userId: this.authService.currentUser?.uid,
+      userId: this.user?.id,
     });
 
     if (this.form.invalid) {
@@ -76,12 +81,16 @@ export class CondominiumsMainPageComponent {
     });
   }
 
+  getBackgroundImage(imageUrl: string | null): string {
+    return imageUrl ? `url('${imageUrl}')` : 'none';
+  }
+
   goToCreateCondominium() {
     console.log('Creating a new condominium...');
     this.router.navigate(['/condominium/create']);
   }
   goHome() {
-    this.authService.logout();
+    this.authenticationService.logOut();
     this.router.navigate(['']);
   }
   viewCondominium(id: string) {
@@ -94,14 +103,10 @@ export class CondominiumsMainPageComponent {
     this.errorText = '';
   }
 
-  ngOnInit() {
-    this.loadUserCondominiums();
-  }
-
   loadUserCondominiums(): void {
     this.condominiumService
       .getCondominiumsJoinedByUser({
-        userId: this.authService.currentUser?.uid ?? '',
+        userId: this.user?.id ?? '',
       })
       .subscribe({
         next: (result) => {

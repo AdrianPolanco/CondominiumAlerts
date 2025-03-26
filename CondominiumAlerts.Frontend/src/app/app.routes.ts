@@ -42,14 +42,6 @@ export const routes: Routes = [
                 './features/condominiums/pages/condominiums-main-page/condominiums-main-page.component'
               ).then((c) => c.CondominiumsMainPageComponent),
           },
-          {
-            path: 'create',
-            title: 'Crear condominio',
-            loadComponent: () =>
-              import(
-                './features/condominiums/pages/condominium-page/condominium-page.component'
-              ).then((x) => x.CondominiumPageComponent),
-          },
         ],
       },
     ],
@@ -61,15 +53,6 @@ export const routes: Routes = [
         './features/condominiums/pages/condominium-page/condominium-page.component'
       ).then((x) => x.CondominiumPageComponent),
   },
-
-  {
-    path: 'condominium/create',
-    loadComponent: () =>
-      import(
-        './features/condominiums/pages/condominium-page/condominium-page.component'
-      ).then((x) => x.CondominiumPageComponent),
-  },
-
   {
     path: 'condominium/chat',
     loadComponent: () =>
