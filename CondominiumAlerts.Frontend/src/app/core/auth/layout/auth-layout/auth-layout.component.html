@@ -3,12 +3,12 @@
     <ng-template #start>
       <img ngSrc="images/condominiumAlertsLogo-removebg.png" alt="Condominium Alerts" height="40" width="40"/>
     </ng-template>
-    <ng-template #center>
-      <p-iconfield iconPosition="left">
+    <!--<ng-template #center>
+      <p-iconfield iconPosition="left" styleClass="sm:p-0">
         <p-inputicon styleClass="pi pi-search" />
         <input type="text" pInputText placeholder="Buscar" />
       </p-iconfield>
-    </ng-template>
+    </ng-template>-->
     <ng-template #end>
       <nav class="flex gap-4 items-center">
         <i class="pi pi-bell" pBadge [value]="notifications.length" style="font-size: 1.2rem" (click)="showNotificationsDialog()"></i>
