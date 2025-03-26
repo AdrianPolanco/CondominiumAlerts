@@ -1,55 +1,5 @@
-<header class="card">
-  <p-toolbar styleClass="rounded-none">
-    <ng-template #start>
-      <img ngSrc="images/condominiumAlertsLogo-removebg.png" alt="Condominium Alerts" height="40" width="40"/>
-    </ng-template>
-    <!--<ng-template #center>
-      <p-iconfield iconPosition="left" styleClass="sm:p-0">
-        <p-inputicon styleClass="pi pi-search" />
-        <input type="text" pInputText placeholder="Buscar" />
-      </p-iconfield>
-    </ng-template>-->
-    <ng-template #end>
-      <nav class="flex gap-4 items-center">
-        <i class="pi pi-bell" pBadge [value]="notifications.length" style="font-size: 1.2rem" (click)="showNotificationsDialog()"></i>
-        <p-menu #menu [model]="menuItems" [popup]="true" />
-        <button (click)="menu.toggle($event)" class="flex justify-center items-center">
-          @if(userData?.profilePictureUrl){
-            <p-avatar [image]="userData?.profilePictureUrl" class="mr-2" size="large" shape="circle" />
-          }@else{
-            <p-avatar icon="pi pi-user" class="mr-2" size="large" shape="circle" />
-          }
-        </button>      
-      </nav>
-    </ng-template>
-  </p-toolbar>
-</header>
-<p-dialog [(visible)]="visible" [modal]="true" [style]="{ width: '25rem' }">
-  <h1 class="text-center text-3xl mb-5">Mi perfil</h1>
-  <div class="flex justify-center items-center w-full rounded-full">
-    @if(imageUrl()){
-      <p-image styleClass="rounded-full" src="{{imageUrl()}}" alt="Image" width="200" [preview]="true" />
-    }@else{
-      <p-image styleClass="rounded-full" src="images/default-profile-pic.png" alt="Image" width="200" [preview]="true" />
-    }
-  </div>
-  <shared-form
-    [formSettingsInput]="profileFormSettings()"
-    (onFormCreated)="onFormCreated($event)"
-    (onFormSubmitted)="onSubmit($event)">
-  </shared-form>
-</p-dialog>
+<core-user-options></core-user-options>
 <main>
+  <shared-chats-drawer (onCondominiumSelected)="onCondominiumSelected()"/>
   <router-outlet></router-outlet>
 </main>
-<p-dialog header="Notificaciones" [modal]="true" [(visible)]="showNotifications" [style]="{ width: '50rem' }" [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }" [maximizable]="true">
-  <div class="w-50 p-5">
-    <div *ngFor="let notification of notifications" class="mb-3">
-      <div class="flex items-center space-x-2">
-        <i class="pi pi-bell text-red-500"></i>
-        <p class="text-sm">{{ notification.message }}</p>
-      </div>
-      <span class="text-xs text-gray-400">{{ notification.time }}</span>
-    </div>
-  </div>
-</p-dialog>
