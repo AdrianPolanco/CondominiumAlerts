@@ -17,7 +17,6 @@
         <i class="fa-solid fa-user"></i> {{ this.options()?.user?.name }}
       }
     </div>
-
     @if(wasLastMessageToday()){
       @if(summaryStatus() !== null && summarizing()){
         @switch (summaryStatus()) {
@@ -66,15 +65,6 @@
           }
         }
       }@else if(!summaryStatus || !summarizing()){
-        @if(isThereSummaryResult()){
-          <p-button 
-            icon="pi pi-eye" 
-            [rounded]="true" 
-            label="Ver resumen" 
-            (onClick)="showSummaryResult()" 
-            size="small"
-          />
-        }@else {
           <p-button 
             icon="pi pi-book" 
             [rounded]="true" 
@@ -82,9 +72,17 @@
             (onClick)="summarizeMessages()" 
             size="small"
           />
-        }
       }
-    }
+   }
+   @if(isThereSummaryResult()){
+    <p-button 
+      icon="pi pi-eye" 
+      [rounded]="true" 
+      label="Ver resumen" 
+      (onClick)="showSummaryResult()" 
+      size="small"
+    />
+  }
   </header>
   <section class="chat-content bg-white scroll-invisible w-full flex flex-col gap-4">
         <div class="chat-content bg-white scroll-invisible w-full flex flex-col gap-4 ">

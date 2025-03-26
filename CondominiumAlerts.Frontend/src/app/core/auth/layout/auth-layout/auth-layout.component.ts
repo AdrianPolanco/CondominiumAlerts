@@ -18,6 +18,8 @@ import {User} from './user.type';
 import {Subject, takeUntil, tap} from 'rxjs';
 import {AutoUnsubscribe} from '../../../../shared/decorators/autounsuscribe.decorator';
 import {BadgeModule} from 'primeng/badge';
+import {Menu} from 'primeng/menu';
+import { MenuItem } from 'primeng/api';
 
 @AutoUnsubscribe()
 @Component({
@@ -35,13 +37,35 @@ import {BadgeModule} from 'primeng/badge';
     Image,
     DialogModule,
     NgFor,
-    BadgeModule
+    BadgeModule,
+    Menu
   ],
   templateUrl: './auth-layout.component.html',
   styleUrl: './auth-layout.component.css'
 })
 export class AuthLayoutComponent implements OnInit, OnDestroy{
 
+  menuItems: MenuItem[] = [
+    {
+      label: 'Opciones',
+      items: [
+        {
+          label: 'Mi perfil',
+          icon: 'pi pi-user-edit',
+          command: () => {
+            this.showForm();
+          }
+        },
+        {
+          label: 'Cerrar sesión',
+          icon: 'pi pi-sign-out',
+          command: () => {
+            this.authenticationService.logOut()
+          }
+        }
+        ]
+    }
+  ]
   
   constructor(private authenticationService: AuthenticationService) {
     effect(() => {

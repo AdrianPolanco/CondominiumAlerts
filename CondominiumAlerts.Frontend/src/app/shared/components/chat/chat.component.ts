@@ -109,37 +109,34 @@ export class ChatComponent implements OnInit, OnDestroy {
     .subscribe(({ status, result, canShowSummary }) => {
       // Actualiza las señales basadas en el estado
       this.summaryStatus.set(status);
-      
-      this.summaryStatus.set(status);
-      
       this.summaryState$
-    .pipe(takeUntil(this.destroy$))
-    .subscribe(({ status, result, canShowSummary }) => {
-      // Comprehensive state management
-      this.summaryStatus.set(status);
-      
-      switch (status) {
-        case SummaryStatus.Cancelled:
-          this.summarizing.set(false);
-          this.summaryResult.set(null);
-          this.summaryJobId = null;
-          break;
-        case SummaryStatus.Processing:
-        case SummaryStatus.Created:
-        case SummaryStatus.Queued:
-          this.summarizing.set(true);
-          this.isThereSummaryResult.set(false);
-          break;
-        case SummaryStatus.Completed:
-          this.summarizing.set(false);
-          this.summaryResult.set(result);
-          this.isThereSummaryResult.set(canShowSummary);
-          break;
-        default:
-          this.summarizing.set(false);
-          this.isThereSummaryResult.set(false);
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(({ status, result, canShowSummary }) => {
+        // Comprehensive state management
+        this.summaryStatus.set(status);
+          switch (status) {
+            case SummaryStatus.Cancelled:
+              this.summarizing.set(false);
+              this.summaryResult.set(null);
+              this.summaryJobId = null;
+              break;
+            case SummaryStatus.Processing:
+            case SummaryStatus.Created:
+            case SummaryStatus.Queued:
+              this.summarizing.set(true);
+              this.isThereSummaryResult.set(false);
+              break;
+            case SummaryStatus.Completed:
+              this.summarizing.set(false);
+              this.summaryResult.set(result);
+              this.isThereSummaryResult.set(canShowSummary);
+              break;
+            default:
+              this.summarizing.set(false);
+              this.isThereSummaryResult.set(false);
+          }
       }
-    });
+    );
     });
 
         // Conectar automáticamente al SignalR hub para recibir actualizaciones en tiempo real
@@ -170,9 +167,12 @@ private loadSummaryState() {
       next: (summary) => {
         console.log("LOADED SUMMARY", summary);
         if (summary.data?.content) {
+          console.log("SUMMARY DATA", summary.data);
           this.summaryResult.set(summary.data);
           this.isThereSummaryResult.set(true);
           this.summarizing.set(false);
+
+          console.log("ISTHERESUMMARY", this.isThereSummaryResult());
         } else {
           this.isThereSummaryResult.set(false);
         }
@@ -227,6 +227,8 @@ private loadSummaryState() {
             if(!summary) return;
             this.summaryResult.set(summary);
             this.isThereSummaryResult.set(true);
+            console.log("HAY SUMMARYRESULT", this.summaryResult());
+            console.log("SUMMARIZERESULT EJECUTADO", this.summaryResult());
            // summaryResultSubscription.unsubscribe();
             //await this.chatService.disconnectFromHub();
           });
