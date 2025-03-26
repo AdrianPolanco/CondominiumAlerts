@@ -28,14 +28,30 @@
     </div>
 
     <div
-      *ngFor="let condominium of condominiums"
-      class="w-full max-w-[17rem] min-w-[10rem] aspect-square flex flex-col justify-center items-center text-white rounded-lg p-4 cursor-pointer hover:bg-green-600 transition"
-      [ngStyle]="{'background-image': getBackgroundImage(condominium.imageUrl), 'background-position': 'center'}"
-      (click)="viewCondominium(condominium.id)"
-    >
-      <h3 class="text-xl font-semibold text-center">{{ condominium.name | titlecase }}</h3>
-      <p class="text-center text-sm mt-2">Dirección: {{ condominium.address }}</p>
+    *ngFor="let condominium of condominiums"
+    class="relative w-full max-w-[17rem] min-w-[10rem] aspect-square flex flex-col justify-center items-center text-white rounded-lg p-4 cursor-pointer transition group"
+    (click)="viewCondominium(condominium.id)"
+  >
+    <!-- Imagen de fondo -->
+    <div
+      class="absolute inset-0 bg-cover bg-center rounded-lg"
+      [ngStyle]="{'background-image': getBackgroundImage(condominium.imageUrl)}"
+    ></div>
+  
+    <!-- Capa oscura -->
+    <div
+      class="absolute inset-0 bg-black/50 rounded-lg backdrop-blur-sm transition-all duration-300 group-hover:bg-black/20 group-hover:backdrop-blur-none"
+    ></div>
+  
+    <!-- Contenido -->
+    <div class="relative text-center">
+      <h3 class="text-xl font-semibold">{{ condominium.name }}</h3>
+      <p class="text-sm mt-2 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+        {{ condominium.address }}
+      </p>
     </div>
+  </div>
+  
   </div>
 </section>
 

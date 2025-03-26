@@ -21,9 +21,7 @@ import { UserOptionsComponent } from "../../../core/auth/layout/user-options/use
 @Component({
   selector: 'app-condominiums-layout',
   imports: [
-    Toolbar,
     CommonModule, 
-    NgOptimizedImage,  
     DrawerModule, 
     ChatsDrawerComponent, 
     UserOptionsComponent
