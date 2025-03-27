@@ -309,9 +309,7 @@ private loadSummaryState() {
   }
 
   async ngOnDestroy() {
-    if (this.summarizing()){
-      await this.chatService.disconnectFromHub()
-    };
+    await this.chatService.disconnectFromHub()
     this.destroy$.next();
     this.destroy$.complete();
   }
