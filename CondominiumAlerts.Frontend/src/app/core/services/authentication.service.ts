@@ -66,7 +66,7 @@ export class AuthenticationService {
       );
 
       if(doesUserExist.doesUserExist) {
-        this.router.navigate(['/']);
+        this.router.navigate(['/condominiums']);
         return;
       }
 
@@ -99,7 +99,7 @@ export class AuthenticationService {
       ).subscribe({
         next: (response) => {
           console.log(response);
-          this.router.navigate(['/']);
+          this.router.navigate(['/condominiums']);
         },
         error: (error) => {
           console.error(error);

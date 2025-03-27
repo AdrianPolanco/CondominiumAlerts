@@ -1,7 +1,14 @@
     <header class="card">
         <p-toolbar styleClass="rounded-none">
         <ng-template #start>
-            <img ngSrc="images/condominiumAlertsLogo-removebg.png" alt="Condominium Alerts" height="40" width="40"/>
+            <img
+                (click)="onLogoClicked()"
+                ngSrc="images/condominiumAlertsLogo-removebg.png" 
+                alt="Condominium Alerts" 
+                height="40"
+                width="40"
+                class="cursor-pointer"
+            />
         </ng-template>
         <!--<ng-template #center>
             <p-iconfield iconPosition="left" styleClass="sm:p-0">

@@ -55,6 +55,7 @@ export class ChatsDrawerComponent implements OnInit, OnDestroy{
   emitCondominium(condominium: Pick<Condominium, 'id' | 'name' | 'imageUrl'| 'address'> | null): void {
       if(condominium) {
         this.currentCondominium = condominium;
+        this.chatService.setChatOptions({ type: "condominium", condominium, user: null})
         this.onCondominiumSelected.emit(condominium);
       } 
   }

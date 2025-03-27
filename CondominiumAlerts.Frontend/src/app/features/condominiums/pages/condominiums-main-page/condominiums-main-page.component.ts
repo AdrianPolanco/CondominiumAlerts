@@ -14,6 +14,7 @@ import { AuthenticationService } from '../../../../core/services/authentication.
 import { User } from '../../../../core/auth/layout/auth-layout/user.type';
 import { Subject, takeUntil } from 'rxjs';
 import { AutoUnsubscribe } from '../../../../shared/decorators/autounsuscribe.decorator';
+import { ChatsDrawerComponent } from "../../../../shared/components/chats-drawer/chats-drawer.component";
 
 @AutoUnsubscribe()
 @Component({
@@ -22,8 +23,9 @@ import { AutoUnsubscribe } from '../../../../shared/decorators/autounsuscribe.de
     NgFor,
     CommonModule,
     ReactiveFormsModule,
-    Button
-  ],
+    Button,
+    ChatsDrawerComponent
+],
   templateUrl: './condominiums-main-page.component.html',
   styleUrls: ['./condominiums-main-page.component.css'],
 })
@@ -79,6 +81,10 @@ export class CondominiumsMainPageComponent {
         this.errorText = err.error.Errors[0].Message;
       },
     });
+  }
+
+  onCondominiumSelected() {
+    this.router.navigate(['/condominium/chat']);
   }
 
   private setCurrentCondominium(condominium: GetCondominiumsJoinedByUserResponse) {

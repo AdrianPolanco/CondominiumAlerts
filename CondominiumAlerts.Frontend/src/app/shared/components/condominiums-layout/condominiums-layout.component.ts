@@ -60,7 +60,11 @@ export class CondominiumsLayoutComponent implements OnInit {
       this.isMobile = result.matches;
     });
 
-    this.currentCondominium = this.condominiumService.currentCondominium;
+    this.chatService.chatOptions$.pipe().subscribe((chatOptions) => {
+      if (chatOptions) {
+        this.currentCondominium = chatOptions.condominium;
+      }
+    });
   }
 
   showNotificationsDialog(): void {
@@ -77,10 +81,7 @@ export class CondominiumsLayoutComponent implements OnInit {
   }
 
   onCondominiumSelected(condominium: Pick<Condominium, 'id' | 'name' | 'imageUrl'| 'address'> | null): void {
-    if(condominium) {
-      console.log("ACTUALIZANDO CHAT OPTIONS")
-      this.chatService.setChatOptions({ type: 'condominium', condominium, user: null });
-    }
+    console.log("ACTUALIZANDO CHAT OPTIONS")
     this.currentCondominium = condominium;
   }
 

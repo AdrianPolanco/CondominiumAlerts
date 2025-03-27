@@ -1,0 +1,7 @@
+@if(color() === 'primary'){
+    <p-button icon="pi pi-arrow-left" [rounded]="rounded" (onClick)="goBack()"/>
+}@else if(color() === 'contrast'){
+    <p-button icon="pi pi-arrow-left" styleClass="bg-primary-contrast text-primary" [rounded]="rounded" (onClick)="goBack()"/>
+}@else{
+    <p-button icon="pi pi-arrow-left" styleClass="bg-transparent text-primary border-none" [rounded]="rounded" (onClick)="goBack()"/>
+}

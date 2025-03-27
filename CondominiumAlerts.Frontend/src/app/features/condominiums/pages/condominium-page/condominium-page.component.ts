@@ -7,14 +7,14 @@ import { SharedForm } from '../../../../shared/components/form/shared-form.inter
 import { CondominiumService } from '../../services/condominium.service';
 import { AddCondominiumCommand } from "../../models/addCondominium.command";
 import { Router } from '@angular/router';
-import { Feedback } from '../../../../shared/components/form/feedback.interface';
 import {ButtonDirective} from 'primeng/button';
+import { ChatsDrawerComponent } from "../../../../shared/components/chats-drawer/chats-drawer.component";
 
 @Component({
     selector: 'app-condominium-page',
     templateUrl: './condominium-page.component.html',
     styleUrls: ['./condominium-page.component.css'],
-  imports: [FormComponent, ButtonDirective]
+  imports: [FormComponent, ButtonDirective, ChatsDrawerComponent]
 })
 export class CondominiumPageComponent {
 

@@ -1,6 +1,6 @@
 import {Component, effect, OnDestroy, OnInit, signal, viewChild} from '@angular/core';
 import {Toolbar} from 'primeng/toolbar';
-import {Router, RouterOutlet} from '@angular/router';
+import {Router} from '@angular/router';
 import {NgFor, NgOptimizedImage} from '@angular/common';
 import {Avatar} from 'primeng/avatar';
 import {Dialog, DialogModule} from 'primeng/dialog';
@@ -48,6 +48,14 @@ menuItems: MenuItem[] = [
             this.showForm();
           }
         },
+
+        {
+          label: "Mis condominios",
+          icon: 'pi pi-home',
+          command: () => {
+            this.router.navigate(['/condominiums'])
+          }
+        },        
         {
           label: 'Cerrar sesión',
           icon: 'pi pi-sign-out',
@@ -55,13 +63,6 @@ menuItems: MenuItem[] = [
             this.authenticationService.logOut()
           }
         },
-        {
-          label: "Mis condominios",
-          icon: 'pi pi-home',
-          command: () => {
-            this.router.navigate(['/condominiums'])
-          }
-        }
         ]
     }
   ]
@@ -105,6 +106,11 @@ menuItems: MenuItem[] = [
     { message: 'Carlos ha publicado algo nuevo', time: 'Hace 1 hora' },
     { message: 'María ha reaccionado a tu publicación', time: 'Hace 2 horas' },
   ];
+
+  onLogoClicked(){
+    if(this.userData) this.router.navigate(['/condominiums']);
+    else this.router.navigate(['/home']);
+  }
 
   onSubmit(value: any) {
     const formComponent = this.formComponent();

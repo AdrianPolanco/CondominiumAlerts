@@ -7,6 +7,8 @@ import { UserService } from '../../../users/services/user.service';
 import { CondominiumService } from '../../services/condominium.service';
 import { GetCondominiumResponse } from "../../models/getCondominium.response";
 import { CondominiumsLayoutComponent } from '../../../../shared/components/condominiums-layout/condominiums-layout.component';
+import { ChatsDrawerComponent } from "../../../../shared/components/chats-drawer/chats-drawer.component";
+import { BackArrowComponent } from "../../../../shared/components/back-arrow/back-arrow.component";
 
 @Component({
   selector: 'app-condominium-index',
@@ -14,7 +16,9 @@ import { CondominiumsLayoutComponent } from '../../../../shared/components/condo
     NgFor,
     CommonModule,
     CondominiumsLayoutComponent,
-  ],
+    ChatsDrawerComponent,
+    BackArrowComponent
+],
   templateUrl: './condominum-index.component.html',
   styleUrls: ['./condominum-index.component.css'],
 })
@@ -53,7 +57,10 @@ export class CondominumIndexComponent implements OnInit {
    this.getCondominiumData();
     this.loadPosts();
     this.loadUsers();
+  }
 
+  onCondominiumSelected(){
+    this.router.navigate(['/condominium/chat']);
   }
 
   loadPosts(): void {

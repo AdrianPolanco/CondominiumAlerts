@@ -3,6 +3,7 @@
     <div class="text-xl">
       @if(this.options()?.type == 'condominium'){
         <div class="flex items-center gap-2">
+          <shared-back-arrow url="/condominiums" color="transparent"/>
           <img
             [src]="this.options()?.condominium?.imageUrl"
             [alt]="this.options()?.condominium?.id"

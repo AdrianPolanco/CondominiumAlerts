@@ -1,4 +1,4 @@
-import {ChangeDetectorRef, Component, computed, inject, OnDestroy, OnInit, signal,} from '@angular/core';
+import {Component, computed, inject, OnDestroy, OnInit, signal,} from '@angular/core';
 import {ChatBoxComponent} from '../chat-box/chat-box.component';
 import {ChatBubleComponent} from '../chat-buble/chat-buble.component';
 import {NgFor} from '@angular/common';
@@ -16,6 +16,7 @@ import {Dialog} from 'primeng/dialog';
 import {MessageService} from 'primeng/api';
 import {Toast} from 'primeng/toast';
 import {SummaryStatus} from '../../../features/condominiums/models/summaryStatus.enum';
+import { BackArrowComponent } from "../back-arrow/back-arrow.component";
 
 
 @AutoUnsubscribe()
@@ -28,7 +29,9 @@ import {SummaryStatus} from '../../../features/condominiums/models/summaryStatus
     FormsModule,
     Button,
     Toast,
-    Dialog],
+    Dialog,
+    BackArrowComponent
+],
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.css',
   providers: [MessageService]
