@@ -16,7 +16,7 @@ namespace CondominiumAlerts.Api.Endpoints
         private const string mainPath = "/priorityLevels/";
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            app.MapGet(GetEndpointPattern("get"), async (ISender sender, [AsParameters] GetPriorityLevelsQuery request, CancellationToken cancellationToken) =>
+            app.MapGet(GetEndpointPattern(), async (ISender sender, [AsParameters] GetPriorityLevelsQuery request, CancellationToken cancellationToken) =>
             {
                 Result<GetPriorityLevelResponce> result = await sender.Send(request, cancellationToken);
 
@@ -94,7 +94,7 @@ namespace CondominiumAlerts.Api.Endpoints
             });
 
             //TODO : Make the condominiumId come from the request claims in the user token
-            app.MapGet(GetEndpointPattern("getById"), async (ISender sender, [AsParameters] GetByIdPriorityLevelQuery request, CancellationToken cancellationToken) =>
+            app.MapGet(GetEndpointPattern("id"), async (ISender sender, [AsParameters] GetByIdPriorityLevelQuery request, CancellationToken cancellationToken) =>
             {
                 Result<GetByIdPriorityLevelResponse> result = await sender.Send(request, cancellationToken);
 
@@ -115,7 +115,7 @@ namespace CondominiumAlerts.Api.Endpoints
         }
 
         #region private Methods 
-        private string GetEndpointPattern(string name)
+        private string GetEndpointPattern(string name = "")
         {
             return mainPath + name;
         }
