@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { FileUpload } from 'primeng/fileupload';
-import { SignalRService } from '../../../core/services/signal-r.service';
+import { ChatSignalRService } from '../../../core/services/chat-signal-r.service';
 
 @Component({
   selector: 'app-chat-box',
@@ -11,7 +11,7 @@ import { SignalRService } from '../../../core/services/signal-r.service';
 })
 export class ChatBoxComponent {
   messageControl = new FormControl();
-  constructor(private signalRService: SignalRService) {}
+  constructor(private chatSignalRService: ChatSignalRService) {}
 
   sendMessage() {
     console.log(this.messageControl.value);

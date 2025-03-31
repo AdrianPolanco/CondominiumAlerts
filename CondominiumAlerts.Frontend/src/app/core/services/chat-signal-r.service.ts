@@ -2,34 +2,47 @@ import { Injectable } from '@angular/core';
 import {
   HubConnection,
   HubConnectionBuilder,
+  LogLevel,
   HubConnectionState,
+  HttpTransportType,
 } from '@microsoft/signalr';
 import { AuthService } from '../auth/services/auth.service';
 import { Subject } from 'rxjs';
+import { ChatMessageDto } from '../models/chatMessage.dto';
 @Injectable({
   providedIn: 'root',
 })
-export class SignalRService {
+export class ChatSignalRService {
   private hubConnection: HubConnection;
   onHubConnected = new Subject<boolean>();
+  onNewMessage = new Subject<ChatMessageDto>();
 
   constructor(private authService: AuthService) {
     this.hubConnection = new HubConnectionBuilder()
-      .withUrl('https://localhost:7048/hubs/chat', {
+      .withUrl('/api/hubs/chat', {
         accessTokenFactory: () => this.authService.getUserToken(),
+        transport: HttpTransportType.ServerSentEvents,
       })
+      .configureLogging(LogLevel.Debug)
+      .withAutomaticReconnect()
       .build();
   }
 
   async start() {
     try {
-      if (this.authService.isUserLoggedIn) {
+      if (!this.isHubConnected) {
         await this.hubConnection.start();
         this.onHubConnected.next(true);
+        this.addEventHandlers();
       }
     } catch (error) {
       this.onHubConnected.next(false);
+      console.log(error);
     }
+  }
+
+  private addEventHandlers() {
+    
   }
 
   async closeConnection() {
@@ -39,6 +52,9 @@ export class SignalRService {
     } catch (error) {
       this.onHubConnected.next(false);
     }
+  }
+
+  async sendMessage(){
   }
 
   async joinToGroup(group: string) {
