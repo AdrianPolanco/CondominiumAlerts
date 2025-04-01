@@ -13,10 +13,10 @@ namespace CondominiumAlerts.Api.Endpoints
 {
     public class PriorityLevelsModule : ICarterModule
     {
-        private const string mainPath = "/priorityLevels/";
+        private const string mainPath = "/priorityLevels";
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            app.MapGet(GetEndpointPattern(), async (ISender sender, [AsParameters] GetPriorityLevelsQuery request, CancellationToken cancellationToken) =>
+            app.MapGet(GetEndpointPattern(""), async (ISender sender, [AsParameters] GetPriorityLevelsQuery request, CancellationToken cancellationToken) =>
             {
                 Result<GetPriorityLevelResponce> result = await sender.Send(request, cancellationToken);
 
@@ -35,7 +35,7 @@ namespace CondominiumAlerts.Api.Endpoints
 
             });
 
-            app.MapPost(GetEndpointPattern("add"), async (ISender sender, [FromBody] AddPriorityLevelCommand request, CancellationToken cancellationToken) =>
+            app.MapPost(GetEndpointPattern("/add"), async (ISender sender, [FromBody] AddPriorityLevelCommand request, CancellationToken cancellationToken) =>
             {
                 Result<AddPriorityLevelResponse> result = await sender.Send(request, cancellationToken);
 
@@ -54,7 +54,7 @@ namespace CondominiumAlerts.Api.Endpoints
 
             });
 
-            app.MapPut(GetEndpointPattern("update"), async (ISender sender, [FromBody] UpdatePriorityLevelCommand request) =>
+            app.MapPut(GetEndpointPattern("/update"), async (ISender sender, [FromBody] UpdatePriorityLevelCommand request) =>
             {
                 Result<UpdatePriorityLevelResponse> result = await sender.Send(request);
 
@@ -74,7 +74,7 @@ namespace CondominiumAlerts.Api.Endpoints
             });
 
             //TODO : Make the condominiumId come from the request claims in the user token
-            app.MapDelete(GetEndpointPattern("delete"), async (ISender sender, [FromBody] DeletePriorityLevelCommand request, CancellationToken cancellationToken) =>
+            app.MapDelete(GetEndpointPattern("/delete"), async (ISender sender, [FromBody] DeletePriorityLevelCommand request, CancellationToken cancellationToken) =>
             {
                 Result<DeletePriorityLevelResponse> result = await sender.Send(request, cancellationToken);
 
@@ -94,7 +94,7 @@ namespace CondominiumAlerts.Api.Endpoints
             });
 
             //TODO : Make the condominiumId come from the request claims in the user token
-            app.MapGet(GetEndpointPattern("id"), async (ISender sender, [AsParameters] GetByIdPriorityLevelQuery request, CancellationToken cancellationToken) =>
+            app.MapGet(GetEndpointPattern("/id"), async (ISender sender, [AsParameters] GetByIdPriorityLevelQuery request, CancellationToken cancellationToken) =>
             {
                 Result<GetByIdPriorityLevelResponse> result = await sender.Send(request, cancellationToken);
 

@@ -66,6 +66,12 @@ export const routes: Routes = [
       import(
         './features/condominiums/pages/condominum-index/condominum-index.component'
       ).then((c) => c.CondominumIndexComponent),
+  },{
+    path: 'priority-levels/index',
+    loadComponent: ()=>
+      import('./features/priority-levels/pages/index/index.component'
+        
+      ).then((c) => c.IndexComponent)
   },
   {
     path: '',
