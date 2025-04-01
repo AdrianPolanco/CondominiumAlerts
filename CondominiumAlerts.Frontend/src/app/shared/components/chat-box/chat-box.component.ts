@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, input } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { FileUpload } from 'primeng/fileupload';
 import { ChatSignalRService } from '../../../core/services/chat-signal-r.service';
+import { ChatOptions } from '../chat/chat.type';
 
 @Component({
   selector: 'app-chat-box',
@@ -10,11 +11,19 @@ import { ChatSignalRService } from '../../../core/services/chat-signal-r.service
   styleUrl: './chat-box.component.css',
 })
 export class ChatBoxComponent {
-  messageControl = new FormControl();
+  options = input<ChatOptions | null>(null);
+  messageControl = new FormControl<string>('');
+
   constructor(private chatSignalRService: ChatSignalRService) {}
 
-  sendMessage() {
-    console.log(this.messageControl.value);
+  async sendMessage() {
+    if (!this.messageControl.value || this.messageControl.value?.length === 0)
+      return;
+    
+    await this.chatSignalRService.sendMessage(
+      this.options()?.condominium?.id!,
+      this.messageControl.value
+    );
     this.messageControl.reset('');
   }
 

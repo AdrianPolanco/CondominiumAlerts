@@ -42,7 +42,10 @@ export class ChatSignalRService {
   }
 
   private addEventHandlers() {
-    
+    this.hubConnection.off('NewMessage');
+    this.hubConnection.on('NewMessage', (message) => {
+      this.onNewMessage.next(message);
+    });
   }
 
   async closeConnection() {
@@ -54,7 +57,33 @@ export class ChatSignalRService {
     }
   }
 
-  async sendMessage(){
+  async sendMessage(
+    condominiumId: string,
+    text: string,
+    receiverUserId?: string,
+    media?: string
+  ) {
+    try {
+      await this.hubConnection.send(
+        'SendMessage',
+        condominiumId,
+        text,
+        this.authService.currentUser?.uid,
+        receiverUserId,
+        media
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  convertToBase64(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = (error) => reject(error);
+    });
   }
 
   async joinToGroup(group: string) {

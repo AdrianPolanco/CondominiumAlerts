@@ -3,9 +3,11 @@
 public record MessageDto(
     Guid Id,
     string Text,
+    ChatCreatorUserDto CreatorUser,
+    string? CreatorUserId,
+    string? ReceiverUserId,
     string? MediaUrl,
     Guid? CondominiumId,
-    string? ReceiverUserId,
     Guid? MessageBeingRepliedToId,
     DateTime CreatedAt
  );
