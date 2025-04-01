@@ -7,7 +7,7 @@ public sealed class CondominiumUser : IEntity<Guid>
 {
     public Guid Id { get; set; }
     public Guid CondominiumId { get; set; }
-    public string UserId { get; set; } = string.Empty;
+    public string? UserId { get; set; } = string.Empty;
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
 

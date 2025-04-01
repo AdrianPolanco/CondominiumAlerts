@@ -2,11 +2,14 @@
 using System.Net.Mail;
 using CondominiumAlerts.Domain.Aggregates.Entities;
 using CondominiumAlerts.Domain.Repositories;
+using CondominiumAlerts.Features.Features.Condominiums.Summaries;
 using CondominiumAlerts.Infrastructure.Auth;
 using CondominiumAlerts.Infrastructure.Auth.Interfaces;
 using CondominiumAlerts.Infrastructure.Persistence.Context;
 using CondominiumAlerts.Infrastructure.Persistence.Repositories;
 using CondominiumAlerts.Infrastructure.Services;
+using CondominiumAlerts.Infrastructure.Services.AI.MessagesSummary;
+using CondominiumAlerts.Infrastructure.Services.Cancellation;
 using CondominiumAlerts.Infrastructure.Settings;
 using Coravel;
 using FirebaseAdmin;
@@ -44,7 +47,7 @@ public static class DependencyInjection
             return new ChatClient(settings.Model, settings.AIKey);
         });*/
         
-        services.AddHttpClient<IAIService, AIService>((sp,client) =>
+        services.AddHttpClient<IAiService, AiService>((sp,client) =>
         {
             var settings = sp.GetRequiredService<IOptions<AISettings>>().Value;
             client.BaseAddress = new Uri("https://openrouter.ai/api/v1/");
@@ -67,6 +70,10 @@ public static class DependencyInjection
                 })
         );
         services.AddQueue();
+        services.AddSignalR();
+
+        services.AddSingleton<JobCancellationService>();
+        services.AddSingleton<SummaryStatusService>();
         return services;
     }
 }

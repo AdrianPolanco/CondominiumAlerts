@@ -114,5 +114,18 @@ public class AuthModule : ICarterModule
                 
                 return Results.Ok(response);
             }).RequireAuthorization();
+
+        app.MapGet("/users/exists/{id}",
+            async (string id, IRepository<User, string> userRepository, CancellationToken cancellationToken) =>
+            {
+                var user = await userRepository.GetByIdAsync(id, cancellationToken, readOnly: true);
+
+                var response = new
+                {
+                    DoesUserExist = user is not null
+                };
+
+                return Results.Ok(response);
+            });
     }
 }

@@ -1,25 +1,10 @@
-export interface AddCondominiumCommand {
-    name: string;
-    address: string;
-    imageFile: File;
-}
-
-export interface JoinCondominiumCommand{
-  userId: string;
-  condominiumCode: string;
-}
-
-export interface JoinCondominiumResponce{
-  userId: string;
-  CondominiumId: string;
-}
-export interface AddCondominiumResponse {
-  isSuccess: boolean;
-  data?: {
-    id: string;
-    name: string;
-    address: string;
-    imageUrl: string;
-  },
-  errors?: any[]
+export type Condominium = {
+  id: string;
+  name: string;
+  address: string;
+  imageUrl: string | null;
+  code: string;
+  token: string;
+  tokenExpirationDate: Date;
+  amountOfUsers: number;
 }

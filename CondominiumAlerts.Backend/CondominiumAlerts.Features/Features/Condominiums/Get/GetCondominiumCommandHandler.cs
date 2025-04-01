@@ -1,0 +1,65 @@
+﻿using CondominiumAlerts.CrossCutting.CQRS.Interfaces.Handlers;
+using CondominiumAlerts.Domain.Aggregates.Entities;
+using CondominiumAlerts.Domain.Repositories;
+using FluentValidation;
+using LightResults;
+using Microsoft.Extensions.Logging;
+using CondominiumEntity = CondominiumAlerts.Domain.Aggregates.Entities.Condominium;
+
+namespace CondominiumAlerts.Features.Features.Condominiums.Get
+{
+    public class GetCondominiumCommandHandler : ICommandHandler<GetCondominiumCommand, Result<GetCondominiumResponse>>
+    {
+        private readonly IRepository<CondominiumEntity, Guid> _condominiumRepository;
+        private readonly IRepository<CondominiumUser, Guid> _condominiumUserRepository;
+        private readonly IValidator<GetCondominiumCommand> _validator;
+        private readonly ILogger<GetCondominiumCommand> _logger;
+
+        public GetCondominiumCommandHandler( 
+            IRepository<CondominiumEntity, Guid> condominiumRepository,
+            IValidator<GetCondominiumCommand> validator,
+            ILogger<GetCondominiumCommand> logger,
+            IRepository<CondominiumUser, Guid> condominiumUserRepository)
+        {
+            _condominiumRepository = condominiumRepository;
+            _validator = validator;
+            _logger = logger;
+            _condominiumUserRepository = condominiumUserRepository;
+        }
+
+        public async Task<Result<GetCondominiumResponse>> Handle(GetCondominiumCommand request, CancellationToken cancellationToken)
+        {
+         FluentValidation.Results.ValidationResult validResult = _validator.Validate(request);   
+            if(!validResult.IsValid)
+            {
+                IEnumerable<string> erros = validResult.Errors.Select(e => e.ErrorMessage);
+                _logger.LogWarning("validation failed: \n {errors}", String.Join("\n ", erros));
+                return Result.Fail<GetCondominiumResponse>(String.Join(", ", erros)); 
+            }
+
+            CondominiumEntity condominium = 
+                await _condominiumRepository.GetByIdAsync(Guid.Parse(request.CondominiumId), cancellationToken);
+
+            if (condominium == null) {
+                _logger.LogWarning("No condominium with the id {request.CondominiumId} was found", request.CondominiumId);
+                return Result.Fail<GetCondominiumResponse>("No condominium was found");
+            }
+            
+            var usersJoinedToCondominium = 
+                await _condominiumUserRepository.GetAsync(
+                    cancellationToken: cancellationToken,
+                    filter: cu => cu.CondominiumId == Guid.Parse(request.CondominiumId)
+                );
+
+            return Result< GetCondominiumResponse >.Ok(new(
+                condominium.Id,
+                condominium.Name,
+                condominium.Address, 
+                condominium.ImageUrl,
+                condominium.InviteCode, 
+                condominium.LinkToken,
+                condominium.TokenExpirationDate,
+                usersJoinedToCondominium.Count));
+        }
+    }
+}

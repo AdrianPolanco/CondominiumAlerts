@@ -1,0 +1,38 @@
+<div class="flex items-center py-1 px-3 bg-gray-50 dark:bg-gray-700">
+  <p-fileupload
+    mode="basic"
+    class="hidden"
+    id="image-uploader"
+    accept="image/*"
+    maxFileSize="1000000"
+  />
+
+  <button
+    type="button"
+    (click)="uploadImage()"
+    class="inline-flex justify-center p-2 text-gray-500 rounded-lg cursor-pointer hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-600"
+  >
+    <i class="fas fa-image"></i>
+  </button>
+  <!-- <button
+    type="button"
+    class="p-2 text-gray-500 rounded-lg cursor-pointer hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-600"
+  >
+    <i class="fa-solid fa-face-smile"></i>
+  </button> -->
+  <textarea
+    id="chat"
+    rows="1"
+    [formControl]="messageControl"
+    (keyup.enter)="sendMessage()"
+    class="scroll-invisible block mx-4 p-2.5 w-full text-sm max-h-[4rem] h-full overflow-y-auto text-gray-900 bg-white rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+    placeholder="Tu mensaje..."
+  ></textarea>
+  <button
+    type="submit"
+    class="inline-flex justify-center p-2 text-primary rounded-full cursor-pointer hover:bg-blue-100 dark:text-blue-500 dark:hover:bg-gray-600"
+    (click)="sendMessage()"
+  >
+    <i class="fa-solid fa-paper-plane"></i>
+  </button>
+</div>

@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 
 namespace CondominiumAlerts.Features.Features.Condominiums.Join
 {
-    public class JoinCondominiumCommandHandler : ICommandHandler<JoinCondominiumCommand, Result<JoinCondominiumResponce>>
+    public class JoinCondominiumCommandHandler : ICommandHandler<JoinCondominiumCommand, Result<JoinCondominiumResponse>>
     {
         private readonly IRepository<Domain.Aggregates.Entities.Condominium, Guid> _condominiumRepository;
         private readonly IRepository<User, string> _userRepository;
@@ -31,7 +31,7 @@ namespace CondominiumAlerts.Features.Features.Condominiums.Join
             _logger = logger;
         }
 
-        public async Task<Result<JoinCondominiumResponce>> Handle(JoinCondominiumCommand request, CancellationToken cancellationToken)
+        public async Task<Result<JoinCondominiumResponse>> Handle(JoinCondominiumCommand request, CancellationToken cancellationToken)
         {
            FluentValidation.Results.ValidationResult validation = _validations.Validate(request);
 
@@ -39,7 +39,7 @@ namespace CondominiumAlerts.Features.Features.Condominiums.Join
             {
                 IEnumerable<string> errors = validation.Errors.Select(e => e.ErrorMessage);
                 _logger.LogWarning($"Validation failed {errors}");
-                return Result.Fail<JoinCondominiumResponce>(string.Join(", ", errors));
+                return Result.Fail<JoinCondominiumResponse>(string.Join(", ", errors));
             }
 
            Domain.Aggregates.Entities.Condominium condominiumTobeJoined = 
@@ -48,28 +48,28 @@ namespace CondominiumAlerts.Features.Features.Condominiums.Join
             if (condominiumTobeJoined == null)
             {
                 _logger.LogWarning($"The Code {request.CondominiumCode} dosent belong to any condominium");
-                return Result.Fail<JoinCondominiumResponce>($"The Code {request.CondominiumCode} dosent belong to any condominium");
+                return Result.Fail<JoinCondominiumResponse>($"The Code {request.CondominiumCode} dosent belong to any condominium");
             }
 
-            if (await _userRepository.AnyAsync((u => u.Id == request.UserId), default))
+            if (!await _userRepository.AnyAsync((u => u.Id == request.UserId), default))
             {
                 _logger.LogWarning($"The user with supposed Id {request.UserId} couldn't be founded");
-                return Result.Fail<JoinCondominiumResponce>($"The user couldn't be founded");
+                return Result.Fail<JoinCondominiumResponse>($"The user couldn't be founded");
             }
 
-            if (await _condominiumUserRepository.AnyAsync(cu => cu.UserId == request.UserId && cu.CondominiumId == condominiumTobeJoined.Id, default))
+            if (await _condominiumUserRepository.AnyAsync(cu => cu.UserId == request.UserId && cu.CondominiumId == condominiumTobeJoined.Id, cancellationToken))
             {
                 _logger.LogWarning($"The user is already part of the condominium {condominiumTobeJoined?.Name }");
-                return Result.Fail<JoinCondominiumResponce>($"The user is already part of the condominium {condominiumTobeJoined?.Name}");
+                return Result.Fail<JoinCondominiumResponse>($"The user is already part of the condominium {condominiumTobeJoined?.Name}");
             }
 
             await _condominiumUserRepository.CreateAsync(new()
             {
                 CondominiumId = condominiumTobeJoined.Id,
                 UserId = request.UserId,
-            });
+            }, cancellationToken);
 
-            return Result.Ok<JoinCondominiumResponce>(new(request.UserId, condominiumTobeJoined.Id));
+            return Result.Ok<JoinCondominiumResponse>(new(request.UserId, condominiumTobeJoined.Id));
 
         }
     }

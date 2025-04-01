@@ -12,7 +12,7 @@ import { Toolbar } from 'primeng/toolbar';
 import { RouterLink } from '@angular/router';
 import { Divider } from 'primeng/divider';
 import { NgOptimizedImage } from '@angular/common';
-import { UserService } from '../../../services/user.service';
+import { AuthenticationService } from '../../../services/authentication.service';
 import { MessageService } from 'primeng/api';
 import { FirebaseError } from 'firebase/app';
 
@@ -36,7 +36,7 @@ export class SingInComponent {
   constructor(
     private authService: AuthService,
     private router: Router,
-    private userService: UserService,
+    private authenticationService: AuthenticationService,
     private messageService: MessageService
   ) {}
 
@@ -77,7 +77,7 @@ export class SingInComponent {
       );
       if (result.user) {
         //Link de la pagina principal de la app
-        this.router.navigateByUrl('/condominium/main-page');
+        this.router.navigateByUrl('/condominiums');
         return;
       }
       this.presentToast('Error al iniciar sesión. Intente nuevamente.');
@@ -92,10 +92,10 @@ export class SingInComponent {
 
   async loginWithGoogle() {
     try {
-      const user = await this.userService.loginWithGoogle();
+      const user = await this.authenticationService.signUpWithGoogle();
       console.log('Usuario logueado:', user);
       if (user) {
-        this.router.navigateByUrl('/condominium/main-page');
+        this.router.navigateByUrl('/condominiums');
         return;
       }
 

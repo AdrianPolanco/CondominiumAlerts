@@ -5,16 +5,16 @@ import { SharedFormField } from '../../../../shared/components/form/shared-form-
 import { FormGroup, Validators } from '@angular/forms';
 import { SharedForm } from '../../../../shared/components/form/shared-form.interface';
 import { CondominiumService } from '../../services/condominium.service';
-import { AddCondominiumCommand } from '../../models/condominium.model';
+import { AddCondominiumCommand } from "../../models/addCondominium.command";
 import { Router } from '@angular/router';
-import { Feedback } from '../../../../shared/components/form/feedback.interface';
 import {ButtonDirective} from 'primeng/button';
+import { ChatsDrawerComponent } from "../../../../shared/components/chats-drawer/chats-drawer.component";
 
 @Component({
     selector: 'app-condominium-page',
     templateUrl: './condominium-page.component.html',
     styleUrls: ['./condominium-page.component.css'],
-  imports: [FormComponent, ButtonDirective]
+  imports: [FormComponent, ButtonDirective, ChatsDrawerComponent]
 })
 export class CondominiumPageComponent {
 
@@ -74,7 +74,7 @@ export class CondominiumPageComponent {
         this.formGroup.set(form);
     }
     goToMainPage(){
-      this.router.navigate(["condominium/main-page"])
+      this.router.navigate(["condominiums"])
     }
 
     onSubmit(value: AddCondominiumCommand) {

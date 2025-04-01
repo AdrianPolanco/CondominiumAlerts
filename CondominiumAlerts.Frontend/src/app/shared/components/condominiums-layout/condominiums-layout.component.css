@@ -1,0 +1,25 @@
+/* Estilos personalizados */
+.bg-gray-900 {
+  background-color: #1a1a1a;
+}
+
+.bg-gray-800 {
+  background-color: #2d2d2d;
+}
+
+.text-red-500 {
+  color: #ef4444;
+}
+
+.hover\:bg-red-600:hover {
+  background-color: #dc2626;
+}
+
+.hover\:text-red-600:hover {
+  color: #dc2626;
+}
+
+.container-height {
+  height: calc(100vh - 81px);
+  max-height: calc(100vh - 81px);
+}

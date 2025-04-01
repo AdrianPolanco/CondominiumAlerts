@@ -13,6 +13,8 @@ public class ApplicationDbContext : DbContext
     public DbSet<Notification> Notifications { get; set; }
     public DbSet<User> Users { get; set; }
     public DbSet<Summary> Summaries { get; set; }
+    public DbSet<CondominiumUser> CondominiumUsers { get; set; }
+    
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> dbContextOptions) : base(dbContextOptions)
     {
         

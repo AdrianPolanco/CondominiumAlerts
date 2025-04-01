@@ -157,7 +157,13 @@ public static class DependencyInjection
         app.UseAuthentication();
         app.UseAuthorization();
         app.MapGroup("/api").MapCarter();
-        app.UseCors("AllowSpecificOrigin");
+        app.UseCors(options =>
+        {
+            options.WithOrigins("http://localhost:4200") // Permite solicitudes desde este origen
+                .AllowAnyMethod()                    // Permite cualquier método HTTP
+                .AllowAnyHeader()                    // Permite cualquier cabecera
+                .AllowCredentials();                 // Permite credenciales
+        });
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
         {

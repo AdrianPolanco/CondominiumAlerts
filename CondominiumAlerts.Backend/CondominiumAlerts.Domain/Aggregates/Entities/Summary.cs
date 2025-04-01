@@ -1,6 +1,8 @@
-﻿namespace CondominiumAlerts.Domain.Aggregates.Entities;
+﻿using CondominiumAlerts.Domain.Aggregates.Interfaces;
 
-public class Summary
+namespace CondominiumAlerts.Domain.Aggregates.Entities;
+
+public class Summary : IBaseEntity<Guid>
 {
     public Guid Id { get; set; }
     public string Content { get; set; }
