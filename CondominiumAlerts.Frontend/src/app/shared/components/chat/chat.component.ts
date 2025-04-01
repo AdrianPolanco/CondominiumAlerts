@@ -97,16 +97,6 @@ export class ChatComponent implements OnInit, OnDestroy {
     await this.chatSignalRService.start();
     this.subcrisbeToHubSubject();
 
-    this.chatSignalRService.onHubConnected
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (value) => {
-          const options = this.options();
-          if (!value || !options?.condominium?.id) return;
-          this.chatSignalRService.joinToGroup(options.condominium.id);
-        },
-      });
-
     this.authenticationService.userData$
       .pipe(takeUntil(this.destroy$))
       .subscribe((userData) => {
@@ -117,21 +107,21 @@ export class ChatComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe((options) => {
         // Actualizar la opción de chat actual
+        if (options?.condominium?.id) {
+          this.chatSignalRService.leftToGroup(options.condominium.id);
+        }
         this.options.set(options);
+        this.joinToGroup();
 
         // Reaccionar a nuevas opciones de chat
         if (options && options.type === 'condominium' && options.condominium) {
-          console.log('COND FROM SUBSCRIPTION', options.condominium.id);
-
           // Cargar mensajes
           this.chatService
             .getMessagesByCondominium(options.condominium.id)
             .pipe(takeUntil(this.destroy$))
             .subscribe((response) => {
-              console.log('MESSAGES RECOVERED: ', response);
               this.messages.set(response.data);
               this.lastMessage.set(response.data[response.data.length - 1]);
-              console.log('LAST MESSAGE', this.lastMessage());
             });
 
           // Cargar el estado del resumen y el resultado al inicializar
@@ -192,12 +182,30 @@ export class ChatComponent implements OnInit, OnDestroy {
       });
   }
 
+  private joinToGroup() {
+    const options = this.options();
+    if (this.chatSignalRService.isHubConnected && options?.condominium) {
+      this.chatSignalRService.joinToGroup(options.condominium.id);
+    }
+
+    this.chatSignalRService.onHubConnected
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (value) => {
+          if (!value || !options?.condominium?.id) return;
+          this.chatSignalRService.joinToGroup(options.condominium.id);
+        },
+      });
+  }
+
   private subcrisbeToHubSubject() {
-    this.chatSignalRService.onNewMessage.subscribe({
-      next: (value) => {
-        this.messages.update((c) => [...c, value]);
-      },
-    });
+    this.chatSignalRService.onNewMessage
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (value) => {
+          this.messages.update((c) => [...c, value]);
+        },
+      });
   }
   // Nuevo método para cargar el estado del resumen
   private loadSummaryState() {
@@ -210,7 +218,6 @@ export class ChatComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (summary) => {
-          console.log('LOADED SUMMARY', summary);
           if (summary.data?.content) {
             console.log('SUMMARY DATA', summary.data);
             this.summaryResult.set(summary.data);

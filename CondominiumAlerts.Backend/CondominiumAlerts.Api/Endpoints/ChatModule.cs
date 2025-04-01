@@ -1,5 +1,5 @@
 ﻿using Carter;
-using CondominiumAlerts.Infrastructure.Services.Chat;
+using CondominiumAlerts.Api.Hubs;
 
 namespace CondominiumAlerts.Api.Endpoints
 {
