@@ -20,20 +20,20 @@ export class priorityLevelService {
   constructor(private httpClient: HttpClient) { 
   }
 
-  getPriorityLevels(request: getPriorityLevelsQuery) : Observable<GetPriorityLevelResponce>{
+  getPriorityLevels(request: getPriorityLevelsQuery) : Observable<{ isSuccess: boolean,data:GetPriorityLevelResponce}>{
     
-    return this.httpClient.get<GetPriorityLevelResponce>('/api/priorityLevels', {params: 
+    return this.httpClient.get<{ isSuccess: boolean,data:GetPriorityLevelResponce}>('/api/priorityLevels', {params: 
       {condominiumId: request.condominiumId, pageNumber:  request.pageNumber, pageSize: request.pageSize}})
   }
 
-  getPriorityLevelById(request: getByIdPriorityLevelQuery): Observable<getByIdPriorityLevelResponse>{
-    return this.httpClient.get<getByIdPriorityLevelResponse>('/api/priorityLevels/id', {
+  getPriorityLevelById(request: getByIdPriorityLevelQuery): Observable<{ isSuccess: boolean,data:getByIdPriorityLevelResponse}>{
+    return this.httpClient.get<{ isSuccess: boolean,data:getByIdPriorityLevelResponse}>('/api/priorityLevels/id', {
       params:{id: request.id,condominiumId: request.condominiumId }
     })
   }
 
   postPriorityLevel(request: addPriorityLevelCommand): Observable<addPriorityLevelResponse>{
-
+console.log(request)
     return this.httpClient.post<addPriorityLevelResponse>('/api/priorityLevels/add', request)
   }
 
@@ -42,6 +42,6 @@ export class priorityLevelService {
   }
 
   deletePriorityLevel(request: deletePriorityLevelCommand ) : Observable<deletePriorityLevelResponse>{
-    return this.httpClient.delete<deletePriorityLevelResponse>('/api/priorityLevels/delete', { params:{id: request.id,condominiumId: request.condominiumId }})
+    return this.httpClient.delete<deletePriorityLevelResponse>('/api/priorityLevels/delete', { body:{id: request.id,condominiumId: request.condominiumId }})
   }
 }

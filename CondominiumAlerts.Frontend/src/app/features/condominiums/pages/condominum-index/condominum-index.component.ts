@@ -9,7 +9,7 @@ import { GetCondominiumResponse } from "../../models/getCondominium.response";
 import { CondominiumsLayoutComponent } from '../../../../shared/components/condominiums-layout/condominiums-layout.component';
 import { ChatsDrawerComponent } from "../../../../shared/components/chats-drawer/chats-drawer.component";
 import { BackArrowComponent } from "../../../../shared/components/back-arrow/back-arrow.component";
-
+import { Button } from 'primeng/button';
 @Component({
   selector: 'app-condominium-index',
   imports: [
@@ -17,7 +17,8 @@ import { BackArrowComponent } from "../../../../shared/components/back-arrow/bac
     CommonModule,
     CondominiumsLayoutComponent,
     ChatsDrawerComponent,
-    BackArrowComponent
+    BackArrowComponent,
+    Button
 ],
   templateUrl: './condominum-index.component.html',
   styleUrls: ['./condominum-index.component.css'],
@@ -109,7 +110,9 @@ export class CondominumIndexComponent implements OnInit {
   goHome(): void {
     this.router.navigate(['']);
   }
-
+  goToLevels(): void {
+    this.router.navigate(['/priority-levels/index',  this.condominiumId ?? '' ]);
+  }
   openCreatePostModal(): void {
     console.log('Abrir modal de creación de publicaciones');
   }

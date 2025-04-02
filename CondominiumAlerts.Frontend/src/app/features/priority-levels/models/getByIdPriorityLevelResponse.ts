@@ -1,7 +1,7 @@
 export interface getByIdPriorityLevelResponse{
-     Id: string;
-     Title: string;
-     Priority: number;
+     id: string;
+     title: string;
+     priority: number;
      description: string;
      condominiumId: string;
      createdAt: Date;

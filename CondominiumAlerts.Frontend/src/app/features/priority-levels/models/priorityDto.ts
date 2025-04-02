@@ -1,6 +1,6 @@
 export interface priorityDto  {
      id: string;
      title: string;
-     priority: Number;
+     priority: number;
      condominiumId: string | null;
 }

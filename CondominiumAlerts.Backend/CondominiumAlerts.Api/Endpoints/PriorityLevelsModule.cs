@@ -16,7 +16,7 @@ namespace CondominiumAlerts.Api.Endpoints
         private const string mainPath = "/priorityLevels";
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            app.MapGet(GetEndpointPattern(""), async (ISender sender, [AsParameters] GetPriorityLevelsQuery request, CancellationToken cancellationToken) =>
+            app.MapGet("/priorityLevels", async (ISender sender, [AsParameters] GetPriorityLevelsQuery request, CancellationToken cancellationToken) =>
             {
                 Result<GetPriorityLevelResponce> result = await sender.Send(request, cancellationToken);
 
@@ -31,7 +31,7 @@ namespace CondominiumAlerts.Api.Endpoints
                     Data = result.Value,
                 };
 
-                return Results.NotFound(responce);
+                return Results.Ok(responce);
 
             });
 

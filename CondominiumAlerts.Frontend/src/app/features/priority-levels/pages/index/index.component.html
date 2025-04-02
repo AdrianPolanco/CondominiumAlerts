@@ -8,7 +8,7 @@
   <div class="p-6 flex-grow">
     <button
       (click)="openModal()"
-      class="mb-4 flex items-center gap-2 bg-blue-500 text-white px-4 py-2 rounded"
+      class="mb-4 flex items-center gap-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
     >
       <span class="material-icons">add</span> Add Priority
     </button>
@@ -25,19 +25,19 @@
         <tbody>
           <tr
             *ngFor="let priority of priorities"
-            class="border border-gray-300"
+            class="border border-gray-300 hover:bg-gray-100 transition"
           >
             <td class="border border-gray-300 p-2">{{ priority.title }}</td>
             <td class="border border-gray-300 p-2 flex gap-2">
               <button
                 (click)="openModal(priority)"
-                class="px-3 py-1 border rounded flex items-center gap-1"
+                class="px-3 py-1 border rounded flex items-center gap-1 hover:bg-gray-200 transition"
               >
                 <span class="material-icons">edit</span> Update
               </button>
               <button
                 (click)="deletePriority(priority.id)"
-                class="px-3 py-1 bg-red-500 text-white rounded flex items-center gap-1"
+                class="px-3 py-1 bg-red-500 text-white rounded flex items-center gap-1 hover:bg-red-700 transition"
               >
                 <span class="material-icons">delete</span> Delete
               </button>
@@ -52,8 +52,12 @@
   <div
     *ngIf="showModal"
     class="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center"
+    (click)="closeModal()"
   >
-    <div class="bg-white p-6 rounded shadow-lg w-96">
+    <div
+      class="bg-white p-6 rounded shadow-lg w-96"
+      (click)="$event.stopPropagation()"
+    >
       <h2 class="text-lg font-bold mb-4">
         {{ editingPriority ? "Update" : "Add" }} Priority
       </h2>
@@ -63,18 +67,28 @@
         class="w-full p-2 border rounded mb-2"
       />
       <input
+        [(ngModel)]="modalData.description"
+        placeholder="Description"
+        class="w-full p-2 border rounded mb-2"
+      />
+      <input
         [(ngModel)]="modalData.priority"
         type="number"
         placeholder="Priority"
+        min="0"
+        max="10"
         class="w-full p-2 border rounded mb-2"
       />
       <div class="flex justify-end gap-2 mt-4">
-        <button (click)="closeModal()" class="px-3 py-1 border rounded">
+        <button
+          (click)="closeModal()"
+          class="px-3 py-1 border rounded hover:bg-gray-200 transition"
+        >
           Cancel
         </button>
         <button
           (click)="savePriority()"
-          class="px-3 py-1 bg-blue-500 text-white rounded"
+          class="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-700 transition"
         >
           Save
         </button>
