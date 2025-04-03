@@ -3,8 +3,8 @@ using MediatR;
 
 namespace CondominiumAlerts.Features.Features.Posts.Get
 {
-	public class GetPostsCommand : IRequest<Result<List<GetPostsResponse>>>
-	{
-		
-	}
+    public class GetPostsCommand : IRequest<Result<List<GetPostsResponse>>>
+    {
+        public Guid CondominiumId { get; set; } 
+    }
 }

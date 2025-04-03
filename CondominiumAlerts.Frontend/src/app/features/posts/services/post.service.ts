@@ -1,8 +1,15 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from '../../../../enviroments/environment';
+import {
+  CreatePostCommand,
+  CreatePostsResponse,
+  UpdatePostCommand,
+  UpdatePostResponse
+} from '../models/posts.model';
+import { AuthService } from '../../../core/auth/services/auth.service';
 
 @Injectable({
   providedIn: 'root',
@@ -10,14 +17,75 @@ import { environment } from '../../../../enviroments/environment';
 export class PostService {
   private apiUrl = `${environment.backBaseUrl}/posts`;
 
-  constructor(private http: HttpClient) { }
+  constructor(
+    private http: HttpClient,
+    private authService: AuthService
+  ) { }
 
-  getPosts(): Observable<any[]> {
-    return this.http.get<any>(this.apiUrl).pipe(
+  getPosts(condominiumId: string): Observable<any[]> {
+    const params = new HttpParams().set('condominiumId', condominiumId);
+
+    return this.http.get<any>(this.apiUrl, { params }).pipe(
       map(response => {
-        console.log('Respuesta completa del backend:', response); // Verifica la respuesta completa
-        return response.data; // Extrae el array de publicaciones
+        console.log('Respuesta completa del backend:', response);
+        return response.data;
       })
     );
+  }
+
+  getCurrentUserId(): string | null {
+    return this.authService.currentUser?.uid ?? null;
+  }
+
+  getPostById(postId: string): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/${postId}`).pipe(
+      map(response => response.data)
+    );
+  }
+
+  createPost(cmd: CreatePostCommand, condominiumId: string): Observable<CreatePostsResponse> {
+    const fb = new FormData();
+    const userId = this.authService.currentUser?.uid ?? '';
+
+    if (!userId) {
+      throw new Error('Usuario no autenticado.');
+    }
+
+    const fixedLevelOfPriorityId = 'fc279d15-da6d-4e8e-9407-74dc73b4a628';
+
+    fb.append('title', cmd.title);
+    fb.append('description', cmd.description);
+    fb.append('imageFile', cmd.imageFile);
+    fb.append('CondominiumId', condominiumId);
+    fb.append('userId', userId);
+    fb.append('levelOfPriorityId', fixedLevelOfPriorityId);
+
+    console.log('User ID:', userId);
+    console.log('LevelOfPriorityId:', fixedLevelOfPriorityId);
+
+    return this.http.post<CreatePostsResponse>(this.apiUrl, fb);
+  }
+
+  updatePost(postId: string, cmd: UpdatePostCommand): Observable<UpdatePostResponse> {
+    const fb = new FormData();
+
+    fb.append('title', cmd.title);
+    fb.append('description', cmd.description);
+    fb.append('levelOfPriorityId', cmd.levelOfPriorityId);
+
+    // Solo adjuntar la imagen si existe
+    if (cmd.imageFile) {
+      fb.append('imageFile', cmd.imageFile);
+    }
+
+    console.log('Actualizando post ID:', postId);
+    console.log('Datos enviados:', {
+      title: cmd.title,
+      description: cmd.description,
+      levelOfPriorityId: cmd.levelOfPriorityId,
+      hasImage: !!cmd.imageFile
+    });
+
+    return this.http.put<UpdatePostResponse>(`${this.apiUrl}/${postId}`, fb);
   }
 }

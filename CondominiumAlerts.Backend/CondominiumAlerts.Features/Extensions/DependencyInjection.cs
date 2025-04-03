@@ -6,7 +6,9 @@ using CondominiumAlerts.Features.Features.Condominiums.Get;
 using CondominiumAlerts.Features.Features.Condominiums.GetCondominiumsJoinedByUser;
 using CondominiumAlerts.Features.Features.Condominiums.Join;
 using CondominiumAlerts.Features.Features.Condominiums.Summaries;
+using CondominiumAlerts.Features.Features.Posts.Create;
 using CondominiumAlerts.Features.Features.Posts.Get;
+using CondominiumAlerts.Features.Features.Posts.Update;
 using CondominiumAlerts.Features.Features.Users.GetCondominiumsUsers;
 using CondominiumAlerts.Features.Features.PriorityLevels.Add;
 using CondominiumAlerts.Features.Features.PriorityLevels.Delete;
@@ -15,6 +17,7 @@ using CondominiumAlerts.Features.Features.PriorityLevels.GetById;
 using CondominiumAlerts.Features.Features.PriorityLevels.Update;
 using CondominiumAlerts.Features.Features.Users.Register;
 using CondominiumAlerts.Features.Features.Users.Update;
+using CondominiumAlerts.Features.Validators.Posts;
 using FluentValidation;
 using LightResults;
 using MediatR;
@@ -38,6 +41,7 @@ public static class DependencyInjection
         services.AddScoped<IValidator<JoinCondominiumCommand>, JoinCondominiumValidator>();
         services.AddScoped<IValidator<AddCondominiumCommand>, AddCondominiumValidator>();
         services.AddScoped<IValidator<GetCondominiumCommand>, GetCondominiumValidator>();
+        services.AddScoped<IValidator<UpdatePostsCommand>, UpdatePostsCommandValidator>();
         services.AddScoped<IValidator<GetCondominiumsJoinedByUserCommand>, GetCondominiumsJoinedByUserValidator>();
         services.AddScoped<IValidator<UpdateUserCommand>, UpdateUserValidator>();
         services.AddScoped<IValidator<GetPriorityLevelsQuery>, GetPriorityLevelValidator>();
@@ -50,6 +54,8 @@ public static class DependencyInjection
         services.AddScoped<IValidator<GetCondominiumsUsersCommand>, GetCondominiumsUsersValidator>();
 
         services.AddScoped<IRequestHandler<GetPostsCommand, Result<List<GetPostsResponse>>>, GetPostsHandler>();
+        services.AddScoped<IValidator<CreatePostCommand>, CreatePostValidator>();
+
 
 
         services.AddTransient<EmailConfirmationJob>();
