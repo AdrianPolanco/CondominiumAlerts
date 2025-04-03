@@ -1,20 +1,19 @@
 <shared-condominiums-layout>
-  <div class="flex-1 bg-primary-emphasis-alt p-5">
+  <div class="flex-1 bg-gray-900 p-5">
     <div class="flex justify-between mb-6">
       <shared-back-arrow url="/condominiums" />
-      <button
-        class="bg-primary-contrast text-primary-700 px-4 py-2 rounded-md flex items-center hover:bg-primary-emphasis-alt hover:text-primary-contrast"
-        (click)="openCreatePostModal()"
-      >
-        <i class="pi pi-plus mr-2"></i>
-        Nuevo post
-      </button>
 
-      <p-button
-        icon="pi pi-arrow-left"
-        styleClass="bg-primary-contrast text-primary"
-        (onClick)="goToLevels()"
-      />
+      <div class="flex space-x-2">
+        <button class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md flex items-center"
+                (click)="goToCreatePosts()">
+          <i class="pi pi-plus mr-2"></i>
+          Nuevo post
+        </button>
+
+        <p-button icon="pi pi-arrow-left"
+                  styleClass="bg-primary-contrast text-primary"
+                  (onClick)="goToLevels()" />
+      </div>
     </div>
 
     <h2 class="text-xl md:text-4xl font-semibold mb-4 text-white">
@@ -30,10 +29,12 @@
           <h3 class="text-xl font-bold text-primary-500">
             {{ publication.title }}
           </h3>
-          <div *ngIf="isCurrentUserPost(publication.userId)">
-            <button class="text-gray-300 hover:text-white ml-2"
+          <div class="flex items-center">
+            <span class="text-sm text-gray-400 mr-2">{{ publication.time }}</span>
+            <button *ngIf="isCurrentUserPost(publication.userId)"
+                    class="text-gray-300 hover:text-white ml-2"
                     (click)="editPost(publication.id)">
-              <i class="pi pi-pencil mr-1"></i> Edit
+              <i class="pi pi-pencil mr-1"></i> Editar
             </button>
           </div>
         </div>
@@ -43,7 +44,7 @@
           <img *ngIf="publication.imageUrl"
                [src]="publication.imageUrl"
                alt="Publicación"
-               class="w-full h-auto object-contain" />
+               class="w-full h-auto object-contain rounded-lg" />
         </div>
 
         <div class="mt-4 flex items-center space-x-4">
@@ -57,7 +58,5 @@
       </div>
     </div>
   </div>
-  <shared-chats-drawer
-    (onCondominiumSelected)="onCondominiumSelected()"
-  ></shared-chats-drawer>
+  <shared-chats-drawer (onCondominiumSelected)="onCondominiumSelected()"></shared-chats-drawer>
 </shared-condominiums-layout>

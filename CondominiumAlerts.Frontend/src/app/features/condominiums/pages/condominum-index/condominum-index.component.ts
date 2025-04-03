@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { NgFor, CommonModule, NgOptimizedImage } from '@angular/common';
+import { NgFor, CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PostService } from '../../../posts/services/post.service';
 import { GetCondominiumsUsersResponse } from '../../../users/models/user.model';
@@ -9,19 +9,20 @@ import { GetCondominiumResponse } from "../../models/getCondominium.response";
 import { CondominiumsLayoutComponent } from '../../../../shared/components/condominiums-layout/condominiums-layout.component';
 import { ChatsDrawerComponent } from "../../../../shared/components/chats-drawer/chats-drawer.component";
 import { BackArrowComponent } from "../../../../shared/components/back-arrow/back-arrow.component";
-import { Button } from 'primeng/button';
+import { ButtonModule } from 'primeng/button';
 import { AuthService } from '../../../../core/auth/services/auth.service';
 
 @Component({
   selector: 'app-condominium-index',
+  standalone: true,
   imports: [
     NgFor,
     CommonModule,
     CondominiumsLayoutComponent,
     ChatsDrawerComponent,
     BackArrowComponent,
-    Button
-],
+    ButtonModule
+  ],
   templateUrl: './condominum-index.component.html',
   styleUrls: ['./condominum-index.component.css'],
 })
@@ -70,11 +71,15 @@ export class CondominumIndexComponent implements OnInit {
     this.loadUsers();
   }
 
-  onCondominiumSelected(){
+  onCondominiumSelected(): void {
     this.router.navigate(['/condominium/chat']);
+  }
+
   goToCreatePosts(): void {
     console.log('Creating a new post');
-    this.router.navigate([`/posts/create/${this.condominiumId}`]);
+    if (this.condominiumId) {
+      this.router.navigate([`/posts/create/${this.condominiumId}`]);
+    }
   }
 
   isCurrentUserPost(userId: string): boolean {
@@ -126,11 +131,11 @@ export class CondominumIndexComponent implements OnInit {
   goHome(): void {
     this.router.navigate(['']);
   }
+
   goToLevels(): void {
-    this.router.navigate(['/priority-levels/index',  this.condominiumId ?? '' ]);
-  }
-  openCreatePostModal(): void {
-    console.log('Abrir modal de creación de publicaciones');
+    if (this.condominiumId) {
+      this.router.navigate(['/priority-levels/index', this.condominiumId]);
+    }
   }
 
   editPost(postId: string): void {
@@ -139,7 +144,6 @@ export class CondominumIndexComponent implements OnInit {
       return;
     }
 
-    // Navegar a la página de edición con ambos IDs
     this.router.navigate([`/posts/edit/${this.condominiumId}/${postId}`]);
   }
 }
