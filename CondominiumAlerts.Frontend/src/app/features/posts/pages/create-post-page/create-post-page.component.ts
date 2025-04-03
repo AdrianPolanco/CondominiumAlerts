@@ -1,12 +1,12 @@
 import { Component, OnInit, ViewChild, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormGroup, Validators } from '@angular/forms';
-import { PostService } from '../../posts/services/post.service';
-import { AuthService } from '../../../core/auth/services/auth.service';
-import { CreatePostCommand } from '../models/posts.model';
-import { FormComponent } from '../../../shared/components/form/form.component';
-import { SharedFormField } from '../../../shared/components/form/shared-form-field.interface';
-import { SharedForm } from '../../../shared/components/form/shared-form.interface';
+import { PostService } from '../../../posts/services/post.service';
+import { AuthService } from '../../../../core/auth/services/auth.service';
+import { CreatePostCommand } from '../../models/posts.model';
+import { FormComponent } from '../../../../shared/components/form/form.component';
+import { SharedFormField } from '../../../../shared/components/form/shared-form-field.interface';
+import { SharedForm } from '../../../../shared/components/form/shared-form.interface';
 import { ButtonDirective } from 'primeng/button';
 
 @Component({

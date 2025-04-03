@@ -24,3 +24,18 @@ export interface CreatePostsResponse {
   },
   errors?: any[]
 }
+export interface UpdatePostCommand {
+  title: string;
+  description: string;
+  imageFile?: File;
+  levelOfPriorityId: string;
+}
+
+export interface UpdatePostResponse {
+  id: string;
+  title: string;
+  description: string;
+  imageUrl: string;
+  levelOfPriorityId: string;
+  updatedAt: string;
+}

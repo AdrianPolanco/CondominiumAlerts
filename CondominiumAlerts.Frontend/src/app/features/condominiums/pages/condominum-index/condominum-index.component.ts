@@ -7,6 +7,7 @@ import { UserService } from '../../../users/services/user.service';
 import { CondominiumService } from '../../services/condominium.service';
 import { GetCondominiumResponse } from "../../models/getCondominium.response";
 import { CondominiumsLayoutComponent } from '../../../../shared/components/condominiums-layout/condominiums-layout.component';
+import { AuthService } from '../../../../core/auth/services/auth.service';
 
 @Component({
   selector: 'app-condominum-index',
@@ -40,7 +41,8 @@ export class CondominumIndexComponent implements OnInit {
     private route: ActivatedRoute,
     private postService: PostService,
     private userService: UserService,
-    private condominiumService: CondominiumService
+    private condominiumService: CondominiumService,
+    private authService: AuthService
   ) { }
 
   ngOnInit(): void {
@@ -61,6 +63,11 @@ export class CondominumIndexComponent implements OnInit {
   goToCreatePosts(): void {
     console.log('Creating a new post');
     this.router.navigate([`/posts/create/${this.condominiumId}`]);
+  }
+
+  isCurrentUserPost(userId: string): boolean {
+    const currentUserId = this.authService.currentUser?.uid;
+    return currentUserId === userId;
   }
 
   loadPosts(): void {
@@ -110,5 +117,15 @@ export class CondominumIndexComponent implements OnInit {
 
   openCreatePostModal(): void {
     console.log('Abrir modal de creación de publicaciones');
+  }
+
+  editPost(postId: string): void {
+    if (!this.condominiumId) {
+      console.error('No hay condominiumId disponible');
+      return;
+    }
+
+    // Navegar a la página de edición con ambos IDs
+    this.router.navigate([`/posts/edit/${this.condominiumId}/${postId}`]);
   }
 }
