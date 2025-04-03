@@ -41,7 +41,7 @@ export class EditPostPageComponent implements OnInit {
     },
     {
       name: 'imageFile',
-      label: 'Cambiar imagen (opcional)',
+      label: 'Cambiar imagen',
       type: 'file',
       filetype: 'image/*',
       onFileSelect: (event: any) => {
