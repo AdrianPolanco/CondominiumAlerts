@@ -5,7 +5,6 @@ import {
   inject,
   input,
 } from '@angular/core';
-import { Message } from '../../../core/models/message.models';
 import { AuthService } from '../../../core/auth/services/auth.service';
 import { NgClass } from '@angular/common';
 import { ChatMessageDto } from '../../../core/models/chatMessage.dto';

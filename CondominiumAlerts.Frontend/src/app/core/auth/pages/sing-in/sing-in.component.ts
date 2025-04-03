@@ -77,7 +77,7 @@ export class SingInComponent {
       );
       if (result.user) {
         //Link de la pagina principal de la app
-        this.router.navigateByUrl('/condominium/main-page');
+        this.router.navigateByUrl('/condominiums');
         return;
       }
       this.presentToast('Error al iniciar sesión. Intente nuevamente.');
@@ -95,7 +95,7 @@ export class SingInComponent {
       const user = await this.authenticationService.signUpWithGoogle();
       console.log('Usuario logueado:', user);
       if (user) {
-        this.router.navigateByUrl('/condominium/main-page');
+        this.router.navigateByUrl('/condominiums');
         return;
       }
 

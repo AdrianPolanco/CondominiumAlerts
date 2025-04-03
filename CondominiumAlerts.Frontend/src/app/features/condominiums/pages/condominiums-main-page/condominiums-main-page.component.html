@@ -1,4 +1,4 @@
-<div class="w-[70%] mx-auto p-5 space-y-6">
+<section class="w-[100%] mx-auto p-5 space-y-6 bg-primary-50">
   <div class="flex justify-center m-10">
     <h1
       class="mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl dark:text-white"
@@ -9,9 +9,10 @@
   <div class="flex justify-center">
     <button
       (click)="changeModalState()"
-      class="w-full h-20 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition"
+      class="w-full h-20 px-4 py-2 flex gap-3 justify-center items-center bg-primary-500 text-pretty text-white rounded-md hover:bg-primary-600 transition"
     >
-      Unéte a un condominio
+      <i class="pi pi-user-plus ml-2 text-xl"></i>
+      <span class="text-xl">Unéte a un condominio</span>
     </button>
   </div>
 
@@ -19,60 +20,78 @@
     class="grid place-items-center grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8"
   >
     <div
-      class="w-full max-w-[17rem] min-w-[10rem] aspect-square flex flex-col justify-center items-center bg-blue-200 rounded-lg p-4 cursor-pointer hover:bg-blue-300 transition"
+      class="w-full max-w-[17rem] min-w-[10rem] aspect-square flex flex-col justify-center items-center bg-primary-200 rounded-lg p-4 cursor-pointer hover:bg-primary-300 transition"
       (click)="goToCreateCondominium()"
     >
       <h3 class="text-lg font-semibold text-center">Crea un condominio</h3>
+      <i class="pi pi-plus-circle text-xl mt-4"></i>
     </div>
 
     <div
-      *ngFor="let condo of condominiums"
-      class="w-full max-w-[17rem] min-w-[10rem] aspect-square flex flex-col justify-center items-center bg-green-500 text-white rounded-lg p-4 cursor-pointer hover:bg-green-600 transition"
-      (click)="viewCondominium(condo.id)"
-    >
-      <h3 class="text-xl font-semibold text-center">{{ condo.name }}</h3>
-      <p class="text-center text-sm mt-2">Dirreccion: {{ condo.address }}</p>
+    *ngFor="let condominium of condominiums"
+    class="relative w-full max-w-[17rem] min-w-[10rem] aspect-square flex flex-col justify-center items-center text-white rounded-lg p-4 cursor-pointer transition group"
+    (click)="viewCondominium(condominium)"
+  >
+    <!-- Imagen de fondo -->
+    <div
+      class="absolute inset-0 bg-cover bg-center rounded-lg"
+      [ngStyle]="{'background-image': getBackgroundImage(condominium.imageUrl)}"
+    ></div>
+  
+    <!-- Capa oscura -->
+    <div
+      class="absolute inset-0 bg-black/50 rounded-lg backdrop-blur-sm transition-all duration-300 group-hover:bg-black/20 group-hover:backdrop-blur-none"
+    ></div>
+  
+    <!-- Contenido -->
+    <div class="relative text-center">
+      <h3 class="text-xl font-semibold">{{ condominium.name }}</h3>
+      <p class="text-sm mt-2 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+        {{ condominium.address }}
+      </p>
     </div>
   </div>
-</div>
+  
+  </div>
+</section>
 
 <div
   *ngIf="isModalOpen"
   class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
 >
-  <div class="bg-white p-6 rounded-lg shadow-lg w-96">
-    <h2 class="text-xl font-semibold">Introduce un código de condominio</h2>
-    <p class="text-gray-600 mt-2">Por favor, introduce un código de condominio aquí abajo.</p>
+  <div class="bg-white p-1 rounded-lg shadow-lg w-96">
+    <div class="flex justify-end">
+      <p-button icon="pi pi-times" (onClick)="changeModalState()" [rounded]="true" [text]="true" severity="danger" styleClass="self-end"/>
+    </div>
+    <div class="p-6">
+      <h2 class="text-xl font-semibold">Introduce un código de condominio</h2>
+      <p class="text-gray-600 mt-2">Por favor, introduce un código de condominio aquí abajo.</p>
 
-    <form [formGroup]="form" (ngSubmit)="joinCondominium()">
-      <div class="mt-4">
-        <input
-          type="text"
-          formControlName="condominiumCode"
-          max="11"
-          name="condominiumCode"
-          class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          placeholder="Enter code"
-          required
-        />
-      </div>
+      <form [formGroup]="form" (ngSubmit)="joinCondominium()">
+        <div class="mt-4">
+          <input
+            type="text"
+            formControlName="condominiumCode"
+            max="11"
+            name="condominiumCode"
+            class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+            placeholder="Introduce el código de condominio"
+            required
+          />
+        </div>
 
-      <div class="mt-4 flex justify-between">
-        <button
-          type="button"
-          (click)="changeModalState()"
-          class="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition"
-        >
-          Cerrar
-        </button>
-        <button
-          type="submit"
-          [disabled]="form.invalid"
-          class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition"
-        >
-          Unirse
-        </button>
-      </div>
-    </form>
+        <div class="mt-4 flex justify-end">
+          <button
+            type="submit"
+            [disabled]="form.invalid"
+            class="px-4 py-2 bg-primary-500 text-white rounded-md hover:bg-primary-600 transition"
+          >
+            Unirse
+          </button>
+        </div>
+      </form>
+    </div>
   </div>
 </div>
+
+<shared-chats-drawer (onCondominiumSelected)="onCondominiumSelected()"></shared-chats-drawer>

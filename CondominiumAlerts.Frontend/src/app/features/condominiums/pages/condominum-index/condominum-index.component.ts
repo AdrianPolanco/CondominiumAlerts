@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { NgFor, CommonModule } from '@angular/common';
-import { Router, ActivatedRoute } from '@angular/router';
+import { NgFor, CommonModule, NgOptimizedImage } from '@angular/common';
+import { ActivatedRoute, Router } from '@angular/router';
 import { PostService } from '../../../posts/services/post.service';
 import { GetCondominiumsUsersResponse } from '../../../users/models/user.model';
 import { UserService } from '../../../users/services/user.service';
@@ -8,10 +8,18 @@ import { CondominiumService } from '../../services/condominium.service';
 import { GetCondominiumResponse } from "../../models/getCondominium.response";
 import { CondominiumsLayoutComponent } from '../../../../shared/components/condominiums-layout/condominiums-layout.component';
 import { AuthService } from '../../../../core/auth/services/auth.service';
+import { ChatsDrawerComponent } from "../../../../shared/components/chats-drawer/chats-drawer.component";
+import { BackArrowComponent } from "../../../../shared/components/back-arrow/back-arrow.component";
 
 @Component({
-  selector: 'app-condominum-index',
-  imports: [NgFor, CommonModule, CondominiumsLayoutComponent],
+  selector: 'app-condominium-index',
+  imports: [
+    NgFor,
+    CommonModule,
+    CondominiumsLayoutComponent,
+    ChatsDrawerComponent,
+    BackArrowComponent
+],
   templateUrl: './condominum-index.component.html',
   styleUrls: ['./condominum-index.component.css'],
 })
@@ -60,6 +68,8 @@ export class CondominumIndexComponent implements OnInit {
     this.loadUsers();
   }
 
+  onCondominiumSelected(){
+    this.router.navigate(['/condominium/chat']);
   goToCreatePosts(): void {
     console.log('Creating a new post');
     this.router.navigate([`/posts/create/${this.condominiumId}`]);

@@ -1,40 +1,5 @@
-<header class="card">
-  <p-toolbar styleClass="rounded-none">
-    <ng-template #start>
-      <img ngSrc="images/condominiumAlertsLogo-removebg.png" alt="Condominium Alerts" height="40" width="40"/>
-    </ng-template>
-    <ng-template #center>
-      <p-iconfield iconPosition="left">
-        <p-inputicon styleClass="pi pi-search" />
-        <input type="text" pInputText placeholder="Buscar" />
-      </p-iconfield>
-    </ng-template>
-    <ng-template #end>
-      <button (click)="showForm()" class="flex justify-center items-center">
-        @if(userData?.profilePictureUrl){
-          <p-avatar [image]="userData?.profilePictureUrl" class="mr-2" size="large" shape="circle" />
-        }@else{
-          <p-avatar icon="pi pi-user" class="mr-2" size="large" shape="circle" />
-        }
-      </button>
-    </ng-template>
-  </p-toolbar>
-</header>
-<p-dialog [(visible)]="visible" [modal]="true" [style]="{ width: '25rem' }">
-  <h1 class="text-center text-3xl mb-5">Mi perfil</h1>
-  <div class="flex justify-center items-center w-full rounded-full">
-    @if(imageUrl()){
-      <p-image styleClass="rounded-full" src="{{imageUrl()}}" alt="Image" width="200" [preview]="true" />
-    }@else{
-      <p-image styleClass="rounded-full" src="images/default-profile-pic.png" alt="Image" width="200" [preview]="true" />
-    }
-  </div>
-  <shared-form
-    [formSettingsInput]="profileFormSettings()"
-    (onFormCreated)="onFormCreated($event)"
-    (onFormSubmitted)="onSubmit($event)">
-  </shared-form>
-</p-dialog>
+<core-user-options></core-user-options>
 <main>
+  <shared-chats-drawer (onCondominiumSelected)="onCondominiumSelected()"/>
   <router-outlet></router-outlet>
 </main>

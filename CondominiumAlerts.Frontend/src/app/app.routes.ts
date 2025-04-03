@@ -21,7 +21,7 @@ export const routes: Routes = [
     path: 'home',
     title: 'Home',
     loadComponent: () =>
-      import('./home/home.component').then((c) => c.HomeComponent),
+      import('./features/home/home.component').then((c) => c.HomeComponent),
   },
   {
     path: '',
@@ -41,15 +41,7 @@ export const routes: Routes = [
               import(
                 './features/condominiums/pages/condominiums-main-page/condominiums-main-page.component'
               ).then((c) => c.CondominiumsMainPageComponent),
-          },
-          {
-            path: 'create',
-            title: 'Crear condominio',
-            loadComponent: () =>
-              import(
-                './features/condominiums/pages/condominium-page/condominium-page.component'
-              ).then((x) => x.CondominiumPageComponent),
-          },
+          }
         ],
       },
     ],
@@ -61,29 +53,12 @@ export const routes: Routes = [
         './features/condominiums/pages/condominium-page/condominium-page.component'
       ).then((x) => x.CondominiumPageComponent),
   },
-
-  {
-    path: 'condominium/create',
-    loadComponent: () =>
-      import(
-        './features/condominiums/pages/condominium-page/condominium-page.component'
-      ).then((x) => x.CondominiumPageComponent),
-  },
-
   {
     path: 'condominium/chat',
     loadComponent: () =>
       import(
         './features/condominiums/pages/condominium-chat/condominium-chat.component'
       ).then((c) => c.CondominiumChatComponent),
-  },
-
-  {
-    path: 'condominium/main-page',
-    loadComponent: () =>
-      import(
-        './features/condominiums/pages/condominiums-main-page/condominiums-main-page.component'
-      ).then((c) => c.CondominiumsMainPageComponent),
   },
   {
     path: "condominium/index/:condominiumId",

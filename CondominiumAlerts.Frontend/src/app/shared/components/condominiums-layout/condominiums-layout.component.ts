@@ -1,33 +1,36 @@
-import { Component, inject, OnInit } from '@angular/core';
-import { NgFor, CommonModule, NgOptimizedImage } from '@angular/common';
+import { Component, inject, input, OnInit, signal } from '@angular/core';
+import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { Router } from '@angular/router';
-import { Toolbar } from 'primeng/toolbar';
-import { Button } from 'primeng/button';
 import { GetCondominiumsUsersResponse } from '../../../features/users/models/user.model';
-import { UserService } from '../../../features/users/services/user.service';
 import { AuthService } from '../../../core/auth/services/auth.service';
 import { BehaviorSubject, Subject, takeUntil } from 'rxjs';
 import { AuthenticationService } from '../../../core/services/authentication.service';
 import { AutoUnsubscribe } from '../../decorators/autounsuscribe.decorator';
-
 import { CondominiumService } from '../../../features/condominiums/services/condominium.service';
 import { User } from '../../../core/auth/layout/auth-layout/user.type';
 import { GetCondominiumsJoinedByUserResponse } from "../../../features/condominiums/models/getCondominiumsJoinedByUser.response";
 import { ChatService } from '../../services/chat.service';
 import { Condominium } from '../../../features/condominiums/models/condominium.model';
-import { isUser } from '../../helpers/isUser.helper';
+import { DrawerModule } from 'primeng/drawer';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { ChatsDrawerComponent } from "../chats-drawer/chats-drawer.component";
+import { UserOptionsComponent } from "../../../core/auth/layout/user-options/user-options.component";
 
 @AutoUnsubscribe()
 @Component({
-  selector: 'app-condominiums-layout',
-  imports: [Toolbar, NgFor, CommonModule, Button, NgOptimizedImage],
+  selector: 'shared-condominiums-layout',
+  imports: [
+    CommonModule, 
+    DrawerModule, 
+    ChatsDrawerComponent, 
+    UserOptionsComponent
+  ],
   templateUrl: './condominiums-layout.component.html',
   styleUrl: './condominiums-layout.component.css',
 })
 export class CondominiumsLayoutComponent implements OnInit {
-  private authService = inject(AuthService);
-  private userService = inject(UserService);
   private condominiumService = inject(CondominiumService)
+  private authService = inject(AuthService);
   private authenticationService = inject(AuthenticationService);
   private chatService = inject(ChatService);
   private router = inject(Router);
@@ -36,6 +39,13 @@ export class CondominiumsLayoutComponent implements OnInit {
   condominiums$ = this.condominiumsSubject.asObservable();
   currentCondominium: Pick<Condominium, 'id' | 'name' | 'imageUrl'| 'address'> | null = null;
   private destroy$ = new Subject<void>();
+  areCondominiumsLoading = signal(true)
+  showNotifications = false;
+  showDrawer = false;
+  private breakpointObserver = inject(BreakpointObserver);
+  isMobile = false;
+
+  showChatDrawer = input(false);
 
   notifications = [
     { message: 'Nuevo mensaje de Juan', time: 'Hace 5 minutos' },
@@ -44,48 +54,34 @@ export class CondominiumsLayoutComponent implements OnInit {
   ];
 
   ngOnInit(): void {
-    this.authenticationService.userData$.pipe(takeUntil(this.destroy$)).subscribe((userData) => {
-      this.currentUser = userData?.data!;
-      // Solo llamamos getUserCondominiums() cuando this.currentUser está definido
-      if (this.currentUser?.id) this.getUserCondominiums(); 
+    this.breakpointObserver.observe([Breakpoints.Handset])
+    .pipe(takeUntil(this.destroy$))
+    .subscribe(result => {
+      this.isMobile = result.matches;
     });
+
+    this.chatService.chatOptions$.pipe().subscribe((chatOptions) => {
+      if (chatOptions) {
+        this.currentCondominium = chatOptions.condominium;
+      }
+    });
+  }
+
+  showNotificationsDialog(): void {
+    this.showNotifications = true;
   }
 
   getLoggedUsername() {
     return this.authService.currentUser?.displayName;
   }
 
-  goHome(): void {
-    this.router.navigate(['']);
+  async goHome() {
+    await this.authenticationService.logOut();
+    this.router.navigate(['/home']);
   }
-
-  getUserCondominiums(): void {
-    console.log("USERID", this.currentUser?.id)
-    this.condominiumService.getCondominiumsJoinedByUser({userId: this.currentUser?.id!}).pipe(takeUntil(this.destroy$)).subscribe((response) => {
-      this.condominiumsSubject.next(response.data);
-    });
-  }
-
-  goToChat(data: User | Pick<Condominium, 'id' | 'name' | 'imageUrl'| 'address'>): void {
-    console.log(data);
-    //this.userService.setCurrentCondominiumUser(user);
-    const type = isUser(data) ? 'user' : 'condominium';
-
-    this.chatService.setChatOptions({
-      type,
-      user: isUser(data) ? data as User : null,
-      condominium: isUser(data) ? null : data as Pick<Condominium, 'id' | 'name' | 'imageUrl'| 'address'>,
-    })
-
-    this.router.navigate(['condominium/chat']);
-  }
-
-
 
   onCondominiumSelected(condominium: Pick<Condominium, 'id' | 'name' | 'imageUrl'| 'address'> | null): void {
-    if(condominium) {
-      console.log("ACTUALIZANDO CHAT OPTIONS")
-      this.chatService.setChatOptions({ type: 'condominium', condominium, user: null });}
+    console.log("ACTUALIZANDO CHAT OPTIONS")
     this.currentCondominium = condominium;
   }
 
