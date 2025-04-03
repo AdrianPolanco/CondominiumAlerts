@@ -102,9 +102,10 @@ export class CondominiumsMainPageComponent {
     this.authenticationService.logOut();
     this.router.navigate(['']);
   }
-  viewCondominium(id: string) {
-    console.log(`Viewing condominium ID: ${id}`);
-    this.router.navigate([`/condominium/index/${id}`]); 
+  viewCondominium(condominium: GetCondominiumsJoinedByUserResponse) {
+    console.log(`Viewing condominium ID: ${condominium.id}`);
+    this.setCurrentCondominium(condominium)
+    this.router.navigate(['/condominium/index', condominium.id]);
   }
 
 
