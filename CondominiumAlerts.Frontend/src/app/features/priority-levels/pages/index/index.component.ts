@@ -23,7 +23,7 @@ export class IndexComponent {
   condominiumId: string | null = null;
   page: getPriorityLevelsQuery = {
     pageNumber: 1,
-    pageSize: 10,
+    pageSize: 20,
     condominiumId: "",
   };
 
