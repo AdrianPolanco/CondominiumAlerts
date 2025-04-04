@@ -8,12 +8,13 @@ import { FormComponent } from '../../../../shared/components/form/form.component
 import { SharedFormField } from '../../../../shared/components/form/shared-form-field.interface';
 import { SharedForm } from '../../../../shared/components/form/shared-form.interface';
 import { ButtonDirective } from 'primeng/button';
+import { NgIf } from '@angular/common';
 
 @Component({
   selector: 'app-edit-post-page',
   templateUrl: './edit-post-page.component.html',
   styleUrls: ['./edit-post-page.component.css'],
-  imports: [FormComponent, ButtonDirective]
+  imports: [FormComponent, ButtonDirective, NgIf]
 })
 export class EditPostPageComponent implements OnInit {
   condominiumId: string | null = null;
