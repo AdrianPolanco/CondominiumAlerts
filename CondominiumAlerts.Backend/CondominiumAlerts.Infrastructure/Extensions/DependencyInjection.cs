@@ -56,6 +56,8 @@ public static class DependencyInjection
 
 
 
+        services.AddScoped<IPostsRepository, PostsRepository>();
+
         // Registrar política de reintentos con Polly
         services.AddSingleton<IAsyncPolicy>(policy => Policy
             .Handle<SmtpCommandException>() // Maneja excepciones de MailKit

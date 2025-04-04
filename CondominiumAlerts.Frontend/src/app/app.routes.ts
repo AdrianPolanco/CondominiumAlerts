@@ -28,8 +28,7 @@ export const routes: Routes = [
     loadComponent: () =>
       import('../app/core/auth/layout/auth-layout/auth-layout.component').then(
         (c) => c.AuthLayoutComponent
-      ), // El layout autenticado
-    // Protege todas las rutas dentro
+      ),
     children: [
       {
         path: 'condominiums',
@@ -66,12 +65,24 @@ export const routes: Routes = [
       import(
         './features/condominiums/pages/condominum-index/condominum-index.component'
       ).then((c) => c.CondominumIndexComponent),
-  },{
+  },
+  {
     path: 'priority-levels/index/:condominiumId',
-    loadComponent: ()=>
-      import('./features/priority-levels/pages/index/index.component'
-        
-      ).then((c) => c.IndexComponent)
+    loadComponent: () =>
+      import('./features/priority-levels/pages/index/index.component')
+        .then((c) => c.IndexComponent)
+  },
+  {
+    path: 'posts/create/:condominiumId',
+    loadComponent: () =>
+      import('./features/posts/pages/create-post-page/create-post-page.component')
+        .then(c => c.PostPageComponent)
+  },
+  {
+    path: 'posts/edit/:condominiumId/:postId',
+    loadComponent: () =>
+      import('./features/posts/pages/edit-post-page/edit-post-page.component')
+        .then(c => c.EditPostPageComponent)
   },
   {
     path: '',

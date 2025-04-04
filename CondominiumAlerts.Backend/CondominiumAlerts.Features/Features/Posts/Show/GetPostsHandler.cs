@@ -1,4 +1,3 @@
-using CondominiumAlerts.Domain.Aggregates.Entities;
 using CondominiumAlerts.Infrastructure.Persistence.Context;
 using LightResults;
 using MediatR;
@@ -18,6 +17,8 @@ namespace CondominiumAlerts.Features.Features.Posts.Get
         public async Task<Result<List<GetPostsResponse>>> Handle(GetPostsCommand request, CancellationToken cancellationToken)
         {
             var posts = await _context.Posts
+                .Where(p => p.CondominiumId == request.CondominiumId)
+                .OrderByDescending(p => p.CreatedAt)
                 .Select(p => new GetPostsResponse
                 {
                     Id = p.Id,
@@ -31,6 +32,9 @@ namespace CondominiumAlerts.Features.Features.Posts.Get
                     LevelOfPriorityId = p.LevelOfPriorityId
                 })
                 .ToListAsync(cancellationToken);
+
+            if (!posts.Any())
+                return Result.Fail<List<GetPostsResponse>>("No posts found for the given condominium ID.");
 
             return Result.Ok(posts);
         }
