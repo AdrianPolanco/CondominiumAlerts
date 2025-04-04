@@ -2,19 +2,21 @@
   <div class="flex-1 bg-primary-emphasis-alt p-5">
     <div class="flex justify-between mb-6">
       <shared-back-arrow url="/condominiums" />
-      <button
-        class="bg-primary-contrast text-primary-700 px-4 py-2 rounded-md flex items-center hover:bg-primary-emphasis-alt hover:text-primary-contrast"
-        (click)="openCreatePostModal()"
-      >
-        <i class="pi pi-plus mr-2"></i>
-        Nuevo post
-      </button>
+      <div class="flex gap-1">
+        <button
+          class="bg-primary-contrast text-primary-700 px-4 py-2 rounded-md flex items-center hover:bg-primary-emphasis-alt hover:text-primary-contrast"
+          (click)="openCreatePostModal()"
+        >
+          <i class="pi pi-plus mr-2"></i>
+          Nuevo post
+        </button>
 
-      <p-button
-        icon="pi pi-arrow-left"
-        styleClass="bg-primary-contrast text-primary"
-        (onClick)="goToLevels()"
-      />
+        <p-button
+          label="Mantenimiento Niveles"
+          styleClass="bg-primary-contrast text-primary-700 px-4 py-2 rounded-md flex items-center hover:bg-primary-emphasis-alt hover:text-primary-contrast"
+          (onClick)="goToLevels()"
+        />
+      </div>
     </div>
 
     <h2 class="text-xl md:text-4xl font-semibold mb-4 text-white">
@@ -22,7 +24,6 @@
       Publicaciones
     </h2>
 
-    <!-- Publicaciones dinámicas -->
     <div class="space-y-4">
       <div
         *ngFor="let publication of publications"

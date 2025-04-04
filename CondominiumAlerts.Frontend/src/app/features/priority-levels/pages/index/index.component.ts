@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { priorityDto } from '../../models/priorityDto';
-import { NgFor, NgIf } from '@angular/common';
+import { NgFor, NgIf, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { priorityLevelService } from '../../../services/services.service';
 import { getPriorityLevelsQuery } from '../../models/getPriorityLevelsQuery';
@@ -8,16 +8,17 @@ import { CondominiumService } from '../../../condominiums/services/condominium.s
 import { getByIdPriorityLevelResponse } from '../../models/getByIdPriorityLevelResponse';
 import { addPriorityLevelCommand } from '../../models/addPriorityLevelCommand';
 import { ActivatedRoute } from '@angular/router';
-
+import { CondominiumsLayoutComponent } from '../../../../shared/components/condominiums-layout/condominiums-layout.component';
+import { Button } from 'primeng/button';
 @Component({
   selector: 'app-index',
-  imports: [NgFor, FormsModule, NgIf],
+  imports: [NgFor, FormsModule, NgIf,CondominiumsLayoutComponent, Button],
   templateUrl: './index.component.html',
   styleUrl: './index.component.css'
 })
 export class IndexComponent {
 
-  constructor(private LevelService: priorityLevelService, private condominiumService: CondominiumService, private route: ActivatedRoute ) {}
+  constructor(private LevelService: priorityLevelService, private condominiumService: CondominiumService, private route: ActivatedRoute, private location:Location ) {}
 
   condominiumId: string | null = null;
   page: getPriorityLevelsQuery = {
@@ -65,7 +66,9 @@ loadPriorities() : void{
      
     }
   }
-
+  goBack(){
+    this.location.back();
+  }
   closeModal() {
     this.showModal = false;
     this.editingPriority = null;
@@ -80,7 +83,7 @@ loadPriorities() : void{
         priority: this.modalData.priority!,
         description: this.modalData.description!,
         condominiumId: this.condominiumId ?? "",
-      }).subscribe(() => {
+      }).subscribe((result) => {
         this.priorities = this.priorities.map(p => 
           p.id === this.editingPriority!.id ? { ...p, ...this.modalData } as priorityDto : p
         );
@@ -94,7 +97,7 @@ loadPriorities() : void{
         condominiumId: this.condominiumId ?? "",
       };
       this.LevelService.postPriorityLevel(newPriority).subscribe((data) => {
-        this.priorities.push({ ...newPriority, id: data.id });
+        this.priorities.push({ ...newPriority, id: data.data.id });
         this.closeModal();
       });
     }
