@@ -1,5 +1,5 @@
 import {HttpClient} from '@angular/common/http';
-import {inject, Injectable} from '@angular/core';
+import {inject, Injectable, OnDestroy} from '@angular/core';
 import {BehaviorSubject, catchError, Observable, Subject, takeUntil, tap, throwError} from 'rxjs';
 import {ChatOptions} from '../components/chat/chat.type';
 import {ChatMessageDto} from '../../core/models/chatMessage.dto';
@@ -18,7 +18,7 @@ import { GetSummaryStatusResponse } from '../../features/condominiums/models/get
 @Injectable({
   providedIn: 'root',
 })
-export class ChatService{
+export class ChatService implements OnDestroy{
 
   private chatOptions = new BehaviorSubject<ChatOptions | null>(null);
   chatOptions$ = this.chatOptions.asObservable();
@@ -344,4 +344,17 @@ export class ChatService{
       }
     }
   }
+
+    ngOnDestroy(): void {
+      this.summarizingSubject.complete();
+      this.chatOptions.complete();
+      this.processingStatus.complete();
+      this.summaryResult.complete();
+      this.processingError.complete();
+      this.summaryStatus.complete();
+      this.summarizingSubject.complete();
+      this.messageService.clear();
+      this.destroy$.next();
+      this.destroy$.complete();
+    }
 }

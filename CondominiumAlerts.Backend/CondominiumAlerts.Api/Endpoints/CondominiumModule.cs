@@ -181,10 +181,10 @@ namespace CondominiumAlerts.Api.Endpoints
                 Guid condominiumId,
                 ISender sender,
                 CancellationToken cancellationToken) =>
-            {
+              {
                 var userId = claims.FindFirst("user_id")?.Value;
                 
-                if(string.IsNullOrEmpty(userId)) return Results.Unauthorized();
+                 if(string.IsNullOrEmpty(userId)) return Results.Unauthorized();
 
                 var query = new GetSummaryQuery(userId, condominiumId);
                 

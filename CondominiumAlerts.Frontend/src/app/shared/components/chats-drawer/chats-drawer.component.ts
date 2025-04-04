@@ -62,5 +62,7 @@ export class ChatsDrawerComponent implements OnInit, OnDestroy{
 
   ngOnDestroy(): void {
     this.condominiumsSubject.complete();
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

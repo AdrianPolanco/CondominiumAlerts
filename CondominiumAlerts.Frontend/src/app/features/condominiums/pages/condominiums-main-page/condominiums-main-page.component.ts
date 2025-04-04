@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -29,7 +29,7 @@ import { ChatsDrawerComponent } from "../../../../shared/components/chats-drawer
   templateUrl: './condominiums-main-page.component.html',
   styleUrls: ['./condominiums-main-page.component.css'],
 })
-export class CondominiumsMainPageComponent {
+export class CondominiumsMainPageComponent implements OnDestroy{
   form: FormGroup;
   isModalOpen: boolean = false;
   errorText: string = '';
@@ -126,5 +126,10 @@ export class CondominiumsMainPageComponent {
           console.log(err);
         },
       });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }
