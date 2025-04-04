@@ -108,6 +108,7 @@ export class CondominiumsMainPageComponent implements OnDestroy{
     this.router.navigate(['/condominium/index', condominium.id]);
   }
 
+
   changeModalState() {
     this.isModalOpen = !this.isModalOpen;
     this.errorText = '';

@@ -32,6 +32,8 @@ builder.Services.AddApiServices(builder.Configuration);
 //builder.Services.AddCrossCuttingConcerns();
 
 builder.WebHost.ConfigureHTTPVersion(builder.Configuration);
+builder.Services.AddHttpContextAccessor();
+
 
 
 
