@@ -3,7 +3,7 @@ import { FullCalendarModule } from '@fullcalendar/angular';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import timeGridPlugin from '@fullcalendar/timegrid';
-import { CondominiumEvent } from '../../event.type';
+import { PartialEvent } from '../../event.type';
 import esLocale from '@fullcalendar/core/locales/es';
 import { CalendarOptions } from '@fullcalendar/core/index.js';
 
@@ -29,10 +29,12 @@ export class CalendarComponent {
     dateClick: () => alert('Date clicked!'),
     eventClick: (info) => {
       alert('Event clicked: ' + info.event.title);
-    }
+    },
+    dayMaxEventRows: 3,
+   // eventDrop: 
   }
 
-  events: CondominiumEvent[] = [
+  events: PartialEvent[] = [
     {
       id: '1',
       title: 'Event 1',
@@ -52,7 +54,7 @@ export class CalendarComponent {
       title: 'Event 3',
       start: new Date(Date.now() + 86400000 * 4),
       end: new Date(Date.now() + 86400000 * 5),
-      description: 'Description for Event 3',
+      description: 'Description for Event 3'
     },
     {
       id: '4',
