@@ -9,6 +9,6 @@ public record ChatMessageDto(
     string? ReceiverUserId,
     Guid? MessageBeingRepliedToId,
     DateTime CreatedAt,
-    ChatCreatorUserDto CreatorUser,
+    UserDto CreatorUser,
     string? MediaUrl);
     

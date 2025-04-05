@@ -68,12 +68,12 @@ namespace CondominiumAlerts.Api.Endpoints
 
                     if (!result.IsSuccess) return Results.BadRequest(result);
 
-                    var responce = new
+                    var response = new
                     {
                         IsSuccess = result.IsSuccess,
                         Data = result.Value,
                     };
-                    return Results.Ok(responce);    
+                    return Results.Ok(response);    
                 });
 
             app.MapGet("/condominium/GetCondominiumsJoinedByUser",
@@ -85,13 +85,13 @@ namespace CondominiumAlerts.Api.Endpoints
 
                     if (!result.IsSuccess) return Results.BadRequest(result);
 
-                    var responce = new
+                    var response = new
                     {
                         IsSuccess = result.IsSuccess,
                         Data = result.Value,
                     };
 
-                    return Results.Ok(responce);
+                    return Results.Ok(response);
                 }).RequireAuthorization();
 
             app.MapGet("/condominiums/{condominiumId}/messages",

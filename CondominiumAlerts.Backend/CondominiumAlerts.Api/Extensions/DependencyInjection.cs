@@ -4,6 +4,9 @@ using System.Threading.RateLimiting;
 using Carter;
 using CloudinaryDotNet;
 using CondominiumAlerts.CrossCutting.ErrorHandler;
+using CondominiumAlerts.Features.Events;
+using Coravel;
+using Coravel.Scheduling.Schedule.Interfaces;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
 using LightResults.Extensions.Json;
@@ -125,6 +128,7 @@ public static class DependencyInjection
         });
         services.AddCarter();
         services.AddExceptionHandler<ErrorHandler>();
+        services.AddTransient<EventNotificationJob>();
         
         return services;
     }
@@ -169,7 +173,8 @@ public static class DependencyInjection
         {
             app.MapOpenApi();
         }
-        
+        var scheduler = app.Services.GetRequiredService<IScheduler>();
+        scheduler.Schedule<EventNotificationJob>().EveryMinute();
         return app;
     }
 }
