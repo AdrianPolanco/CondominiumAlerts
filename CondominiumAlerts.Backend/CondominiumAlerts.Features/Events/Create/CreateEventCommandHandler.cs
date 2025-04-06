@@ -32,20 +32,36 @@ public class CreateEventCommandHandler: ICommandHandler<CreateEventCommand, Resu
         if (createdBy is null || condominium is null)
             return Result.Fail<CreateEventResponse>("Usuario o condominio no encontrado.");
 
-        var startDateTime = DateTime.Parse(request.Start.ToString()).ToUniversalTime();
-        var endDateTime = DateTime.Parse(request.End.ToString()).ToUniversalTime();
+        DateTime startLocal = request.Start;
+        DateTime endLocal = request.End;
+
+        TimeZoneInfo rdTimeZone;
+
+        if (OperatingSystem.IsWindows())
+        {
+            rdTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SA Western Standard Time");
+        }
+        else
+        {
+            rdTimeZone = TimeZoneInfo.FindSystemTimeZoneById("America/Santo_Domingo");
+        }
+
+        // Convertir correctamente a UTC
+        var startDateTimeUtc = TimeZoneInfo.ConvertTimeToUtc(startLocal, rdTimeZone);
+        var endDateTimeUtc = TimeZoneInfo.ConvertTimeToUtc(endLocal, rdTimeZone);
 
         var newEvent = new Event
         {
             Id = Guid.NewGuid(),
             Title = request.Title,
             Description = request.Description,
-            Start = startDateTime,
-            End = endDateTime,
+            Start = startDateTimeUtc,
+            End = endDateTimeUtc,
             CreatedById = createdBy.Id,
             CreatedBy = createdBy,
             CondominiumId = condominium.Id,
-            Condominium = condominium
+            Condominium = condominium,
+            IsToday = startDateTimeUtc.Date == DateTime.UtcNow.Date
         };
 
         await _eventRepository.CreateAsync(newEvent, cancellationToken);

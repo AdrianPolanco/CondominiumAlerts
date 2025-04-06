@@ -34,7 +34,7 @@ public class EventsModule: ICarterModule
             };
 
             return Results.Ok(successResponse);
-        }).RequireAuthorization();
+        })/*.RequireAuthorization()*/;
 
         app.MapHub<EventHub>("/hubs/events");
     }
