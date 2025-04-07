@@ -1,20 +1,110 @@
 <section class="chat">
   <header class="chat-header bg-gray-50 dark:bg-gray-700 flex justify-between items-center p-4">
     <div class="text-xl">
-      <i class="fa-solid fa-user"></i> {{ currentUser()?.fullName }}
+      @if(this.options()?.type == 'condominium'){
+        <div class="flex items-center gap-2">
+          <shared-back-arrow url="/condominiums" color="transparent"/>
+          <img
+            [src]="this.options()?.condominium?.imageUrl"
+            [alt]="this.options()?.condominium?.id"
+            class="w-10 h-11 rounded-full"
+          />
+          <div class="flex flex-col gap-0 items-start">
+            <p>{{ this.options()?.condominium?.name }}</p>
+            <span class="text-xs text-gray-500 dark:text-gray-400 block">({{ this.options()?.condominium?.address }})</span>
+          </div>
+        </div>
+      }@else{
+        <i class="fa-solid fa-user"></i> {{ this.options()?.user?.name }}
+      }
     </div>
-
-    @if(summarizing()){
-      <p-button icon="pi pi-book" [rounded]="true" label="Resumir" (onClick)="summarizeMessages()" size="small"/>
-    }@else {
-      <p-button icon="pi pi-cog"styleClass="animate-[spin_3s_linear_infinite]" [rounded]="true" (onClick)="summarizeMessages()" size="small"/>
-    }
+    @if(wasLastMessageToday()){
+      @if(summaryStatus() !== null && summarizing()){
+        @switch (summaryStatus()) {
+          @case (SummaryStatusEnum.Created) {  
+            <div class="flex justify-center items-center gap-2">
+              <p-button icon="pi pi-cog" styleClass="animate-[spin_3s_linear_infinite]" [rounded]="true" size="small"/>
+              <label class="text-xs">Preparando...</label>
+              <div class="flex justify-end items-start">
+                <p-button icon="pi pi-times" [rounded]="true" [text]="true" severity="danger" size="small" (onClick)="cancelSummary()"/>
+              </div>
+            </div> 
+          }
+          @case (SummaryStatusEnum.Queued) {
+            <div class="flex justify-center items-center gap-2">
+              <p-button icon="pi pi-arrow-circle-right" styleClass="animate-[spin_3s_linear_infinite]" [rounded]="true" size="small"/>
+              <label class="text-xs">En cola...</label>
+              <div class="flex justify-end items-start">
+                <p-button icon="pi pi-times" [rounded]="true" [text]="true" severity="danger" size="small" (onClick)="cancelSummary()"/>
+              </div>
+            </div> 
+          }
+          @case (SummaryStatusEnum.Processing) { 
+            <div class="flex justify-center items-center gap-2">
+              <p-button icon="pi pi-cog" styleClass="animate-[spin_3s_linear_infinite]" [rounded]="true" size="small"/>
+              <label class="text-xs">Resumiendo...</label>
+              <div class="flex justify-end items-start">
+                <p-button icon="pi pi-times" [rounded]="true" [text]="true" severity="danger" size="small" (onClick)="cancelSummary()"/>
+              </div>
+            </div> 
+          }@case (SummaryStatusEnum.Completed){
+            <p-button 
+            icon="pi pi-eye" 
+            [rounded]="true" 
+            label="Ver resumen" 
+            (onClick)="showSummaryResult()" 
+            size="small"
+          />
+          }@case (SummaryStatusEnum.Cancelled) {
+            <p-button 
+            icon="pi pi-book" 
+            [rounded]="true" 
+            label="Resumir" 
+            (onClick)="summarizeMessages()" 
+            size="small"
+          />
+          }
+        }
+      }@else if(!summaryStatus || !summarizing()){
+          <p-button 
+            icon="pi pi-book" 
+            [rounded]="true" 
+            label="Resumir" 
+            (onClick)="summarizeMessages()" 
+            size="small"
+          />
+      }
+   }
+   @if(isThereSummaryResult()){
+    <p-button 
+      icon="pi pi-eye" 
+      [rounded]="true" 
+      label="Ver resumen" 
+      (onClick)="showSummaryResult()" 
+      size="small"
+    />
+  }
   </header>
-  <section class="chat-content bg-white scroll-invisible w-full flex flex-col gap-4 ">
-    <app-chat-buble
-      *ngFor="let message of messages()"
-      [message]="message"
-    ></app-chat-buble>
+  <section class="chat-content bg-white scroll-invisible w-full flex flex-col gap-4">
+        <div class="chat-content bg-white scroll-invisible w-full flex flex-col gap-4 ">
+        <app-chat-buble
+          *ngFor="let message of messages()"
+          [message]="message"
+        ></app-chat-buble>
+        @if(messages().length === 0){
+          <div class="flex flex-col justify-center items-center text-gray-400 gap-1">
+            <p>¡Sé el primero en mandar un mensaje!</p>
+          </div>
+        }
+  </div>
   </section>
   <app-chat-box> </app-chat-box>
 </section>
+@if(isThereSummaryResult() && showSummary && summaryResult()?.content){
+  <p-dialog header="Resumen" [modal]="true" [(visible)]="showSummary" [style]="{ width: '50rem' }" [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }" [maximizable]="true">
+  <ul>
+    <li *ngFor="let item of formatSummary()">{{ item }}</li>
+  </ul>
+</p-dialog>
+}
+<p-toast/>

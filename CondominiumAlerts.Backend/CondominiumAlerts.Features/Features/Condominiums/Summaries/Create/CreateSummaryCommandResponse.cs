@@ -3,4 +3,4 @@ using OpenAI.Chat;
 
 namespace CondominiumAlerts.Features.Features.Condominiums.Summaries;
 
-public record GetSummaryCommandResponse(Summary Summary);
+public record CreateSummaryCommandResponse(Summary Summary);

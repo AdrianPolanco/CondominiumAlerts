@@ -1,0 +1,110 @@
+<shared-condominiums-layout>
+  <div class="min-h-screen flex flex-col">
+    <div class="p-6 flex-grow">
+      <div class="flex justify-between">
+        <p-button
+          icon="pi pi-arrow-left"
+          styleClass="bg-primary-contrast text-primary"
+          (onClick)="goBack()"
+        />
+        <button
+          (click)="openModal()"
+          class="mb-4 flex items-center gap-2 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700 transition"
+        >
+          Agregar nivel
+        </button>
+      </div>
+      <div class="h-creen flex items-center justify-center">
+        <h1
+          class="mb-4 text-4xl font-extrabold leading-none tracking-tight text-white text-gray-900 md:text-5xl lg:text-6xl dark:text-white"
+        >
+          Niveles de prioridad
+        </h1>
+      </div>
+
+      <div class="flex justify-center mt-6">
+        <div class="w-1/2 overflow-x-auto">
+          <table class="w-full border-collapse border border-gray-300">
+            <thead class="bg-gray-200">
+              <tr>
+                <th class="border border-gray-100 p-2">Titulo</th>
+                <th class="border border-gray-100 p-2">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                *ngFor="let priority of priorities"
+                class="border bg-red-200 border-gray-300 hover:bg-gray-100 transition"
+              >
+                <td class="border border-gray-100 p-2">{{ priority.title }}</td>
+                <td
+                  class="border border-gray-100 p-2 flex justify-center gap-2"
+                >
+                  <button
+                    (click)="openModal(priority)"
+                    class="px-3 bg-gray-200 py-1 border rounded flex items-center gap-1 hover:bg-gray-400 transition"
+                  >
+                    <span class="material-icons">Actualizar</span>
+                  </button>
+                  <button
+                    (click)="deletePriority(priority.id)"
+                    class="px-3 py-1 bg-red-500 text-white rounded flex items-center gap-1 hover:bg-red-700 transition"
+                  >
+                    <span class="material-icons">Borrar</span>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div
+      *ngIf="showModal"
+      class="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center"
+      (click)="closeModal()"
+    >
+      <div
+        class="bg-white p-6 rounded shadow-lg w-96"
+        (click)="$event.stopPropagation()"
+      >
+        <h2 class="text-lg font-bold mb-4">
+          {{ editingPriority ? "Actualizar" : "Agregar" }} Prioridad
+        </h2>
+        <input
+          [(ngModel)]="modalData.title"
+          placeholder="Titulo"
+          class="w-full p-2 border rounded mb-2"
+        />
+        <input
+          [(ngModel)]="modalData.description"
+          placeholder="Descripcion"
+          class="w-full p-2 border rounded mb-2"
+        />
+        <input
+          [(ngModel)]="modalData.priority"
+          type="number"
+          placeholder="Prioridad"
+          min="0"
+          max="10"
+          class="w-full p-2 border rounded mb-2"
+        />
+        <div class="flex justify-end gap-2 mt-4">
+          <button
+            (click)="closeModal()"
+            class="px-3 py-1 border rounded hover:bg-gray-200 transition"
+          >
+            Cancel
+          </button>
+          <button
+            (click)="savePriority()"
+            class="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-700 transition"
+          >
+            Save
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</shared-condominiums-layout>

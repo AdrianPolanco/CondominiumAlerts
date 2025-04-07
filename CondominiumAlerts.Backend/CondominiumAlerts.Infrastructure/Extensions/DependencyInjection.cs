@@ -2,6 +2,7 @@
 using System.Net.Mail;
 using CondominiumAlerts.Domain.Aggregates.Entities;
 using CondominiumAlerts.Domain.Repositories;
+using CondominiumAlerts.Features.Features.Condominiums.Summaries;
 using CondominiumAlerts.Infrastructure.Auth;
 using CondominiumAlerts.Infrastructure.Auth.Interfaces;
 using CondominiumAlerts.Infrastructure.Persistence.Context;
@@ -56,6 +57,8 @@ public static class DependencyInjection
 
 
 
+        services.AddScoped<IPostsRepository, PostsRepository>();
+
         // Registrar política de reintentos con Polly
         services.AddSingleton<IAsyncPolicy>(policy => Policy
             .Handle<SmtpCommandException>() // Maneja excepciones de MailKit
@@ -73,6 +76,7 @@ public static class DependencyInjection
         services.AddSignalR();
 
         services.AddSingleton<JobCancellationService>();
+        services.AddSingleton<SummaryStatusService>();
         return services;
     }
 }

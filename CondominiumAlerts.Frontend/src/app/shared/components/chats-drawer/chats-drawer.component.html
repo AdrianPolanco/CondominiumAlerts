@@ -1,0 +1,60 @@
+<p-button 
+(click)="showDrawerDialog()"
+icon="pi pi-align-left" 
+class=""
+styleClass="fixed bottom-16 right-5 text-transparent hover:text-white rounded-full shadow-lg p-3 transition 
+bg-transparent hover:bg-primary hover:shadow-xl hover:text-white"/>
+<p-drawer [(visible)]="showDrawer" header="Conversaciones" position="full">
+    <div class="flex container-height">
+      <div class="w-full p-5">
+        <div class="text-lg font-semibold mb-4 text-center border-b pb-4 border-primary-200">
+          Condominios
+        </div>
+        @if(areCondominiumsLoading()){
+          <div class="flex justify-center items-center">
+            <i class="pi pi-spin pi-spinner" styleClass="animate-[spin_3s_linear_infinite]" style="font-size: 2rem"></i>
+          </div>
+        }@else {
+              <div
+                *ngFor="let condominium of condominiums$ | async"
+                class="flex items-center space-x-3 cursor-pointer p-3 rounded-lg transition-all duration-200 hover:bg-gray-50"
+                [ngClass]="{ 'bg-gray-50': currentCondominium?.id === condominium.id }"
+                (click)="emitCondominium(condominium)">
+                <img
+                  [ngSrc]="condominium.imageUrl"
+                  alt="Condominium Profile picture"
+                  width="80"
+                  height="80"
+                  class="rounded-full"
+                />
+                <div class="flex flex-col">
+                  <p class="font-semibold">{{ condominium.name | titlecase }}</p>
+                  <p class="text-sm text-gray-400">{{ condominium.address | titlecase }}</p>
+                </div>
+              </div>
+        }
+
+        <div class="text-lg font-semibold mb-4 text-center border-b pb-4 border-primary-200">
+          Contactos
+        </div>
+        <!--<div
+          *ngFor="let user of users"
+          class="flex items-center space-x-3 cursor-pointer p-3 rounded-lg transition-all duration-200"
+          [ngClass]="{ 'bg-gray-700': currentUser?.id === user.id }"
+          (click)="goToChat(user)"
+        >
+          <img
+            [ngSrc]="user.profilePictureUrl"
+            alt="User Profile picture"
+            width="40"
+            height="40"
+            class="rounded-full"
+          />
+          <div class="flex flex-col">
+            <p class="font-semibold">{{ user.fullName }}</p>
+            <p class="text-sm text-gray-400">{{ user.email }}</p>
+          </div>
+        </div>-->
+      </div>
+    </div>
+  </p-drawer>
