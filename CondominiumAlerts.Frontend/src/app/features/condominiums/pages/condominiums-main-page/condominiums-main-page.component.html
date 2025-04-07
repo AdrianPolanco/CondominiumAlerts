@@ -21,7 +21,7 @@
   >
     <div
       class="w-full max-w-[17rem] min-w-[10rem] aspect-square flex flex-col justify-center items-center bg-primary-200 rounded-lg p-4 cursor-pointer hover:bg-primary-300 transition"
-      (click)="goToCreateCondominium()"
+      (click)="showCreateModal()"
     >
       <h3 class="text-lg font-semibold text-center">Crea un condominio</h3>
       <i class="pi pi-plus-circle text-xl mt-4"></i>
@@ -32,6 +32,7 @@
     class="relative w-full max-w-[17rem] min-w-[10rem] aspect-square flex flex-col justify-center items-center text-white rounded-lg p-4 cursor-pointer transition group"
     (click)="viewCondominium(condominium)"
   >
+
     <!-- Imagen de fondo -->
     <div
       class="absolute inset-0 bg-cover bg-center rounded-lg"
@@ -94,4 +95,7 @@
   </div>
 </div>
 
+<p-dialog header="Crear Condominio" [modal]="true" [(visible)]="showCreate" [style]="{ width: '50rem' }" [breakpoints]="{ '1199px': '50vw', '575px': '90vw' }" [maximizable]="true">
+    <app-condominium-page />
+</p-dialog>
 <shared-chats-drawer (onCondominiumSelected)="onCondominiumSelected()"></shared-chats-drawer>

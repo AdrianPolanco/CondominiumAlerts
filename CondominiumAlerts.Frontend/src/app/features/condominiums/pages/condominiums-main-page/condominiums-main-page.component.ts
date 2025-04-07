@@ -15,6 +15,8 @@ import { User } from '../../../../core/auth/layout/auth-layout/user.type';
 import { Subject, takeUntil } from 'rxjs';
 import { AutoUnsubscribe } from '../../../../shared/decorators/autounsuscribe.decorator';
 import { ChatsDrawerComponent } from "../../../../shared/components/chats-drawer/chats-drawer.component";
+import { Dialog } from 'primeng/dialog';
+import { CondominiumPageComponent } from '../condominium-page/condominium-page.component';
 
 @AutoUnsubscribe()
 @Component({
@@ -24,7 +26,9 @@ import { ChatsDrawerComponent } from "../../../../shared/components/chats-drawer
     CommonModule,
     ReactiveFormsModule,
     Button,
-    ChatsDrawerComponent
+    Dialog,
+    ChatsDrawerComponent,
+    CondominiumPageComponent
 ],
   templateUrl: './condominiums-main-page.component.html',
   styleUrls: ['./condominiums-main-page.component.css'],
@@ -35,6 +39,7 @@ export class CondominiumsMainPageComponent implements OnDestroy{
   errorText: string = '';
   user: User|null = null
   destroy$ = new Subject<void>();
+  showCreate: boolean = false;
 
   constructor(
     private fb: FormBuilder,
@@ -95,9 +100,6 @@ export class CondominiumsMainPageComponent implements OnDestroy{
     return imageUrl ? `url('${imageUrl}')` : 'none';
   }
 
-  goToCreateCondominium() {
-    this.router.navigate(['/condominium/create']);
-  }
   goHome() {
     this.authenticationService.logOut();
     this.router.navigate(['']);
@@ -108,6 +110,9 @@ export class CondominiumsMainPageComponent implements OnDestroy{
     this.router.navigate(['/condominium/index', condominium.id]);
   }
 
+  showCreateModal() {
+    this.showCreate = true;
+  }
 
   changeModalState() {
     this.isModalOpen = !this.isModalOpen;
