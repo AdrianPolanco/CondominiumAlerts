@@ -1,12 +1,12 @@
 using System.Reflection;
 using CondominiumAlerts.CrossCutting.Behaviors;
 using CondominiumAlerts.Domain.Aggregates.ValueObjects;
-using CondominiumAlerts.Features.Events;
 using CondominiumAlerts.Features.Features.Condominiums.Add;
 using CondominiumAlerts.Features.Features.Condominiums.Get;
 using CondominiumAlerts.Features.Features.Condominiums.GetCondominiumsJoinedByUser;
 using CondominiumAlerts.Features.Features.Condominiums.Join;
 using CondominiumAlerts.Features.Features.Condominiums.Summaries;
+using CondominiumAlerts.Features.Features.Events;
 using CondominiumAlerts.Features.Features.Posts.Create;
 using CondominiumAlerts.Features.Features.Posts.Get;
 using CondominiumAlerts.Features.Features.Posts.Update;

@@ -1,6 +1,6 @@
 ﻿using Carter;
-using CondominiumAlerts.Features.Events;
-using CondominiumAlerts.Features.Events.Create;
+using CondominiumAlerts.Features.Features.Events;
+using CondominiumAlerts.Features.Features.Events.Create;
 using LightResults;
 using MediatR;
 

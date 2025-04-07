@@ -4,7 +4,7 @@ using System.Threading.RateLimiting;
 using Carter;
 using CloudinaryDotNet;
 using CondominiumAlerts.CrossCutting.ErrorHandler;
-using CondominiumAlerts.Features.Events;
+using CondominiumAlerts.Features.Features.Events;
 using Coravel;
 using Coravel.Scheduling.Schedule.Interfaces;
 using FirebaseAdmin;

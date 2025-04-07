@@ -1,7 +1,7 @@
 ﻿using CondominiumAlerts.Domain.Aggregates.Entities;
 using CondominiumAlerts.Features.Features.Messages;
 
-namespace CondominiumAlerts.Features.Events.Create;
+namespace CondominiumAlerts.Features.Features.Events.Create;
 
 public record CreateEventResponse(
     Guid Id, 

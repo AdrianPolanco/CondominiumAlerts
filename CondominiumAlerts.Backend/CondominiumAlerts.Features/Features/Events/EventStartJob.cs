@@ -4,7 +4,7 @@ using Coravel.Invocable;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 
-namespace CondominiumAlerts.Features.Events;
+namespace CondominiumAlerts.Features.Features.Events;
 
 public class EventStartJob : IInvocable, IInvocableWithPayload<Guid>
 {

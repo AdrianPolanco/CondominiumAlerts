@@ -23,10 +23,4 @@
       <PackageReference Include="Scrutor" Version="6.0.1" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Events\Delete\" />
-      <Folder Include="Events\Get\" />
-      <Folder Include="Events\Update\" />
-    </ItemGroup>
-
 </Project>

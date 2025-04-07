@@ -1,7 +1,7 @@
 ﻿using CondominiumAlerts.CrossCutting.CQRS.Interfaces;
 using LightResults;
 
-namespace CondominiumAlerts.Features.Events.Create;
+namespace CondominiumAlerts.Features.Features.Events.Create;
 
 public record CreateEventCommand(
     string Title,

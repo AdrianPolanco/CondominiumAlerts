@@ -1,6 +1,6 @@
 ﻿using System.Collections.Concurrent;
 
-namespace CondominiumAlerts.Features.Events;
+namespace CondominiumAlerts.Features.Features.Events;
 
 public class ScheduledEventsService
 {

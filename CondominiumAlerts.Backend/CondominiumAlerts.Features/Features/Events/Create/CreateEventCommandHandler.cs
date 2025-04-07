@@ -1,11 +1,12 @@
 ﻿using CondominiumAlerts.CrossCutting.CQRS.Interfaces.Handlers;
 using CondominiumAlerts.Domain.Aggregates.Entities;
 using CondominiumAlerts.Domain.Repositories;
+using CondominiumAlerts.Features.Features.Events.Create;
 using Coravel.Scheduling.Schedule.Interfaces;
 using LightResults;
 using Mapster;
 
-namespace CondominiumAlerts.Features.Events.Create;
+namespace CondominiumAlerts.Features.Features.Events.Create;
 
 public class CreateEventCommandHandler: ICommandHandler<CreateEventCommand, Result<CreateEventResponse>>
 {
