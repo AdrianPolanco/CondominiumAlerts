@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import { Observable, Subject, takeUntil } from 'rxjs';
 import { AddCondominiumResponse } from "../models/addCondominium.response";
 import { GetCondominiumsJoinedByUserResponse } from "../models/getCondominiumsJoinedByUser.response";
@@ -17,7 +17,7 @@ import { Condominium } from '../models/condominium.model';
 @Injectable({
   providedIn: 'root'
 })
-export class CondominiumService {
+export class CondominiumService implements OnDestroy{
 
   constructor(private httpClient: HttpClient, 
     private authenticationService: AuthenticationService) { 
@@ -79,5 +79,10 @@ export class CondominiumService {
             data: GetCondominiumsJoinedByUserResponse[]
           }>(
         "/api/condominium/GetCondominiumsJoinedByUser",  {params: {userId: cmd.userId}, headers: {Authorization: `Bearer ${this.token}`}})
+    }
+
+    ngOnDestroy(): void {
+      this.destroy$.next();
+      this.destroy$.complete();
     }
 }

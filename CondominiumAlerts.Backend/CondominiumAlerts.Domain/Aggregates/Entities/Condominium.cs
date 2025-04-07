@@ -22,5 +22,5 @@ namespace CondominiumAlerts.Domain.Aggregates.Entities;
         public IReadOnlyCollection<LevelOfPriority>? LevelOfPriorities { get; set; }
         public IReadOnlyCollection<Message>? Messages { get; set; }
         public IReadOnlyCollection<Summary> Summaries { get; set; }
-
+        public IReadOnlyCollection<Event> Events { get; set; }
     }

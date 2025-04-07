@@ -1,5 +1,5 @@
 .chat {
-  display: flex;
+  /*display: flex;*/
   flex-flow: column wrap;
   border: var(--border);
   height: 100%;
