@@ -2,6 +2,7 @@
 using Carter;
 using CondominiumAlerts.Features.Features.Events;
 using CondominiumAlerts.Features.Features.Events.Create;
+using CondominiumAlerts.Features.Features.Events.Delete;
 using CondominiumAlerts.Features.Features.Events.Get;
 using CondominiumAlerts.Features.Features.Events.Update;
 using LightResults;
@@ -14,32 +15,34 @@ public class EventsModule: ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapPost("/events", async (ISender Sender, CancellationToken cancellationToken, CreateEventCommand command) =>
-        {
-            Result<CreateEventResponse> result = await Sender.Send(command, cancellationToken);
-
-            if (!result.IsSuccess)
+        app.MapPost("/events",
+            async (ISender Sender, CancellationToken cancellationToken, CreateEventCommand command) =>
             {
-                var failedResponse = new
+                Result<CreateEventResponse> result = await Sender.Send(command, cancellationToken);
+
+                if (!result.IsSuccess)
                 {
-                    IsSuccess = false,
-                    Data = new {
-                        Message = result.Error.Message
-                    }
+                    var failedResponse = new
+                    {
+                        IsSuccess = false,
+                        Data = new
+                        {
+                            Message = result.Error.Message
+                        }
+                    };
+
+                    return Results.BadRequest(failedResponse);
+                }
+
+                var successResponse = new
+                {
+                    IsSuccess = true,
+                    Data = result.Value
                 };
 
-                return Results.BadRequest(failedResponse);
-            }
-            
-            var successResponse = new
-            {
-                IsSuccess = true,
-                Data = result.Value
-            };
+                return Results.Ok(successResponse);
+            }) /*.RequireAuthorization()*/;
 
-            return Results.Ok(successResponse);
-        })/*.RequireAuthorization()*/;
-        
         app.MapPut("/events",
             async (
                 ISender sender,
@@ -90,10 +93,11 @@ public class EventsModule: ICarterModule
                 };
 
                 return Results.Ok(successResponse);
-            })/*.RequireAuthorization()*/;
-        
+            }) /*.RequireAuthorization()*/;
+
         app.MapGet("/events/{condominiumId}/user/{userId}",
-            async (Guid condominiumId, string userId, ISender sender, CancellationToken cancellationToken, ClaimsPrincipal claims) =>
+            async (Guid condominiumId, string userId, ISender sender, CancellationToken cancellationToken,
+                ClaimsPrincipal claims) =>
             {
                 /*
                 var requesterId = claims.FindFirst("user_id")?.Value;
@@ -114,7 +118,7 @@ public class EventsModule: ICarterModule
                 */
 
                 var query = new GetEventsQuery(condominiumId, userId, userId);
-                
+
                 var result = await sender.Send(query, cancellationToken);
 
                 if (!result.IsSuccess)
@@ -139,10 +143,56 @@ public class EventsModule: ICarterModule
 
                 return Results.Ok(successResponse);
             }
-            )/*.RequireAuthorization()*/;
+        ) /*.RequireAuthorization()*/;
 
+        app.MapDelete("/events/{eventId}/user/{userId}",
+            async (Guid eventId, string userId, ISender sender, CancellationToken cancellationToken, ClaimsPrincipal claims) =>
+            {
+                /*
+               var requesterId = claims.FindFirst("user_id")?.Value;
 
-        app.MapHub<EventHub>("/hubs/events");
-    }
-    
+               if (requesterId is null)
+               {
+                   var response = new
+                   {
+                       Success = false,
+                       Data = new
+                       {
+                           Message = "No se proporcionó un token válido."
+                       }
+                   };
+
+                   return Results.BadRequest(response);
+               }
+               */
+
+                var query = new DeleteEventCommand(eventId, userId, userId);
+
+                var result = await sender.Send(query, cancellationToken);
+
+                if (!result.IsSuccess)
+                {
+                    var response = new
+                    {
+                        Success = false,
+                        Data = new
+                        {
+                            Message = result.Error.Message
+                        }
+                    };
+
+                    return Results.BadRequest(response);
+                }
+                
+                var successResponse = new
+                {
+                    IsSuccess = true,
+                    Data = result.Value
+                };
+
+                return Results.Ok(successResponse);
+            })/*.RequireAuthorization()*/;
+
+                app.MapHub<EventHub>("/hubs/events");
+            }
 }

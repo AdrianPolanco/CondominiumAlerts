@@ -1,6 +1,7 @@
 ﻿using CondominiumAlerts.CrossCutting.CQRS.Interfaces.Handlers;
 using CondominiumAlerts.Domain.Aggregates.Entities;
 using CondominiumAlerts.Domain.Repositories;
+using CondominiumAlerts.Infrastructure.Auth.Interfaces;
 using LightResults;
 using Mapster;
 
@@ -9,14 +10,14 @@ namespace CondominiumAlerts.Features.Features.Events.Get;
 public class GetEventsQueryHandler: IQueryHandler<GetEventsQuery, Result<List<GetEventsQueryResponse>>>
 {
     private readonly IRepository<Event, Guid> _eventRepository;
-    private readonly IRepository<CondominiumUser, Guid> _condominiumUserRepository;
+    private readonly IAuthenticationProvider _authenticationProvider;
 
     public GetEventsQueryHandler(
         IRepository<Event, Guid> eventRepository,
-        IRepository<CondominiumUser, Guid> condominiumUserRepository)
+        IAuthenticationProvider authenticationProvider)
     {
         _eventRepository = eventRepository;
-        _condominiumUserRepository = condominiumUserRepository;
+        _authenticationProvider = authenticationProvider;
     }
     
     public async Task<Result<List<GetEventsQueryResponse>>> Handle(GetEventsQuery request, CancellationToken cancellationToken)
@@ -26,12 +27,9 @@ public class GetEventsQueryHandler: IQueryHandler<GetEventsQuery, Result<List<Ge
             || request.RequesterId != request.UserId)
             return Result<List<GetEventsQueryResponse>>.Fail("No tienes permisos para ejecutar esta accion.");
 
-        var condominiumUsers = await _condominiumUserRepository.GetAsync(
-            cancellationToken,
-            cu => cu.CondominiumId == request.CondominiumId && cu.UserId == request.UserId
-        );
+        var isUserInCondominium = await _authenticationProvider.IsUserInCondominiumAsync(request.RequesterId, request.CondominiumId, cancellationToken);
         
-        if(!condominiumUsers.Any()) return Result.Fail<List<GetEventsQueryResponse>>("El usuario no se encuentra en el condominio dado.");
+        if(!isUserInCondominium) return Result.Fail<List<GetEventsQueryResponse>>("El usuario no se encuentra en el condominio dado.");
 
         var events = await _eventRepository.GetAsync(
             cancellationToken,

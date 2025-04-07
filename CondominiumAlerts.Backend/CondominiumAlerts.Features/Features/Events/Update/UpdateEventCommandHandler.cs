@@ -1,6 +1,7 @@
 ﻿using CondominiumAlerts.CrossCutting.CQRS.Interfaces.Handlers;
 using CondominiumAlerts.Domain.Aggregates.Entities;
 using CondominiumAlerts.Domain.Repositories;
+using CondominiumAlerts.Infrastructure.Auth.Interfaces;
 using LightResults;
 using Mapster;
 
@@ -9,10 +10,12 @@ namespace CondominiumAlerts.Features.Features.Events.Update;
 public class UpdateEventCommandHandler: ICommandHandler<UpdateEventCommand, Result<UpdateEventResponse>>
 {
     private readonly IRepository<Event, Guid> _eventRepository;
+    private readonly IAuthenticationProvider _authenticationProvider;
 
-    public UpdateEventCommandHandler(IRepository<Event, Guid> eventRepository)
+    public UpdateEventCommandHandler(IRepository<Event, Guid> eventRepository, IAuthenticationProvider authenticationProvider)
     {
         _eventRepository = eventRepository;
+        _authenticationProvider = authenticationProvider;
     }
     
     public async Task<Result<UpdateEventResponse>> Handle(UpdateEventCommand request, CancellationToken cancellationToken)
@@ -20,6 +23,12 @@ public class UpdateEventCommandHandler: ICommandHandler<UpdateEventCommand, Resu
         var areCreatorIdsEmpty = string.IsNullOrEmpty(request.CreatedById) || string.IsNullOrWhiteSpace(request.EditorId); 
         if(request.CreatedById != request.EditorId || areCreatorIdsEmpty) 
             return Result<UpdateEventResponse>.Fail("No tienes los permisos requeridos para crear esta accion.");
+
+        var isUserInCondominium = await _authenticationProvider.IsUserInCondominiumAsync(request.EditorId, request.CondominiumId, cancellationToken);
+
+        if (!isUserInCondominium)
+            return Result<UpdateEventResponse>.Fail(
+                "No tienes los permisos requeridos para crear esta accion. Debes pertenecer al condominio.");
         
         var events = await _eventRepository.GetAsync(
             cancellationToken, 
@@ -37,7 +46,10 @@ public class UpdateEventCommandHandler: ICommandHandler<UpdateEventCommand, Resu
         if (foundEvent.IsFinished) return Result<UpdateEventResponse>.Fail("No se puede editar un evento ya finalizado.");
         
         var (start, end) = TimeHelper.ConvertToUtc(request.Start, request.End);
-
+        var doesHavePermissions = _authenticationProvider.DoesHavePermission(request.EditorId, foundEvent.CreatedById);
+        
+        if(!doesHavePermissions) return Result<UpdateEventResponse>.Fail("No tienes los permisos necesarios para realizar esta accion. No creaste este evento.");
+        
         if(start <= DateTime.UtcNow) return Result.Fail<UpdateEventResponse>("No se puede crear un evento con una fecha de inicio anterior o igual al tiempo actual.");
         if (end <= DateTime.UtcNow) 
             return Result<UpdateEventResponse>.Fail("No se puede editar una fecha de finalizacion del evento anterior o igual al tiempo actual.");
