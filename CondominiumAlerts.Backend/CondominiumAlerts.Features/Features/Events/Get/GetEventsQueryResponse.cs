@@ -1,8 +1,8 @@
 ﻿using CondominiumAlerts.Features.Features.Messages;
 
-namespace CondominiumAlerts.Features.Features.Events.Update;
+namespace CondominiumAlerts.Features.Features.Events.Get;
 
-public record UpdateEventResponse(
+public record GetEventsQueryResponse(
     Guid Id, 
     string Title, 
     string Description, 
@@ -11,5 +11,7 @@ public record UpdateEventResponse(
     bool IsStarted,
     bool IsFinished,
     bool IsToday,
+    UserDto CreatedBy,
+    List<UserDto> Suscribers,
     DateTime CreatedAt,
     DateTime UpdatedAt);

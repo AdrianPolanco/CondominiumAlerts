@@ -1,8 +1,6 @@
 ﻿using CondominiumAlerts.CrossCutting.CQRS.Interfaces.Handlers;
 using CondominiumAlerts.Domain.Aggregates.Entities;
 using CondominiumAlerts.Domain.Repositories;
-using CondominiumAlerts.Features.Features.Events.Create;
-using Coravel.Scheduling.Schedule.Interfaces;
 using LightResults;
 using Mapster;
 
@@ -33,36 +31,25 @@ public class CreateEventCommandHandler: ICommandHandler<CreateEventCommand, Resu
         if (createdBy is null || condominium is null)
             return Result.Fail<CreateEventResponse>("Usuario o condominio no encontrado.");
 
-        DateTime startLocal = request.Start;
-        DateTime endLocal = request.End;
-
-        TimeZoneInfo rdTimeZone;
-
-        if (OperatingSystem.IsWindows())
-        {
-            rdTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SA Western Standard Time");
-        }
-        else
-        {
-            rdTimeZone = TimeZoneInfo.FindSystemTimeZoneById("America/Santo_Domingo");
-        }
-
-        // Convertir correctamente a UTC
-        var startDateTimeUtc = TimeZoneInfo.ConvertTimeToUtc(startLocal, rdTimeZone);
-        var endDateTimeUtc = TimeZoneInfo.ConvertTimeToUtc(endLocal, rdTimeZone);
-
+        var (start, end) = TimeHelper.ConvertToUtc(request.Start, request.End);
+        
+        if(start <= DateTime.UtcNow) return Result.Fail<CreateEventResponse>("No se puede crear un evento con una fecha de inicio anterior o igual al tiempo actual.");
+        if(end <= DateTime.UtcNow) return Result.Fail<CreateEventResponse>("No se puede crear un evento con una fecha de finalizacion anterior o igual al tiempo actual.");
+        if(end == start) return Result.Fail<CreateEventResponse>("No se puede crear un evento con una fecha de inicio y finalizacion iguales.");
+        
         var newEvent = new Event
         {
             Id = Guid.NewGuid(),
             Title = request.Title,
             Description = request.Description,
-            Start = startDateTimeUtc,
-            End = endDateTimeUtc,
+            Start = start,
+            End = end,
             CreatedById = createdBy.Id,
             CreatedBy = createdBy,
             CondominiumId = condominium.Id,
             Condominium = condominium,
-            IsToday = startDateTimeUtc.Date == DateTime.UtcNow.Date
+            IsToday = start.Date == DateTime.UtcNow.Date,
+            Suscribers = new(){createdBy}
         };
 
         await _eventRepository.CreateAsync(newEvent, cancellationToken);

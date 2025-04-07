@@ -48,7 +48,7 @@ public class Repository<TEntity, TId> : IRepository<TEntity, TId> where TEntity 
         }
     }
 
-    public virtual async Task<List<TEntity>> GetAsync(CancellationToken cancellationToken, Expression<Func<TEntity, bool>>? filter = null, bool readOnly = true, bool ignoreQueryFilters = false, Expression<Func<TEntity, object>>[]? includes = null)
+    public virtual async Task<List<TEntity>> GetAsync(CancellationToken cancellationToken, Expression<Func<TEntity, bool>>? filter = null, bool readOnly = true, bool ignoreQueryFilters = false, Expression<Func<TEntity, object>>[]? includes = null, bool splitQuery = false)
     {
         IQueryable<TEntity> query = _dbSet.AsQueryable();
 
@@ -60,6 +60,8 @@ public class Repository<TEntity, TId> : IRepository<TEntity, TId> where TEntity 
         {
             query = includes.Aggregate(query, (current, include) => current.Include(include));
         }
+        
+        if(splitQuery) query = query.AsSplitQuery();
 
         if (readOnly) query = query.AsNoTracking();
 
