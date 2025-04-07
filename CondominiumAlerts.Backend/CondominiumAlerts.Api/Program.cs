@@ -34,13 +34,11 @@ builder.Services.AddApiServices(builder.Configuration);
 builder.WebHost.ConfigureHTTPVersion(builder.Configuration);
 builder.Services.AddHttpContextAccessor();
 
-
-
-
 var app = builder.Build();
 
 app.UseCrossCuttingConccerns();
 app.UseApiServices();
+
 
 app.Run();
 

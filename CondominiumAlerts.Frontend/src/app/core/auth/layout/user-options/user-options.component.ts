@@ -292,5 +292,7 @@ menuItems: MenuItem[] = [
 
   ngOnDestroy() {
     this.formGroup().reset();
+    this.destroy$.next(); // Emite un valor para cancelar la suscripción
+    this.destroy$.complete(); // Completa el Subject para cancelar la suscripción
   }
 }

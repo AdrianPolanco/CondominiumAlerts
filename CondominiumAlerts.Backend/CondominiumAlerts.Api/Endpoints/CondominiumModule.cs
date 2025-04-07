@@ -68,12 +68,12 @@ namespace CondominiumAlerts.Api.Endpoints
 
                     if (!result.IsSuccess) return Results.BadRequest(result);
 
-                    var responce = new
+                    var response = new
                     {
                         IsSuccess = result.IsSuccess,
                         Data = result.Value,
                     };
-                    return Results.Ok(responce);    
+                    return Results.Ok(response);    
                 });
 
             app.MapGet("/condominium/GetCondominiumsJoinedByUser",
@@ -85,13 +85,13 @@ namespace CondominiumAlerts.Api.Endpoints
 
                     if (!result.IsSuccess) return Results.BadRequest(result);
 
-                    var responce = new
+                    var response = new
                     {
                         IsSuccess = result.IsSuccess,
                         Data = result.Value,
                     };
 
-                    return Results.Ok(responce);
+                    return Results.Ok(response);
                 }).RequireAuthorization();
 
             app.MapGet("/condominiums/{condominiumId}/messages",
@@ -181,10 +181,10 @@ namespace CondominiumAlerts.Api.Endpoints
                 Guid condominiumId,
                 ISender sender,
                 CancellationToken cancellationToken) =>
-            {
+              {
                 var userId = claims.FindFirst("user_id")?.Value;
                 
-                if(string.IsNullOrEmpty(userId)) return Results.Unauthorized();
+                 if(string.IsNullOrEmpty(userId)) return Results.Unauthorized();
 
                 var query = new GetSummaryQuery(userId, condominiumId);
                 

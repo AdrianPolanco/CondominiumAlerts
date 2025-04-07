@@ -22,4 +22,6 @@ public sealed class User : IAggregateRoot<string>
     public IReadOnlyCollection<Notification>? NotificationsReceivedByUser { get; set; }
     public IReadOnlyCollection<CondominiumUser>? Condominiums { get; set; }
     public IReadOnlyCollection<Summary> TriggeredSummaries { get; set; }
+    public IReadOnlyCollection<Event> CreatedEvents { get; set; }
+    public IReadOnlyCollection<Event> SuscribedToEvents { get; set; }
 }
