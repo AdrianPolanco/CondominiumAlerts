@@ -55,6 +55,7 @@ public class UpdateEventCommandHandler: ICommandHandler<UpdateEventCommand, Resu
             return Result<UpdateEventResponse>.Fail("No se puede editar una fecha de finalizacion del evento anterior o igual al tiempo actual.");
         if (end == start) 
             return Result<UpdateEventResponse>.Fail("No se puede editar unas fechas de inicio y finalizacion iguales.");
+        if(end < start) return Result.Fail<UpdateEventResponse>("No se puede crear un evento con una fecha de inicio posterior a la fecha de finalizacion.");
         if(start == foundEvent.Start && end == foundEvent.End
            && foundEvent.Title == request.Title
            && foundEvent.Description == request.Description)  return Result<UpdateEventResponse>.Fail("Se aborto la actualizacion ya que no hay cambios en los campos correspondientes.");

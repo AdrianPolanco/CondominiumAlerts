@@ -245,8 +245,8 @@ namespace CondominiumAlerts.Api.Endpoints
                 {
                     var row = new CondominiumUser()
                     {
-                        UserId = UserId,
-                        CondominiumId = Guid.Parse(CondominiumId),
+                        UserId = "mklHu6Yg2YaSMLSNnjmO5krUv4t2",
+                        CondominiumId = Guid.Parse("22f0abf5-f9fc-4730-b982-674f80d9b712"),
                     };
 
                     await repository.CreateAsync(row, cancellationToken);

@@ -40,6 +40,7 @@ public class CreateEventCommandHandler: ICommandHandler<CreateEventCommand, Resu
         if(start <= DateTime.UtcNow) return Result.Fail<CreateEventResponse>("No se puede crear un evento con una fecha de inicio anterior o igual al tiempo actual.");
         if(end <= DateTime.UtcNow) return Result.Fail<CreateEventResponse>("No se puede crear un evento con una fecha de finalizacion anterior o igual al tiempo actual.");
         if(end == start) return Result.Fail<CreateEventResponse>("No se puede crear un evento con una fecha de inicio y finalizacion iguales.");
+        if(end < start) return Result.Fail<CreateEventResponse>("No se puede crear un evento con una fecha de inicio posterior a la fecha de finalizacion.");
         
         var isUserInCondominium = await _authenticationProvider.IsUserInCondominiumAsync(request.CreatedById, condominium.Id, cancellationToken);
 
