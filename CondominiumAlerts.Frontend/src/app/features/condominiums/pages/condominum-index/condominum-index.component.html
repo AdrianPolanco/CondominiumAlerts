@@ -40,9 +40,8 @@
         </div>
         <p class="text-gray-300 mb-4">{{ publication.description }}</p>
 
-        <div class="w-full mb-4 rounded-lg overflow-hidden max-h-[400px] flex justify-center bg-transparent">
-          <img *ngIf="publication.imageUrl"
-               [src]="publication.imageUrl"
+        <div *ngIf="publication.imageUrl" class="w-full mb-4 rounded-lg overflow-hidden max-h-[400px] flex justify-center bg-transparent">
+          <img [src]="publication.imageUrl"
                alt="Publicación"
                class="w-full h-auto object-contain rounded-lg" />
         </div>
