@@ -1,6 +1,7 @@
 using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
 using CondominiumAlerts.CrossCutting.CQRS.Interfaces.Handlers;
+using CondominiumAlerts.Domain.Aggregates.Entities;
 using CondominiumAlerts.Domain.Repositories;
 using CondominiumAlerts.Features.Helpers;
 using FluentValidation;
@@ -17,16 +18,19 @@ namespace CondominiumAlerts.Features.Features.Condominiums.Add
         private readonly ICondominiumRepository _condominiumRepository;
         private readonly ILogger<AddCondominiumHandler> _logger;
         private readonly IValidator<AddCondominiumCommand> _validator;
+        private readonly IRepository<CondominiumUser, Guid> _condominumUserRepository;
 
         public AddCondominiumHandler(Cloudinary cloudinary,
                                      ICondominiumRepository condominiumRepository,
                                      ILogger<AddCondominiumHandler> logger,
-                                     IValidator<AddCondominiumCommand> validator)
+                                     IValidator<AddCondominiumCommand> validator,
+                                     IRepository<CondominiumUser, Guid> condominumUserRepository)
         {
             _cloudinary = cloudinary;
             _condominiumRepository = condominiumRepository;
             _logger = logger;
             _validator = validator;
+            _condominumUserRepository = condominumUserRepository;
         }
 
         public async Task<Result<AddCondominiumResponse>>
@@ -36,7 +40,7 @@ namespace CondominiumAlerts.Features.Features.Condominiums.Add
 
             if (!validation.IsValid)
             {
-                IEnumerable< string> errors = validation.Errors.Select(e => e.ErrorMessage);
+                IEnumerable<string> errors = validation.Errors.Select(e => e.ErrorMessage);
                 _logger.LogTrace($"Validation failed {errors}");
                 return Result.Fail<AddCondominiumResponse>(string.Join(", ", errors));
             }
@@ -45,7 +49,8 @@ namespace CondominiumAlerts.Features.Features.Condominiums.Add
             {
                 File = new FileDescription(Guid.NewGuid().ToString(), request.ImageFile.OpenReadStream()),
             });
-            if (imageUploadResult.Error?.Message is { } message) {
+            if (imageUploadResult.Error?.Message is { } message)
+            {
                 _logger.LogTrace("Failed to upload image, error with message {Error}.", message);
                 return Result.Fail<AddCondominiumResponse>(message);
             }
@@ -66,6 +71,16 @@ namespace CondominiumAlerts.Features.Features.Condominiums.Add
                 LinkToken = "",
                 TokenExpirationDate = DateTime.UtcNow.AddDays(90),
             }, cancellationToken);
+            await _condominumUserRepository.CreateAsync(
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    CondominiumId = condominium.Id,
+                    IsAdmin = true,
+                    UserId = request.CreatorUserId,
+                },
+                cancellationToken
+            );
             return new AddCondominiumResponse()
             {
                 Id = condominium.Id,
