@@ -73,6 +73,7 @@ public static class DependencyInjection
                 })
         );
         services.AddQueue();
+        services.AddScheduler();
         services.AddSignalR();
 
         services.AddSingleton<JobCancellationService>();

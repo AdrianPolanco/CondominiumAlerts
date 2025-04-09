@@ -1,7 +1,7 @@
 import {Component, computed, inject, OnDestroy, OnInit, signal,} from '@angular/core';
 import {ChatBoxComponent} from '../chat-box/chat-box.component';
 import {ChatBubleComponent} from '../chat-buble/chat-buble.component';
-import {NgFor} from '@angular/common';
+import {NgClass, NgFor} from '@angular/common';
 import {ChatService} from '../../services/chat.service';
 import {AutoUnsubscribe} from '../../decorators/autounsuscribe.decorator';
 import {combineLatest, firstValueFrom, map, shareReplay, Subject, takeUntil} from 'rxjs';
@@ -17,6 +17,7 @@ import {MessageService} from 'primeng/api';
 import {Toast} from 'primeng/toast';
 import {SummaryStatus} from '../../../features/condominiums/models/summaryStatus.enum';
 import { BackArrowComponent } from "../back-arrow/back-arrow.component";
+import { CalendarComponent } from "../../../features/events/components/calendar/calendar.component";
 
 
 @AutoUnsubscribe()
@@ -30,7 +31,9 @@ import { BackArrowComponent } from "../back-arrow/back-arrow.component";
     Button,
     Toast,
     Dialog,
-    BackArrowComponent
+    BackArrowComponent,
+    CalendarComponent,
+    NgClass
 ],
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.css',
@@ -40,6 +43,7 @@ export class ChatComponent implements OnInit, OnDestroy {
   private chatService = inject(ChatService);
   private authenticationService = inject(AuthenticationService);
   private destroy$ = new Subject<void>();
+  show: "chat" | "calendar" = "chat";
   options = signal<ChatOptions | null>(null);
   currentUser: User | null = null;
   messages = signal<ChatMessageDto[]>([]);
@@ -158,34 +162,38 @@ export class ChatComponent implements OnInit, OnDestroy {
 
   }
 
-  // Nuevo método para cargar el estado del resumen
-private loadSummaryState() {
-  // Cargar estado
-  this.chatService.loadCurrentSummaryStatus();
-  
-  // Cargar resultado si existe
-  this.chatService.getCurrentSummaryResult()
-    .pipe(takeUntil(this.destroy$))
-    .subscribe({
-      next: (summary) => {
-        console.log("LOADED SUMMARY", summary);
-        if (summary.data?.content) {
-          console.log("SUMMARY DATA", summary.data);
-          this.summaryResult.set(summary.data);
-          this.isThereSummaryResult.set(true);
-          this.summarizing.set(false);
+  goTo(page: "chat" | "calendar"){
+    this.show = page;
+  }
 
-          console.log("ISTHERESUMMARY", this.isThereSummaryResult());
-        } else {
+  // Nuevo método para cargar el estado del resumen
+  private loadSummaryState() {
+    // Cargar estado
+    this.chatService.loadCurrentSummaryStatus();
+    
+    // Cargar resultado si existe
+    this.chatService.getCurrentSummaryResult()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (summary) => {
+          console.log("LOADED SUMMARY", summary);
+          if (summary.data?.content) {
+            console.log("SUMMARY DATA", summary.data);
+            this.summaryResult.set(summary.data);
+            this.isThereSummaryResult.set(true);
+            this.summarizing.set(false);
+
+            console.log("ISTHERESUMMARY", this.isThereSummaryResult());
+          } else {
+            this.isThereSummaryResult.set(false);
+          }
+        },
+        error: (err) => {
+          console.error("Error loading summary:", err);
           this.isThereSummaryResult.set(false);
         }
-      },
-      error: (err) => {
-        console.error("Error loading summary:", err);
-        this.isThereSummaryResult.set(false);
-      }
-    });
-}
+      });
+  }
 
   formatSummary(){
     return this.chatService.formatText(this.summaryResult()?.content!);
