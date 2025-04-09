@@ -5,7 +5,7 @@
 **/.angular
 **/.vscode
 .idea
-**/**/Migrations
+
 # User-specific files
 *.suo
 *.user

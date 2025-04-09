@@ -1,15 +1,10 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import {HttpClient, HttpErrorResponse} from '@angular/common/http';
 import {RegisterUserResponse} from '../register/models/RegisterUserResponse';
 import {RegisterUserRequest} from '../register/models/RegisterUserRequest';
 import {Auth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, idToken} from '@angular/fire/auth';
 import {signOut} from 'firebase/auth';
-import {
-  EditProfileRequest,
-  EditProfileResponse,
-  PartialProfile,
-  Profile
-} from '../auth/layout/auth-layout/profile.type';
+import {EditProfileResponse} from '../auth/layout/auth-layout/profile.type';
 import {Router} from '@angular/router';
 import {BehaviorSubject, delay, firstValueFrom, of, tap} from 'rxjs';
 import {UserData} from '../auth/layout/auth-layout/user.type';
@@ -18,7 +13,7 @@ import {UserData} from '../auth/layout/auth-layout/user.type';
 @Injectable({
   providedIn: 'root'
 })
-export class AuthenticationService {
+export class AuthenticationService implements OnDestroy {
 
   private userDataSubject = new BehaviorSubject<UserData | null>(null);
   userData$ = this.userDataSubject.asObservable();
@@ -198,4 +193,8 @@ export class AuthenticationService {
     )
   }
 
+    ngOnDestroy(): void {
+      this.userDataSubject.complete();
+      this.userTokenSubject.complete();
+    }
 }

@@ -6,6 +6,7 @@ using CondominiumAlerts.Features.Features.Condominiums.Get;
 using CondominiumAlerts.Features.Features.Condominiums.GetCondominiumsJoinedByUser;
 using CondominiumAlerts.Features.Features.Condominiums.Join;
 using CondominiumAlerts.Features.Features.Condominiums.Summaries;
+using CondominiumAlerts.Features.Features.Events;
 using CondominiumAlerts.Features.Features.Posts.Create;
 using CondominiumAlerts.Features.Features.Posts.Get;
 using CondominiumAlerts.Features.Features.Posts.Update;
@@ -55,9 +56,7 @@ public static class DependencyInjection
 
         services.AddScoped<IRequestHandler<GetPostsCommand, Result<List<GetPostsResponse>>>, GetPostsHandler>();
         services.AddScoped<IValidator<CreatePostCommand>, CreatePostValidator>();
-
-
-
+        
         services.AddTransient<EmailConfirmationJob>();
         services.AddTransient<MessagesSummarizationJob>();
 
@@ -68,7 +67,7 @@ public static class DependencyInjection
             return basic;
         });
         services.Decorate<IUpdateUserStrategy, UpdateUserWithPhotoStrategy>();
-        
+        services.AddSingleton<ScheduledEventsService>();
         return services;
     }
 }
