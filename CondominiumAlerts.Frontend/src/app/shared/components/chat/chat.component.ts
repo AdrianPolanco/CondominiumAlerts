@@ -1,7 +1,7 @@
 import {Component, computed, inject, OnDestroy, OnInit, signal,} from '@angular/core';
 import {ChatBoxComponent} from '../chat-box/chat-box.component';
 import {ChatBubleComponent} from '../chat-buble/chat-buble.component';
-import {NgClass, NgFor} from '@angular/common';
+import {NgClass, NgFor, NgIf} from '@angular/common';
 import {ChatService} from '../../services/chat.service';
 import {AutoUnsubscribe} from '../../decorators/autounsuscribe.decorator';
 import {combineLatest, firstValueFrom, map, shareReplay, Subject, takeUntil} from 'rxjs';
@@ -34,7 +34,7 @@ import { CalendarComponent } from "../../../features/events/components/calendar/
     BackArrowComponent,
     CalendarComponent,
     NgClass
-],
+  ],
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.css',
   providers: [MessageService]
@@ -86,15 +86,15 @@ export class ChatComponent implements OnInit, OnDestroy {
       if(userData) this.currentUser = userData?.data;
       console.log("TOKEN", this.currentUser);
     });
-    
+
     this.chatService.chatOptions$.pipe(takeUntil(this.destroy$)).subscribe((options) => {
       // Actualizar la opción de chat actual
       this.options.set(options);
-  
+
       // Reaccionar a nuevas opciones de chat
       if (options && options.type === 'condominium' && options.condominium) {
         console.log("COND FROM SUBSCRIPTION", options.condominium.id);
-        
+
         // Cargar mensajes
         this.chatService
           .getMessagesByCondominium(options.condominium.id)
@@ -105,10 +105,10 @@ export class ChatComponent implements OnInit, OnDestroy {
             this.lastMessage.set(response.data[response.data.length - 1]);
             console.log("LAST MESSAGE", this.lastMessage())
           });
-  
+
         // Cargar el estado del resumen y el resultado al inicializar
         this.loadSummaryState();
-        
+
         // Suscribirse a actualizaciones
          // Suscripción para manejar el estado del resumen
     this.summaryState$
@@ -149,14 +149,14 @@ export class ChatComponent implements OnInit, OnDestroy {
         // Conectar automáticamente al SignalR hub para recibir actualizaciones en tiempo real
         if (this.currentUser?.id) {
           this.chatService.connectToCondominiumHub(
-            options.condominium.id, 
-            options.condominium.name, 
+            options.condominium.id,
+            options.condominium.name,
             this.currentUser.id
           ).catch(error => {
             console.error("Error connecting to hub during initialization", error);
           });
         }
-          
+
       }
     });
 
@@ -164,13 +164,18 @@ export class ChatComponent implements OnInit, OnDestroy {
 
   goTo(page: "chat" | "calendar"){
     this.show = page;
+    if(page === "calendar") {
+      this.chatService.disconnectFromHub();
+      this.showSummary = false;
+      console.log("CHATOPTIONS FROM CALENDAR", this.options());
+    }
   }
 
   // Nuevo método para cargar el estado del resumen
   private loadSummaryState() {
     // Cargar estado
     this.chatService.loadCurrentSummaryStatus();
-    
+
     // Cargar resultado si existe
     this.chatService.getCurrentSummaryResult()
       .pipe(takeUntil(this.destroy$))
@@ -301,7 +306,7 @@ export class ChatComponent implements OnInit, OnDestroy {
       try {
         // Siempre intentar cargar el resumen fresco desde el servidor
         const summary = await firstValueFrom(this.chatService.getCurrentSummaryResult());
-        
+
         if (summary && summary.data?.content) {
           // Actualiza el resumen local con los datos del servidor
           this.summaryResult.set(summary.data);

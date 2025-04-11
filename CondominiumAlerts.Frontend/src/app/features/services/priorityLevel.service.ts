@@ -15,14 +15,14 @@ import { deletePriorityLevelResponse } from '../priority-levels/models/deletePri
 @Injectable({
   providedIn: 'root'
 })
-export class priorityLevelService {
+export class PriorityLevelService {
 
-  constructor(private httpClient: HttpClient) { 
+  constructor(private httpClient: HttpClient) {
   }
 
   getPriorityLevels(request: getPriorityLevelsQuery) : Observable<{ isSuccess: boolean,data:GetPriorityLevelResponce}>{
-    
-    return this.httpClient.get<{ isSuccess: boolean,data:GetPriorityLevelResponce}>('/api/priorityLevels', {params: 
+
+    return this.httpClient.get<{ isSuccess: boolean,data:GetPriorityLevelResponce}>('/api/priorityLevels', {params:
       {condominiumId: request.condominiumId, pageNumber:  request.pageNumber, pageSize: request.pageSize}})
   }
 

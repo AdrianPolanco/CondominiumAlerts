@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { priorityDto } from '../../models/priorityDto';
 import { NgFor, NgIf, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { priorityLevelService } from '../../../services/services.service';
+import { PriorityLevelService } from '../../../services/priorityLevel.service';
 import { getPriorityLevelsQuery } from '../../models/getPriorityLevelsQuery';
 import { CondominiumService } from '../../../condominiums/services/condominium.service';
 import { getByIdPriorityLevelResponse } from '../../models/getByIdPriorityLevelResponse';
@@ -18,7 +18,7 @@ import { Button } from 'primeng/button';
 })
 export class IndexComponent {
 
-  constructor(private LevelService: priorityLevelService, private condominiumService: CondominiumService, private route: ActivatedRoute, private location:Location ) {}
+  constructor(private LevelService: PriorityLevelService, private condominiumService: CondominiumService, private route: ActivatedRoute, private location:Location ) {}
 
   condominiumId: string | null = null;
   page: getPriorityLevelsQuery = {
@@ -29,20 +29,20 @@ export class IndexComponent {
 
   priorities: priorityDto[] = [];
   showModal = false;
-  editingPriority: getByIdPriorityLevelResponse | null = null; 
+  editingPriority: getByIdPriorityLevelResponse | null = null;
   modalData: Partial<addPriorityLevelCommand> = {};
 
   ngOnInit() {
     this.loadPriorities()
   }
 loadPriorities() : void{
-  
+
      this.condominiumId =  this.route.snapshot.paramMap.get("condominiumId")
     this.page.condominiumId = this.condominiumId ?? "";
 
     this.LevelService.getPriorityLevels(this.page)
       .subscribe((result) => this.priorities = result.data.priorities);
-      
+
 }
   openModal(priority: priorityDto | null = null) {
     this.showModal = true;
@@ -63,7 +63,7 @@ loadPriorities() : void{
         } ,
         error: (err) => console.error("Error fetching priority level", err)
       });
-     
+
     }
   }
   goBack(){
@@ -84,7 +84,7 @@ loadPriorities() : void{
         description: this.modalData.description!,
         condominiumId: this.condominiumId ?? "",
       }).subscribe((result) => {
-        this.priorities = this.priorities.map(p => 
+        this.priorities = this.priorities.map(p =>
           p.id === this.editingPriority!.id ? { ...p, ...this.modalData } as priorityDto : p
         );
         this.closeModal();

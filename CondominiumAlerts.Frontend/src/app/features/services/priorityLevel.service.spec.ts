@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { priorityLevelService } from './services.service';
+import { PriorityLevelService } from './priorityLevel.service';
 
 describe('ServicesService', () => {
-  let service: priorityLevelService;
+  let service: PriorityLevelService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(priorityLevelService);
+    service = TestBed.inject(PriorityLevelService);
   });
 
   it('should be created', () => {
