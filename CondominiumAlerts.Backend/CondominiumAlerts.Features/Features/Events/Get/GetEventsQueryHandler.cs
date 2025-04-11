@@ -38,8 +38,16 @@ public class GetEventsQueryHandler: IQueryHandler<GetEventsQuery, Result<List<Ge
 
         events = events.OrderByDescending(e => e.CreatedAt).ToList();
         
-        var response = events.Adapt<List<GetEventsQueryResponse>>();
+        var responses = events.Select(e =>
+        {
+            var dto = e.Adapt<GetEventsQueryResponse>();
+            dto = dto with
+            {
+                IsSuscribed = e.Suscribers.Any(s => s.Id == request.UserId)
+            };
+            return dto;
+        }).ToList();
         
-        return Result<List<GetEventsQueryResponse>>.Ok(response);
+        return Result<List<GetEventsQueryResponse>>.Ok(responses);
     }
 }

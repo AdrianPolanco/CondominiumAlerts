@@ -39,7 +39,7 @@ public class EventNotificationJob: IInvocable
         {
             _logger.LogInformation($"Event {eventItem.Id} started at {eventItem.Start}");
             eventItem.IsStarted = true;
-            await _hubContext.Clients.Group(eventItem.CondominiumId.ToString()).SendAsync("EventStarted", $"El evento '{eventItem.Title}' ha comenzado.");
+            await _hubContext.Clients.Group(eventItem.Id.ToString()).SendAsync("EventStarted", $"El evento '{eventItem.Title}' ha comenzado en el condominio {eventItem.CondominiumId}.");
         }
 
         // Obtener los eventos cuyo fin esté en los próximos minutos
@@ -50,7 +50,7 @@ public class EventNotificationJob: IInvocable
         {
             _logger.LogInformation($"Event {eventItem.Id} finished at {eventItem.End}");
             eventItem.IsFinished = true;
-            await _hubContext.Clients.Group(eventItem.CondominiumId.ToString()).SendAsync("EventFinished", $"El evento '{eventItem.Title}' ha finalizado.");
+            await _hubContext.Clients.Group(eventItem.Id.ToString()).SendAsync("EventFinished", $"El evento '{eventItem.Title}' ha finalizado en el condominio {eventItem.CondominiumId}.");
         }
 
         // Unimos ambas listas y hacemos un solo BulkUpdate

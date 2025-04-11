@@ -55,7 +55,7 @@ menuItems: MenuItem[] = [
           command: () => {
             this.router.navigate(['/condominiums'])
           }
-        },        
+        },
         {
           label: 'Cerrar sesión',
           icon: 'pi pi-sign-out',
@@ -66,7 +66,7 @@ menuItems: MenuItem[] = [
         ]
     }
   ]
-  
+
   constructor(private authenticationService: AuthenticationService, private router: Router) {
     effect(() => {
       if(!this.visible()) {
@@ -82,6 +82,7 @@ menuItems: MenuItem[] = [
       .subscribe(userData => {
         if(userData) this.userData = userData?.data;
         console.log(this.userData)
+        console.log("TOKEN", this.token)
         this.updateFormFields(); // <== Actualiza los valores del formulario
         if(userData) this.formGroup().patchValue(this.mapUserDataToForm(userData.data));
     });

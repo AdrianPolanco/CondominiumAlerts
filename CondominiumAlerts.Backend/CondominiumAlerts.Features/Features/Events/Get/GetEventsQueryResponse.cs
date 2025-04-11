@@ -14,4 +14,5 @@ public record GetEventsQueryResponse(
     UserDto CreatedBy,
     List<UserDto> Suscribers,
     DateTime CreatedAt,
-    DateTime UpdatedAt);
+    DateTime UpdatedAt,
+    bool IsSuscribed);

@@ -43,7 +43,7 @@ public class EventsModule: ICarterModule
                 };
 
                 return Results.Ok(successResponse);
-            }) /*.RequireAuthorization()*/;
+            }) .RequireAuthorization();
 
         app.MapPut("/events",
             async (
@@ -52,7 +52,7 @@ public class EventsModule: ICarterModule
                 ClaimsPrincipal claims,
                 UpdateEventCommand command) =>
             {
-                /*
+                
                 var requesterId = claims.FindFirst("user_id")?.Value;
 
                 if (requesterId is null)
@@ -70,7 +70,6 @@ public class EventsModule: ICarterModule
                 }
 
                 command = command with { EditorId = requesterId };
-                */
 
                 var result = await sender.Send(command, cancellationToken);
 
@@ -95,13 +94,13 @@ public class EventsModule: ICarterModule
                 };
 
                 return Results.Ok(successResponse);
-            }) /*.RequireAuthorization()*/;
+            }) .RequireAuthorization();
 
         app.MapGet("/events/{condominiumId}/user/{userId}",
             async (Guid condominiumId, string userId, ISender sender, CancellationToken cancellationToken,
                 ClaimsPrincipal claims) =>
             {
-                /*
+                
                 var requesterId = claims.FindFirst("user_id")?.Value;
 
                 if (requesterId is null)
@@ -117,7 +116,6 @@ public class EventsModule: ICarterModule
 
                     return Results.BadRequest(response);
                 }
-                */
 
                 var query = new GetEventsQuery(condominiumId, userId, userId);
 
@@ -145,12 +143,12 @@ public class EventsModule: ICarterModule
 
                 return Results.Ok(successResponse);
             }
-        ) /*.RequireAuthorization()*/;
+        ) .RequireAuthorization();
 
         app.MapDelete("/events/{eventId}/user/{userId}",
             async (Guid eventId, string userId, ISender sender, CancellationToken cancellationToken, ClaimsPrincipal claims) =>
             {
-                /*
+                
                var requesterId = claims.FindFirst("user_id")?.Value;
 
                if (requesterId is null)
@@ -166,7 +164,6 @@ public class EventsModule: ICarterModule
 
                    return Results.BadRequest(response);
                }
-               */
 
                 var query = new DeleteEventCommand(eventId, userId, userId);
 
@@ -193,7 +190,7 @@ public class EventsModule: ICarterModule
                 };
 
                 return Results.Ok(successResponse);
-            })/*.RequireAuthorization()*/;
+            }).RequireAuthorization();
 
         app.MapPut("/events/{eventId}/suscribe/{userId}",
             async (
@@ -203,7 +200,7 @@ public class EventsModule: ICarterModule
                 CancellationToken cancellationToken,
                 ClaimsPrincipal claims) =>
             {
-                /*
+                
                 var requesterId = claims.FindFirst("user_id")?.Value;
 
                 if (requesterId is null)
@@ -219,9 +216,6 @@ public class EventsModule: ICarterModule
 
                     return Results.BadRequest(response);
                 }
-
-                command = command with { EditorId = requesterId };
-                */
 
                 var command = new AddSuscriberCommand(userId, eventId);
                 
@@ -258,7 +252,7 @@ public class EventsModule: ICarterModule
                 CancellationToken cancellationToken,
                 ClaimsPrincipal claims) =>
             {
-                /*
+                
                 var requesterId = claims.FindFirst("user_id")?.Value;
 
                 if (requesterId is null)
@@ -274,9 +268,6 @@ public class EventsModule: ICarterModule
 
                     return Results.BadRequest(response);
                 }
-
-                command = command with { EditorId = requesterId };
-                */
 
                 var command = new RemoveSuscriberCommand(userId, eventId);
                 
@@ -303,7 +294,7 @@ public class EventsModule: ICarterModule
                 };
 
                 return Results.Ok(successResponse);
-            }) /*.RequireAuthorization()*/;
+            }) .RequireAuthorization();
         
         app.MapHub<EventHub>("/hubs/events");
             }
