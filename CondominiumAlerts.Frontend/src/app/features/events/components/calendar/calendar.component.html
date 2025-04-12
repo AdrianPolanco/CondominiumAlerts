@@ -1,4 +1,70 @@
 <div class="bg-white w-full h-full">
     <full-calendar [options]="options" [events]="events" lang="ES"/>
 </div>
+@if(selectedEvent){
+  <p-dialog header="Detalles del Evento" [modal]="true" [(visible)]="visible" [style]="{ width: '30rem' }">
+    <form [formGroup]="form" class="flex flex-col gap-4">
+      <div class="flex justify-end items-center">
+        @if(!isEventEnded(selectedEvent)){
+          <div class="flex gap-1">
+            <p-button size="small" type="button" pButton icon="pi pi-pencil" class="p-button-sm"
+                      *ngIf="!isEditable"
+                      (click)="toggleEdit()"></p-button>
+            <p-button size="small" type="button" pButton icon="pi pi-trash" class="p-button-sm"
+                      *ngIf="!isEditable"
+                      (click)="toggleEdit()"></p-button>
+          </div>
+        }
+      </div>
 
+      <div class="flex items-center gap-4">
+        <label class="w-24">Título</label>
+        <input pInputText formControlName="title" class="flex-1"
+               [ngClass]="{ 'p-disabled': !isEditable }" />
+      </div>
+
+      <div class="flex items-center gap-4">
+        <label class="w-24">Descripción</label>
+        <textarea pTextarea formControlName="description" class="flex-1"
+               [ngClass]="{ 'p-disabled': !isEditable }"></textarea>
+      </div>
+
+      <div class="flex items-center gap-4">
+        <label class="w-24">Inicio</label>
+        <span *ngIf="!isEditable && form.get('start')?.value">
+          {{ form.get('start')?.value | date: 'EEEE d MMMM y, HH:mm':'UTC-4':'es-ES' }}
+        </span>
+        <span *ngIf="!isEditable && !form.get('start')?.value">
+          Sin fecha
+        </span>
+        <input *ngIf="isEditable"
+               type="datetime-local"
+               pInputText
+               formControlName="start"
+               class="flex-1" />
+      </div>
+
+      <div class="flex items-center gap-4">
+        <label class="w-24">Fin</label>
+        <span *ngIf="!isEditable && form.get('end')?.value">
+          {{ form.get('end')?.value | date: 'EEEE d MMMM y, HH:mm':'UTC-4':'es-ES' }}
+        </span>
+              <span *ngIf="!isEditable && !form.get('end')?.value">
+          Sin fecha
+        </span>
+        <input *ngIf="isEditable"
+               type="datetime-local"
+               pInputText
+               formControlName="end"
+               class="flex-1" />
+      </div>
+
+      <div class="flex justify-end gap-2 mt-4">
+        <button type="button" pButton *ngIf="isEditable" severity="secondary" (click)="visible = false">Cancelar</button>
+        <button type="button" pButton *ngIf="isEditable" (click)="toggleEdit()">Editar</button>
+        <button type="submit" pButton *ngIf="isEditable" [disabled]="!form.valid || !isEditable">Guardar</button>
+      </div>
+    </form>
+  </p-dialog>
+
+}

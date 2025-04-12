@@ -8,9 +8,7 @@ import { ToastModule } from 'primeng/toast';
 import {customPreset} from './theme';
 
 //importciones adicionales de nestor
-import { CommonModule } from '@angular/common'; 
-
-
+import {CommonModule} from '@angular/common';
 
 @Component({
   selector: 'app-root',
