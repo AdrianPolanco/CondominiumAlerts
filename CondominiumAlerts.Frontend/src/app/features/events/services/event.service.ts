@@ -1,6 +1,6 @@
 import {Injectable, OnDestroy} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {BehaviorSubject, catchError, of, Subject, takeUntil, tap} from 'rxjs';
+import {BehaviorSubject, catchError, of, Subject, switchMap, takeUntil, tap} from 'rxjs';
 import {CondominiumEvent, PartialEvent} from '../event.type';
 import {AutoUnsubscribe} from '../../../shared/decorators/autounsuscribe.decorator';
 import {AuthenticationService} from '../../../core/services/authentication.service';
@@ -29,7 +29,7 @@ export class EventService implements OnDestroy {
     });
   }
 
-  getEvents(condominiumId: string) {
+  get(condominiumId: string) {
     console.log("USER FROM EVENT SERVICE", this.user)
     return this.httpClient.get<{ isSuccess: boolean, data: CondominiumEvent[] }>(`/api/events/${condominiumId}/user/${this.user?.id}`,
       {
@@ -46,6 +46,98 @@ export class EventService implements OnDestroy {
         return of<{ isSuccess: boolean, data: CondominiumEvent[] }>({ isSuccess: false, data: [] });
       })
     );
+  }
+
+  save(partialEvent: PartialEvent, condominiumId: string) {
+
+    const requestBody = {
+      title: partialEvent.title,
+      description: partialEvent.description,
+      start: partialEvent.start,
+      end: partialEvent.end,
+      createdById: this.user?.id,
+      condominiumId: condominiumId
+    }
+
+    return this.httpClient.post<{ isSuccess: boolean, data: CondominiumEvent }>(`/api/events`, requestBody,
+      {
+        headers: {
+          Authorization: `Bearer ${this.token}`
+        }
+      }).pipe(
+        switchMap(res => {
+          if (res.isSuccess) {
+            // Vuelve a obtener la lista de eventos actualizada desde el backend
+            return this.get(condominiumId).pipe(
+              tap(() => console.log('Eventos actualizados tras creación')),
+            );
+          } else {
+            return of({ isSuccess: false, data: [...this.eventsBehaviorSubject.getValue()] });
+          }
+        }),
+        catchError(err => {
+          console.error('Error al guardar evento:', err);
+          return of({ isSuccess: false, data: [...this.eventsBehaviorSubject.getValue()] });
+        })
+    );
+  }
+
+  update(condominiumEvent: CondominiumEvent, condominiumId: string){
+    const requestBody = {
+      id: condominiumEvent.id,
+      title: condominiumEvent.title,
+      description: condominiumEvent.description,
+      start: condominiumEvent.start,
+      end: condominiumEvent.end,
+      createdById: condominiumEvent.createdBy.id,
+      condominiumId: condominiumId,
+      editorId: this.user?.id
+    }
+
+    return this.httpClient.put<{ isSuccess: boolean, data: CondominiumEvent }>(`/api/events`, requestBody,
+      {
+        headers: {
+          Authorization: `Bearer ${this.token}`
+        }
+      }).pipe(
+      switchMap(res => {
+        if (res.isSuccess) {
+          // Vuelve a obtener la lista de eventos actualizada desde el backend
+          return this.get(condominiumId).pipe(
+            tap(() => console.log('Eventos actualizados tras actualizacion')),
+          );
+        } else {
+          return of({ isSuccess: false, data: [...this.eventsBehaviorSubject.getValue()] });
+        }
+      }),
+      catchError(err => {
+        console.error('Error al actualizar evento:', err);
+        return of({ isSuccess: false, data: [...this.eventsBehaviorSubject.getValue()] });
+      }));
+  }
+
+  delete(event: string, condominiumId: string) {
+    return this.httpClient.delete<{ isSuccess: boolean, data: CondominiumEvent }>(`/api/events/${event}/user/${this.user?.id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${this.token}`
+        }
+      }).pipe(
+      switchMap(res => {
+        if (res.isSuccess) {
+          console.log("CAYENDO EN EL EXITO")
+          // Vuelve a obtener la lista de eventos actualizada desde el backend
+          return this.get(condominiumId).pipe(
+            tap(() => console.log('Eventos actualizados tras eliminacion')),
+          );
+        } else {
+          return of({ isSuccess: false, data: [...this.eventsBehaviorSubject.getValue()] });
+        }
+      }),
+      catchError(err => {
+        console.error('Error al actualizar evento:', err);
+        return of({ isSuccess: false, data: [...this.eventsBehaviorSubject.getValue()] });
+      }));
   }
 
   ngOnDestroy(): void {

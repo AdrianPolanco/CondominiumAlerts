@@ -35,7 +35,8 @@ public class CreateEventCommandHandler: ICommandHandler<CreateEventCommand, Resu
         if (createdBy is null || condominium is null)
             return Result.Fail<CreateEventResponse>("Usuario o condominio no encontrado.");
 
-        var (start, end) = TimeHelper.ConvertToUtc(request.Start, request.End);
+        var start = request.Start;
+        var end = request.End;
         
         if(start <= DateTime.UtcNow) return Result.Fail<CreateEventResponse>("No se puede crear un evento con una fecha de inicio anterior o igual al tiempo actual.");
         if(end <= DateTime.UtcNow) return Result.Fail<CreateEventResponse>("No se puede crear un evento con una fecha de finalizacion anterior o igual al tiempo actual.");

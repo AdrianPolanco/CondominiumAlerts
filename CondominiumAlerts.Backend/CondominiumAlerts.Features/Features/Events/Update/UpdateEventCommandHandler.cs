@@ -45,7 +45,10 @@ public class UpdateEventCommandHandler: ICommandHandler<UpdateEventCommand, Resu
         if (foundEvent.IsStarted) return Result<UpdateEventResponse>.Fail("No se puede editar un evento ya iniciado.");
         if (foundEvent.IsFinished) return Result<UpdateEventResponse>.Fail("No se puede editar un evento ya finalizado.");
         
-        var (start, end) = TimeHelper.ConvertToUtc(request.Start, request.End);
+        //var (start, end) = TimeHelper.ConvertToUtc(request.Start, request.End);
+        var start = request.Start;
+        var end = request.End;
+        
         var doesHavePermissions = _authenticationProvider.DoesHavePermission(request.EditorId, foundEvent.CreatedById);
         
         if(!doesHavePermissions) return Result<UpdateEventResponse>.Fail("No tienes los permisos necesarios para realizar esta accion. No creaste este evento.");
