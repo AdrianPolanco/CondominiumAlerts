@@ -27,15 +27,14 @@ namespace CondominiumAlerts.Features.Features.Notifications.Get
             {
                 var notifications = await _notificationRepository.GetAsync(
                     cancellationToken: cancellationToken,
-                    filter: n => (n.ReceiverUserId == request.UserId || n.ReceiverUserId == null)
-                                 && n.CondominiumId == request.CondominiumId,
+                    filter: n => n.ReceiverUserId == request.UserId || n.ReceiverUserId == null,
                     includes: [n => n.LevelOfPriority],
                     readOnly: true
                 );
 
                 if (!notifications.Any())
                 {
-                    _logger.LogInformation($"No notifications found for user {request.UserId} in condominium {request.CondominiumId}");
+                    _logger.LogInformation($"No notifications found for user {request.UserId} ");
                     return Result.Ok(new List<NotificationDto>());
                 }
 

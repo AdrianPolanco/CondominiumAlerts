@@ -5,7 +5,6 @@ using LightResults;
 namespace CondominiumAlerts.Features.Features.Notifications.Get
 {
     public record GetNotificationsOfUserQuery(
-        string UserId,
-        Guid CondominiumId
+        string UserId
     ) : IQuery<Result<List<NotificationDto>>>;
 }
