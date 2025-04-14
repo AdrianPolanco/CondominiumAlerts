@@ -7,7 +7,8 @@ import {
   CreatePostCommand,
   CreatePostsResponse,
   UpdatePostCommand,
-  UpdatePostResponse
+  UpdatePostResponse,
+  PostFormData
 } from '../models/posts.model';
 import { AuthService } from '../../../core/auth/services/auth.service';
 
@@ -43,7 +44,7 @@ export class PostService {
     );
   }
 
-  createPost(cmd: CreatePostCommand, condominiumId: string): Observable<CreatePostsResponse> {
+  createPost(formData: PostFormData, condominiumId: string): Observable<CreatePostsResponse> {
     const fb = new FormData();
     const userId = this.authService.currentUser?.uid ?? '';
 
@@ -51,17 +52,12 @@ export class PostService {
       throw new Error('Usuario no autenticado.');
     }
 
-    const fixedLevelOfPriorityId = 'fc279d15-da6d-4e8e-9407-74dc73b4a628';
-
-    fb.append('title', cmd.title);
-    fb.append('description', cmd.description);
-    fb.append('imageFile', cmd.imageFile);
-    fb.append('CondominiumId', condominiumId);
+    fb.append('title', formData.title);
+    fb.append('description', formData.description);
+    if (formData.imageFile) fb.append('imageFile', formData.imageFile);
     fb.append('userId', userId);
-    fb.append('levelOfPriorityId', fixedLevelOfPriorityId);
-
-    console.log('User ID:', userId);
-    console.log('LevelOfPriorityId:', fixedLevelOfPriorityId);
+    fb.append('levelOfPriorityId', formData.LevelOfPriorityId);
+    fb.append('condominiumId', condominiumId);
 
     return this.http.post<CreatePostsResponse>(this.apiUrl, fb);
   }

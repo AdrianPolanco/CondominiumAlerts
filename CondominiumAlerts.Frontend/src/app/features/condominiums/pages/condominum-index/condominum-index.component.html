@@ -3,11 +3,9 @@
     <div class="flex justify-between mb-6">
       <shared-back-arrow url="/condominiums" />
 
-      <div class="flex gap-1">
-        <button
-          class="bg-primary-contrast text-primary-700 px-4 py-2 rounded-md flex items-center hover:bg-primary-emphasis-alt hover:text-primary-contrast"
-          (click)="goToCreatePosts()"
-        >
+      <div class="flex space-x-2">
+        <button class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md flex items-center"
+                (click)="openPostModal()">
           <i class="pi pi-plus mr-2"></i>
           Nuevo post
         </button>
@@ -26,6 +24,7 @@
       Publicaciones
     </h2>
 
+    <!-- Publicaciones -->
     <div class="space-y-4">
       <div *ngFor="let publication of publications"
            class="bg-gray-800 p-6 rounded-lg shadow-lg">
@@ -44,9 +43,8 @@
         </div>
         <p class="text-gray-300 mb-4">{{ publication.description }}</p>
 
-        <div class="w-full mb-4 rounded-lg overflow-hidden max-h-[400px] flex justify-center bg-transparent">
-          <img *ngIf="publication.imageUrl"
-               [src]="publication.imageUrl"
+        <div *ngIf="publication.imageUrl" class="w-full mb-4 rounded-lg overflow-hidden max-h-[400px] flex justify-center bg-transparent">
+          <img [src]="publication.imageUrl"
                alt="Publicación"
                class="w-full h-auto object-contain rounded-lg" />
         </div>
@@ -62,5 +60,78 @@
       </div>
     </div>
   </div>
+
+  <!-- Modal para crear/editar posts -->
+  <div class="modal" *ngIf="showPostModal">
+    <div class="modal-content bg-gray-800 text-white rounded-xl shadow-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+      <h2 class="text-2xl font-bold mb-6 border-b border-gray-700 pb-2">
+        {{ editingPost ? 'Editar Publicación' : 'Nueva Publicación' }}
+      </h2>
+
+      <form (ngSubmit)="savePost()" class="space-y-5">
+
+        <div class="form-group">
+          <label class="block mb-1 text-sm font-semibold">Título</label>
+          <input type="text" [(ngModel)]="postForm.title" name="title"
+                 class="w-full p-3 rounded-md bg-gray-900 text-white border border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary"
+                 required>
+        </div>
+
+
+        <div class="form-group">
+          <label class="block mb-1 text-sm font-semibold">Descripción</label>
+          <textarea [(ngModel)]="postForm.description" name="description"
+                    rows="4"
+                    class="w-full p-3 rounded-md bg-gray-900 text-white border border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary"
+                    required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="block mb-1 text-sm font-semibold">Nivel de Prioridad</label>
+          <select [(ngModel)]="postForm.levelOfPriorityId" name="levelOfPriorityId"
+                  class="w-full p-3 rounded-md bg-gray-900 text-white border border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary"
+                  required>
+            <option value="" disabled selected>Selecciona un nivel</option>
+            <option *ngFor="let level of priorityLevels"
+                    [value]="level.id">
+              {{ level.title }} (Prioridad: {{ level.priority }})
+            </option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="block mb-1 text-sm font-semibold">Imagen</label>
+          <div *ngIf="postForm.currentImageUrl" class="mb-2">
+            <img [src]="postForm.currentImageUrl" alt="Vista previa" class="rounded-md max-h-64 object-contain">
+          </div>
+
+
+          <label class="flex items-center justify-center px-4 py-2 bg-white border border-gray-300 text-black rounded-md cursor-pointer hover:bg-gray-50 transition-colors">
+            <span class="mr-1">+</span> Subir imagen
+            <input type="file" (change)="onFileSelected($event)" accept="image/*" class="hidden">
+          </label>
+
+          <small *ngIf="editingPost && !postForm.imageFile" class="text-xs text-gray-500">
+            Dejar en blanco para mantener la imagen actual
+          </small>
+        </div>
+
+
+        <div class="flex justify-end space-x-3 pt-4 border-t border-gray-700 mt-6">
+          <button type="button"
+                  (click)="closePostModal()"
+                  class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-md">
+            Cancelar
+          </button>
+          <button type="submit"
+                  [disabled]="!postForm.title || !postForm.description"
+                  class="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-md font-semibold">
+            {{ editingPost ? 'Actualizar' : 'Publicar' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <shared-chats-drawer (onCondominiumSelected)="onCondominiumSelected()"></shared-chats-drawer>
 </shared-condominiums-layout>

@@ -3,10 +3,17 @@ import { Data } from "@angular/router";
 export interface CreatePostCommand {
   title: string;
   description: string;
-  imageFile: File;
+  imageFile?: File | null;
   userId: string;
   LevelOfPriorityId: string;
   CondominiumId: string;
+}
+
+export interface PostFormData {
+  title: string;
+  description: string;
+  imageFile?: File | null;
+  LevelOfPriorityId: string;
 }
 
 export interface CreatePostsResponse {
