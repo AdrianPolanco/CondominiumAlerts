@@ -1,6 +1,18 @@
 <div class="bg-white w-full h-full">
     <full-calendar [options]="options" [events]="events" lang="ES"/>
 </div>
+@if (isLoading) {
+  <div class="fixed inset-0 flex items-center justify-center bg-black/10 z-50">
+    <p-progress-spinner
+      [style]="{width: '40px', height: '40px'}"
+      styleClass="custom-spinner"
+      strokeWidth="4"
+      fill="var(--surface-ground)"
+      animationDuration=".5s"
+    />
+  </div>
+}
+
 @if(selectedEvent || visible){
   <p-dialog header="Detalles del Evento" [modal]="true" [(visible)]="visible" [style]="{ width: '30rem' }">
     <form [formGroup]="form" class="flex flex-col gap-4">

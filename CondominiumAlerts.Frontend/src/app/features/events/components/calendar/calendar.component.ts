@@ -11,7 +11,6 @@ import {Condominium} from '../../../condominiums/models/condominium.model';
 import {ChatService} from '../../../../shared/services/chat.service';
 import {Subject, takeUntil} from 'rxjs';
 import {AutoUnsubscribe} from '../../../../shared/decorators/autounsuscribe.decorator';
-import {User} from '../../../../core/auth/layout/auth-layout/user.type';
 import {Dialog} from 'primeng/dialog';
 import {Button, ButtonDirective, ButtonIcon, ButtonLabel} from 'primeng/button';
 import {
@@ -27,10 +26,11 @@ import {InputText} from 'primeng/inputtext';
 import {Textarea} from 'primeng/textarea';
 import {MessageService} from 'primeng/api';
 import {Toast} from 'primeng/toast';
+import {ProgressSpinner} from 'primeng/progressspinner';
 
 @AutoUnsubscribe()
 @Component({
-  imports: [FullCalendarModule, Dialog, NgClass, InputText, ReactiveFormsModule, ButtonDirective, NgIf, Textarea, DatePipe, Button, Toast],
+  imports: [FullCalendarModule, Dialog, NgClass, InputText, ReactiveFormsModule, ButtonDirective, NgIf, Textarea, DatePipe, Button, Toast, ProgressSpinner],
   templateUrl: './calendar.component.html',
   styleUrl: './calendar.component.css',
   selector: 'feature-calendar',
@@ -39,6 +39,7 @@ import {Toast} from 'primeng/toast';
   ]
 })
 export class CalendarComponent implements  OnInit, OnDestroy {
+  isLoading = true;
   condominium: Pick<Condominium, 'id' | 'name' | 'imageUrl'| 'address'> | null = null;
   destroy$ = new Subject<void>();
   form: FormGroup;
@@ -120,8 +121,78 @@ export class CalendarComponent implements  OnInit, OnDestroy {
     },
     dayMaxEventRows: 3,
     eventDrop: (info) => {
-      console.log("NEW EVENT DATE START", info.event.start);
-      console.log("NEW EVENT DATE END", info.event.end);
+      const event = this.events?.filter((event) => event.id === info.event.id)[0];
+      const newStart = info.event.start;
+      const newEnd = info.event.end;
+      const now = new Date();
+      const selectedDate = new Date(newStart?.getTime()!);
+    
+      const nowDateOnly = new Date(now);
+      nowDateOnly.setHours(0, 0, 0, 0);
+    
+      const selectedDateOnly = new Date(selectedDate);
+      selectedDateOnly.setHours(0, 0, 0, 0);
+    
+      if (selectedDateOnly < nowDateOnly) {
+        info.revert(); // <- ¡Importante!
+        return;
+      }
+    
+      if (event?.isStarted) {
+        this.messageService.add({
+          text: 'No puedes mover un evento que ya ha comenzado.',
+          severity: 'error',
+          summary: 'Error al mover evento'
+        });
+        info.revert(); // <- ¡Importante!
+        return;
+      }
+    
+      if (event?.isFinished) {
+        this.messageService.add({
+          text: 'No puedes mover un evento que ya ha terminado.',
+          severity: 'error',
+          summary: 'Error al mover evento'
+        });
+        info.revert(); // <- ¡Importante!
+        return;
+      }
+    
+      if(!event || !newStart || !newEnd) {
+        info.revert(); // <- Por si acaso
+        return;
+      }
+    
+      const updatedEvent: CondominiumEvent = {
+        ...event,
+        start: newStart,
+        end: newEnd,
+      };
+    
+      this.eventService.update(updatedEvent, this.condominium?.id!).subscribe(res => {
+        if (!res.isSuccess) {
+          this.messageService.add({
+            text: 'Error al actualizar el evento',
+            severity: 'error',
+            summary: 'Error al actualizar evento'
+          });
+          info.revert(); // <- Si falla la actualización
+        } else {
+          const formattedDate = this.formatDateToInput(new Date(updatedEvent.start));
+          this.messageService.add({
+            text: `Inicio del evento movido correctamente para el ${formattedDate}`,
+            severity: 'success',
+            summary: 'Evento actualizado correctamente'
+          });
+        }
+      }, err => {
+        this.messageService.add({
+          text: 'Error de red al actualizar el evento',
+          severity: 'error',
+          summary: 'Error'
+        });
+        info.revert(); // <- Si falla la petición
+      });
     }
   }
 
@@ -139,6 +210,7 @@ export class CalendarComponent implements  OnInit, OnDestroy {
           .pipe(takeUntil(this.destroy$))
           .subscribe(events => {
             this.events = events;
+            // this.isLoading = false;
           });
       }
     });
@@ -157,6 +229,7 @@ export class CalendarComponent implements  OnInit, OnDestroy {
     if(this.condominium?.id) this.eventService.get(this.condominium?.id).subscribe((res) => {
       console.log("EVENTS", res)
       this.events = [...res.data];
+      this.isLoading = false;
     });
   }
 
@@ -299,6 +372,9 @@ export class CalendarComponent implements  OnInit, OnDestroy {
     }
 
     this.visible = false;
+    this.form.reset();
+    this.form.disable();
+    this.isEditable = false;
   }
 
   deleteEvent(){
