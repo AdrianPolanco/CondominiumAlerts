@@ -14,7 +14,7 @@ import { AuthService } from '../../../../core/auth/services/auth.service';
 import { FormsModule } from '@angular/forms';
 import { priorityLevelService } from '../../../services/services.service'; 
 import { priorityDto } from '../../../priority-levels/models/priorityDto';
-import { CreatePostsResponse, UpdatePostCommand, UpdatePostResponse, CreatePostCommand, PostFormData } from '../../../posts/models/posts.model';
+import { CreatePostsResponse, UpdatePostCommand, PostFormData } from '../../../posts/models/posts.model';
 
 @Component({
   selector: 'app-condominium-index',

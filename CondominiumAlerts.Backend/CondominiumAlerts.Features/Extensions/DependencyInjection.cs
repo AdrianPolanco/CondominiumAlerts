@@ -22,6 +22,7 @@ using FluentValidation;
 using LightResults;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
+using CondominiumAlerts.Features.Features.Comment.Add;
 
 namespace CondominiumAlerts.Features.Extensions;
 
@@ -50,11 +51,10 @@ public static class DependencyInjection
         services.AddScoped<IValidator<DeletePriorityLevelCommand>, DeletePriorityLevelValidator>();
         services.AddScoped<IValidator<GetByIdPriorityLevelQuery>, GetByIdPriorityLevelValidator>();
         services.AddScoped<IValidator<Address>, AddressValidator>();
-
         services.AddScoped<IValidator<GetCondominiumsUsersCommand>, GetCondominiumsUsersValidator>();
-
         services.AddScoped<IRequestHandler<GetPostsCommand, Result<List<GetPostsResponse>>>, GetPostsHandler>();
         services.AddScoped<IValidator<CreatePostCommand>, CreatePostValidator>();
+        services.AddScoped<IValidator<AddCommentCommand>, AddCommentValidator>();
 
 
 

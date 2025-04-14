@@ -14,7 +14,7 @@ namespace CondominiumAlerts.Domain.Aggregates.Entities;
         // if it has a parent comment id it is a comment repling to another comment
         public Guid? ParentCommentId { get; set; }
         public DateTime CreatedAt { get; set; }
-        public DateTime UpdatedAt { get; set; }
+        public DateTime UpdatedAt { get; set; } 
         public Post Post { get; init; }
         public Comment? ParentComment { get; set; }
         public User User { get; init; }
