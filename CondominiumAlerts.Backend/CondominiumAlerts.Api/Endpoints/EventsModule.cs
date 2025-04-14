@@ -4,6 +4,7 @@ using CondominiumAlerts.Features.Features.Events;
 using CondominiumAlerts.Features.Features.Events.Create;
 using CondominiumAlerts.Features.Features.Events.Delete;
 using CondominiumAlerts.Features.Features.Events.Get;
+using CondominiumAlerts.Features.Features.Events.GetByUser;
 using CondominiumAlerts.Features.Features.Events.Suscribers.Add;
 using CondominiumAlerts.Features.Features.Events.Suscribers.Remove;
 using CondominiumAlerts.Features.Features.Events.Update;
@@ -118,6 +119,55 @@ public class EventsModule: ICarterModule
                 }
 
                 var query = new GetEventsQuery(condominiumId, userId, userId);
+
+                var result = await sender.Send(query, cancellationToken);
+
+                if (!result.IsSuccess)
+                {
+                    var response = new
+                    {
+                        Success = false,
+                        Data = new
+                        {
+                            Message = result.Error.Message
+                        }
+                    };
+
+                    return Results.BadRequest(response);
+                }
+
+                var successResponse = new
+                {
+                    IsSuccess = true,
+                    Data = result.Value
+                };
+
+                return Results.Ok(successResponse);
+            }
+        ) .RequireAuthorization();
+        
+        app.MapGet("/events/subscribed",
+            async (ISender sender, CancellationToken cancellationToken,
+                ClaimsPrincipal claims) =>
+            {
+                
+                var requesterId = claims.FindFirst("user_id")?.Value;
+
+                if (requesterId is null)
+                {
+                    var response = new
+                    {
+                        Success = false,
+                        Data = new
+                        {
+                            Message = "No se proporcionó un token válido."
+                        }
+                    };
+
+                    return Results.BadRequest(response);
+                }
+
+                var query = new GetEventsBySubscriberQuery(requesterId);
 
                 var result = await sender.Send(query, cancellationToken);
 
@@ -296,6 +346,6 @@ public class EventsModule: ICarterModule
                 return Results.Ok(successResponse);
             }) .RequireAuthorization();
         
-        app.MapHub<EventHub>("/hubs/events");
+        app.MapHub<EventHub>("/events/hubs");
             }
 }

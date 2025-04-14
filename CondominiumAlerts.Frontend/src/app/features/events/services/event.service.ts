@@ -5,6 +5,7 @@ import {CondominiumEvent, PartialEvent} from '../event.type';
 import {AutoUnsubscribe} from '../../../shared/decorators/autounsuscribe.decorator';
 import {AuthenticationService} from '../../../core/services/authentication.service';
 import {User} from '../../../core/auth/layout/auth-layout/user.type';
+import { HttpTransportType, HubConnection, HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
 
 @AutoUnsubscribe()
 @Injectable({
@@ -12,7 +13,10 @@ import {User} from '../../../core/auth/layout/auth-layout/user.type';
 })
 export class EventService implements OnDestroy {
 
+  private hubConnection: HubConnection | null = null;
   private eventsBehaviorSubject = new BehaviorSubject<CondominiumEvent[]>([]);
+  private notificationBehaviorSubject = new BehaviorSubject<string[]>([]);
+  notification$ = this.notificationBehaviorSubject.asObservable();
   private readonly destroy$ = new Subject<void>();
   private token: string|null = null;
   private user: User|null = null
@@ -27,6 +31,72 @@ export class EventService implements OnDestroy {
       console.log("TOKEN FROM EVENT SERVICE", token)
       this.token = token;
     });
+  }
+
+     // 🔌 Inicia la conexión al Hub si no existe
+  private initHubConnection(): void {
+    if (this.hubConnection) return;
+
+    this.hubConnection = new HubConnectionBuilder()
+      .withUrl(`/api/events/hubs`, {
+        accessTokenFactory: () => this.token ?? '',
+        transport: HttpTransportType.ServerSentEvents
+      })
+      .withAutomaticReconnect()
+      .configureLogging(LogLevel.Information)
+      .build();
+
+    this.hubConnection.on("EventStarted", (message: string) => {
+      console.log("Notificación: ", message);
+      this.notificationBehaviorSubject.next([message]);
+    });
+
+    this.hubConnection.on("EventFinished", (message: string) => {
+      console.log("Notificación: ", message);
+      this.notificationBehaviorSubject.next([message]);
+    });
+
+    this.hubConnection.start()
+      .then(() => console.log('✅ Conectado al hub de eventos'))
+      .catch(err => console.error('❌ Error al conectar al hub:', err));
+  }
+
+  // 🔹 Unirse a un grupo
+  joinEventGroup(eventId: string): void {
+    if (!this.hubConnection) {
+      this.initHubConnection();
+      setTimeout(() => this.invokeJoinGroup(eventId), 1000);
+    } else {
+      this.invokeJoinGroup(eventId);
+    }
+  }
+
+  private invokeJoinGroup(eventId: string): void {
+    this.hubConnection?.invoke('JoinGroup', eventId, this.user?.id)
+      .then(() => console.log(`🟢 Unido al grupo de evento ${eventId}`))
+      .catch(err => console.error('❌ Error al unirse al grupo:', err));
+  }
+
+  // 🔸 Salir del grupo
+  leaveEventGroup(eventId: string): void {
+    if (this.hubConnection) {
+      this.hubConnection.invoke('LeaveGroup', eventId, this.user?.id)
+        .then(() => console.log(`🟡 Saliste del grupo de evento ${eventId}`))
+        .catch(err => console.error('❌ Error al salir del grupo:', err));
+    }
+  }
+
+  // 🔚 Desconectarse completamente del Hub y del grupo
+  disconnectFromEventHub(eventId: string): void {
+    if (this.hubConnection) {
+      this.hubConnection.invoke('LeaveGroup', eventId, this.user?.id)
+        .then(() => this.hubConnection?.stop())
+        .then(() => {
+          this.hubConnection = null;
+          console.log('🔌 Desconectado completamente del hub');
+        })
+        .catch(err => console.error('❌ Error al desconectarse del evento:', err));
+    }
   }
 
   get(condominiumId: string) {
@@ -46,6 +116,15 @@ export class EventService implements OnDestroy {
         return of<{ isSuccess: boolean, data: CondominiumEvent[] }>({ isSuccess: false, data: [] });
       })
     );
+  }
+
+  getSubscribedEvents() {
+    return this.httpClient.get<{ isSuccess: boolean, data: { events: CondominiumEvent[]} }>(`/api/events/subscribed`,
+      {
+        headers: {
+          Authorization: `Bearer ${this.token}`
+        }
+      });
   }
 
   save(partialEvent: PartialEvent, condominiumId: string) {

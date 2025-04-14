@@ -17,6 +17,8 @@ import {BadgeModule} from 'primeng/badge';
 import {Menu} from 'primeng/menu';
 import { MenuItem } from 'primeng/api';
 import { User } from '../auth-layout/user.type';
+import { EventService } from '../../../../features/events/services/event.service';
+import { CondominiumEvent } from '../../../../features/events/event.type';
 
 @AutoUnsubscribe()
 @Component({
@@ -66,13 +68,27 @@ menuItems: MenuItem[] = [
         ]
     }
   ]
+   events: CondominiumEvent[] = [];
 
-  constructor(private authenticationService: AuthenticationService, private router: Router) {
+  constructor(private authenticationService: AuthenticationService, private router: Router, private eventService: EventService) {
     effect(() => {
       if(!this.visible()) {
         this.formGroup().reset();
         this.imageUrl.set(this.userData?.profilePictureUrl);
       };
+    })
+
+    this.eventService.getSubscribedEvents().pipe(takeUntil(this.destroy$)).subscribe(res => {
+      this.events = [...res.data.events];
+      console.log("Eventos obtenidos", this.events)
+      const subscribedEvents = this.events.filter(e => e.isSubscribed);
+      subscribedEvents.forEach(event => {
+        this.eventService.joinEventGroup(event.id);
+      });
+    })
+
+    this.eventService.notification$.pipe(takeUntil(this.destroy$)).subscribe(notification => {
+      this.notifications = [...notification];
     })
   }
 
@@ -102,11 +118,7 @@ menuItems: MenuItem[] = [
   showNotifications = false;
   showDrawer = false;
   userProfileFormFields = signal<SharedFormField[]>([]);
-  notifications = [
-    { message: 'Nuevo mensaje de Juan', time: 'Hace 5 minutos' },
-    { message: 'Carlos ha publicado algo nuevo', time: 'Hace 1 hora' },
-    { message: 'María ha reaccionado a tu publicación', time: 'Hace 2 horas' },
-  ];
+  notifications: string[] = [];
 
   onLogoClicked(){
     if(this.userData) this.router.navigate(['/condominiums']);
@@ -295,5 +307,8 @@ menuItems: MenuItem[] = [
     this.formGroup().reset();
     this.destroy$.next(); // Emite un valor para cancelar la suscripción
     this.destroy$.complete(); // Completa el Subject para cancelar la suscripción
+    this.events
+      .filter(e => e.isSubscribed)
+      .forEach(e => this.eventService.leaveEventGroup(e.id));
   }
 }
