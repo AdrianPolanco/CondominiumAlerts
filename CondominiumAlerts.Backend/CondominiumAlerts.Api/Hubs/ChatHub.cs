@@ -10,9 +10,15 @@ namespace CondominiumAlerts.Api.Hubs
         {
             return base.OnConnectedAsync();
         }
-        public async Task SendMessage(Guid condominiumId, string text, string creatorUserId, string? receiverUserId)
+        public async Task SendMessage(Guid condominiumId, string text, string creatorUserId, string? receiverUserId, string? media)
         {
-            AddMessageCommand command = new() { CondominiumId = condominiumId, Text = text, CreatorUserId = creatorUserId, ReceiverUserId = receiverUserId};
+            AddMessageCommand command = new() {
+                CondominiumId = condominiumId,
+                Text = text,
+                CreatorUserId = creatorUserId,
+                ReceiverUserId = receiverUserId,
+                Media = media,
+            };
             var result = await sender.Send(command);
             await Clients.Group(condominiumId.ToString()).SendAsync("NewMessage", result.Value);
         }
