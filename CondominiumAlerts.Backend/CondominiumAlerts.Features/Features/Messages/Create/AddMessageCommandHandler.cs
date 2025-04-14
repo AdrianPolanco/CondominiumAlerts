@@ -20,7 +20,7 @@ namespace CondominiumAlerts.Features.Features.Messages.Create
 
             var messageAdded = await messageRepository.CreateAsync(message, cancellationToken);
             var messageWithCreatorUser = await messageRepository.GetByIdAsync(messageAdded.Id, cancellationToken, includes: [m => m.CreatorUser])!;
-            ChatCreatorUserDto userDto = new(
+            UserDto userDto = new(
                 messageWithCreatorUser!.CreatorUser.Id,
                 messageWithCreatorUser.CreatorUser.Name,
                 messageWithCreatorUser.CreatorUser.Lastname,

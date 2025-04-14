@@ -32,7 +32,6 @@ import { Toast } from 'primeng/toast';
 import { SummaryStatus } from '../../../features/condominiums/models/summaryStatus.enum';
 import { BackArrowComponent } from '../back-arrow/back-arrow.component';
 import { ChatSignalRService } from '../../../core/services/chat-signal-r.service';
-import { CalendarComponent } from '../../../features/events/components/calendar/calendar.component';
 
 @AutoUnsubscribe()
 @Component({
@@ -45,9 +44,7 @@ import { CalendarComponent } from '../../../features/events/components/calendar/
     Button,
     Toast,
     Dialog,
-    BackArrowComponent,
-    CalendarComponent,
-    NgClass
+    BackArrowComponent
 ],
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.css',

@@ -3,7 +3,7 @@
 public record MessageDto(
     Guid Id,
     string Text,
-    ChatCreatorUserDto CreatorUser,
+    UserDto CreatorUser,
     string? CreatorUserId,
     string? ReceiverUserId,
     string? MediaUrl,
