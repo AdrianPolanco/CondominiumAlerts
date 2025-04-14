@@ -53,7 +53,7 @@ export const routes: Routes = [
       ).then((x) => x.CondominiumPageComponent),
   },
   {
-    path: 'condominium/chat',
+  path: 'condominium/chat',
     loadComponent: () =>
       import(
         './features/condominiums/pages/condominium-chat/condominium-chat.component'
