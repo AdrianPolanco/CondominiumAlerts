@@ -68,14 +68,21 @@ public class CreatePostHandler : ICommandHandler<CreatePostCommand, Result<Creat
             return Result.Fail<CreatePostResponse>(string.Join(", ", errors));
         }
 
-        ImageUploadResult imageUploadResult = await _cloudinary.UploadAsync(new ImageUploadParams()
+        string? imageUrl = null;
+
+        if (request.ImageFile != null)
         {
-            File = new FileDescription(Guid.NewGuid().ToString(), request.ImageFile.OpenReadStream()),
-        });
-        if (imageUploadResult.Error?.Message is { } message)
-        {
-            _logger.LogTrace("Failed to upload image, error with message {Error}.", message);
-            return Result.Fail<CreatePostResponse>(message);
+            ImageUploadResult imageUploadResult = await _cloudinary.UploadAsync(new ImageUploadParams()
+            {
+                File = new FileDescription(Guid.NewGuid().ToString(), request.ImageFile.OpenReadStream()),
+            });
+            if (imageUploadResult.Error?.Message is { } message)
+            {
+                _logger.LogTrace("Failed to upload image, error with message {Error}.", message);
+                return Result.Fail<CreatePostResponse>(message);
+            }
+
+            imageUrl = imageUploadResult.SecureUrl.ToString();
         }
 
 
@@ -86,7 +93,7 @@ public class CreatePostHandler : ICommandHandler<CreatePostCommand, Result<Creat
             Id = Guid.NewGuid(),
             Title = request.Title,
             Description = request.Description,
-            ImageUrl = imageUploadResult.SecureUrl.ToString(),
+            ImageUrl = imageUrl,
             UserId = userId,
             LevelOfPriorityId = request.LevelOfPriorityId,
             CondominiumId = request.CondominiumId,

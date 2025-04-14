@@ -38,7 +38,9 @@ public static class DependencyInjection
         services.AddScoped(typeof(IRepository<,>), typeof(Repository<,>));
         services.AddScoped<ICondominiumRepository, CondominiumRepository>();
         services.AddScoped<INotificationRepository, NotificationRepository>();
-        
+        services.AddScoped<ICommentRepository, CommentRepository>();
+
+
         services.Configure<AISettings>(configuration.GetSection("AISettings"));
 
         /*services.AddSingleton(sp =>

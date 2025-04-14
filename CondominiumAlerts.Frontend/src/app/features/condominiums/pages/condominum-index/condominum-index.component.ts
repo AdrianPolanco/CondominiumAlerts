@@ -11,6 +11,10 @@ import { ChatsDrawerComponent } from "../../../../shared/components/chats-drawer
 import { BackArrowComponent } from "../../../../shared/components/back-arrow/back-arrow.component";
 import { ButtonModule } from 'primeng/button';
 import { AuthService } from '../../../../core/auth/services/auth.service';
+import { FormsModule } from '@angular/forms';
+import { priorityLevelService } from '../../../services/services.service'; 
+import { priorityDto } from '../../../priority-levels/models/priorityDto';
+import { CreatePostsResponse, UpdatePostCommand, PostFormData } from '../../../posts/models/posts.model';
 
 @Component({
   selector: 'app-condominium-index',
@@ -18,6 +22,7 @@ import { AuthService } from '../../../../core/auth/services/auth.service';
   imports: [
     NgFor,
     CommonModule,
+    FormsModule,
     CondominiumsLayoutComponent,
     ChatsDrawerComponent,
     BackArrowComponent,
@@ -27,6 +32,7 @@ import { AuthService } from '../../../../core/auth/services/auth.service';
   styleUrls: ['./condominum-index.component.css'],
 })
 export class CondominumIndexComponent implements OnInit {
+  priorityLevels: priorityDto[] = [];
   users: GetCondominiumsUsersResponse[] = [
     {
       id: 'dddddfsdfdfs',
@@ -37,6 +43,16 @@ export class CondominumIndexComponent implements OnInit {
     },
   ];
 
+  postForm: {
+    title: string;
+    description: string;
+    imageFile: File | null;
+    currentImageUrl: string;
+    levelOfPriorityId: string;
+    condominiumId: string;
+    userId: string | null;
+  };
+
   condominium: GetCondominiumResponse | null = null;
   notifications = [
     { message: 'Nuevo mensaje de Juan', time: 'Hace 5 minutos' },
@@ -46,6 +62,9 @@ export class CondominumIndexComponent implements OnInit {
 
   publications: any[] = [];
   condominiumId: string | null = null;
+  showPostModal = false;
+  editingPost: CreatePostsResponse['data'] | null = null;
+
 
   constructor(
     private router: Router,
@@ -53,8 +72,21 @@ export class CondominumIndexComponent implements OnInit {
     private postService: PostService,
     private userService: UserService,
     private condominiumService: CondominiumService,
-    private authService: AuthService
-  ) { }
+    private authService: AuthService,
+    private priorityService: priorityLevelService,
+  )
+  {
+    this.postForm = {
+      title: '',
+      description: '',
+      imageFile: null as File | null,
+      currentImageUrl: '',
+      levelOfPriorityId: '',
+      condominiumId: '',
+      userId: this.authService.currentUser?.uid ?? null
+    };
+
+  }
 
   ngOnInit(): void {
     this.condominiumId = this.route.snapshot.paramMap.get("condominiumId");
@@ -69,11 +101,39 @@ export class CondominumIndexComponent implements OnInit {
     this.getCondominiumData();
     this.loadPosts();
     this.loadUsers();
+    this.loadPriorityLevels();
   }
 
   onCondominiumSelected(): void {
     this.router.navigate(['/condominium/chat']);
   }
+
+  loadPriorityLevels(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      if (!this.condominiumId) {
+        resolve();
+        return;
+      }
+
+      const query = {
+        condominiumId: this.condominiumId,
+        pageNumber: 1,
+        pageSize: 100
+      };
+
+      this.priorityService.getPriorityLevels(query).subscribe({
+        next: (result) => {
+          this.priorityLevels = result.data.priorities;
+          resolve();
+        },
+        error: (err) => {
+          console.error('Error al cargar niveles de prioridad', err);
+          reject(err);
+        }
+      });
+    });
+  }
+
 
   goToCreatePosts(): void {
     console.log('Creating a new post');
@@ -137,13 +197,122 @@ export class CondominumIndexComponent implements OnInit {
       this.router.navigate(['/priority-levels/index', this.condominiumId]);
     }
   }
+  
 
-  editPost(postId: string): void {
-    if (!this.condominiumId) {
-      console.error('No hay condominiumId disponible');
-      return;
+  async openPostModal(postId?: string) {
+    this.showPostModal = true;
+
+    if (this.priorityLevels.length === 0) {
+      await this.loadPriorityLevels();
     }
 
-    this.router.navigate([`/posts/edit/${this.condominiumId}/${postId}`]);
+    if (postId) {
+      // Modo edición
+      this.postService.getPostById(postId).subscribe({
+        next: (post) => {
+          this.editingPost = post;
+          this.postForm = {
+            ...this.postForm,
+            title: post.title,
+            description: post.description,
+            currentImageUrl: post.imageUrl,
+            levelOfPriorityId: post.levelOfPriorityId
+          };
+        },
+        error: (err) => console.error('Error al cargar post', err)
+      });
+    } else {
+      this.editingPost = null;
+      this.resetPostForm();
+    }
   }
+
+  resetPostForm() {
+    this.postForm = {
+      title: '',
+      description: '',
+      imageFile: null,
+      currentImageUrl: '',
+      levelOfPriorityId: '',
+      condominiumId: this.condominiumId || '',
+      userId: this.authService.currentUser?.uid || ''
+    };
+  }
+
+  onFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files?.length) {
+      const file = input.files[0];
+      if (file.size > 0) { 
+        this.postForm.imageFile = file;
+
+        const reader = new FileReader();
+        reader.onload = () => {
+          this.postForm.currentImageUrl = reader.result as string;
+        };
+        reader.readAsDataURL(file);
+      } else {
+        this.postForm.imageFile = null;
+        this.postForm.currentImageUrl = '';
+      }
+    } else {
+      this.postForm.imageFile = null;
+      this.postForm.currentImageUrl = '';
+    }
+  }
+
+  savePost() {
+    if (!this.condominiumId) return;
+
+    if (this.editingPost) {
+
+      // Edicion de post
+      const updateData: UpdatePostCommand = {
+        title: this.postForm.title,
+        description: this.postForm.description,
+        levelOfPriorityId: this.postForm.levelOfPriorityId,
+        imageFile: this.postForm.imageFile || undefined
+      };
+
+      this.postService.updatePost(this.editingPost.id, updateData).subscribe({
+        next: () => {
+          this.loadPosts();
+          this.closePostModal();
+        },
+        error: (err) => console.error('Error al actualizar', err)
+      });
+    } else {
+
+      // Crear post
+      if (!this.condominiumId) return;
+
+      const formData: PostFormData = {
+        title: this.postForm.title,
+        description: this.postForm.description,
+        imageFile: this.postForm.imageFile || undefined,
+        LevelOfPriorityId: this.postForm.levelOfPriorityId,
+      };
+
+      this.postService.createPost(formData, this.condominiumId).subscribe({
+        next: () => {
+          this.loadPosts();
+          this.closePostModal();
+        },
+        error: (err) => {
+          console.error('Error al crear post:', err);
+        }
+      });
+    }
+  }
+
+  closePostModal() {
+    this.showPostModal = false;
+    this.editingPost = null;
+    this.resetPostForm();
+  }
+
+  editPost(postId: string): void {
+    this.openPostModal(postId);
+  }
+
 }

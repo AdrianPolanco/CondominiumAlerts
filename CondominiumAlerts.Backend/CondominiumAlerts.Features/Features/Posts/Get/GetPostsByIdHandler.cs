@@ -26,7 +26,8 @@ namespace CondominiumAlerts.Features.Features.Posts.Get
                     Id = p.Id,
                     Title = p.Title,
                     Description = p.Description,
-                    ImageUrl = p.ImageUrl
+                    ImageUrl = p.ImageUrl,
+                    LevelOfPriorityId = p.LevelOfPriorityId
                 })
                 .FirstOrDefaultAsync(cancellationToken);
 

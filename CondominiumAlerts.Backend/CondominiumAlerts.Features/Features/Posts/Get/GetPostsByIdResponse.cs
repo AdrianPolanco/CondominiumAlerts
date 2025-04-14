@@ -12,6 +12,7 @@ namespace CondominiumAlerts.Features.Features.Posts.Get
         public string Title { get; init; }
         public string Description { get; init; }
         public string ImageUrl { get; init; }
+        public Guid LevelOfPriorityId { get; init; }
 
     }
 }
