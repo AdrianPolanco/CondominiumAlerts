@@ -37,7 +37,6 @@ namespace CondominiumAlerts.Features.Features.Messages.Create
                     Title = "New Message",
                     Description = $"New message from {messageWithCreatorUser.CreatorUser?.Name}",
                     CondominiumId = message.CondominiumId.Value,
-                    LevelOfPriorityId = 
                     CreatedAt = DateTime.UtcNow,
                     ReceiverUserId = request.ReceiverUserId // Only notify specific user if it's a direct message
                 }, message.CondominiumId.Value.ToString(), cancellationToken);
