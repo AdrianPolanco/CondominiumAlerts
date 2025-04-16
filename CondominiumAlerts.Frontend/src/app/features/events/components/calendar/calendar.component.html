@@ -79,6 +79,10 @@
              class="ml-[7.5rem] text-sm text-primary">
           La fecha de inicio no puede estar en el pasado.
         </div>
+
+        <div *ngIf="form.get('start')?.hasError('minimumOneMinute')" class="ml-[7.5rem] text-sm text-primary">
+          La fecha de inicio debe ser al menos 1 minuto después del tiempo actual.
+        </div>
       </div>
 
       <!-- Input de FIN -->

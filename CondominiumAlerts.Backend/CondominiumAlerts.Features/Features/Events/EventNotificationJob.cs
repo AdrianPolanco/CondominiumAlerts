@@ -32,25 +32,46 @@ public class EventNotificationJob: IInvocable
         var currentDateTime = DateTime.UtcNow;
 
         // Obtener los eventos cuyo inicio esté en los próximos minutos
-        var eventsToStart = await _repository.GetAsync(default, e => e.Start <= currentDateTime && e.Start > currentDateTime.AddMinutes(-1));
+        var eventsToStart = await _repository.GetAsync(
+            default, 
+            e => e.Start <= currentDateTime && e.Start > currentDateTime.AddMinutes(-1),
+            includes: [e => e.Condominium]
+            );
         
         // Notificar los eventos que comienzan
         foreach (var eventItem in eventsToStart)
         {
-            _logger.LogInformation($"Event {eventItem.Id} started at {eventItem.Start}");
-            eventItem.IsStarted = true;
-            await _hubContext.Clients.Group(eventItem.Id.ToString()).SendAsync("EventStarted", $"El evento '{eventItem.Title}' ha comenzado en el condominio {eventItem.Condominium.Name}.");
+            try
+            {
+                _logger.LogInformation($"Event {eventItem.Id} started at {eventItem.Start}");
+                eventItem.IsStarted = true;
+                await _hubContext.Clients.All.SendAsync("EventStarted", $"El evento '{eventItem.Title}' ha comenzado en el condominio {eventItem.Condominium.Name}.");                
+            }catch (Exception ex)
+            {
+                _logger.LogError(ex, "❌ Error al enviar notificación de evento iniciado");
+            }
+
         }
 
         // Obtener los eventos cuyo fin esté en los próximos minutos
-        var eventsToEnd = await _repository.GetAsync(default, e => e.End <= currentDateTime && e.End > currentDateTime.AddMinutes(-1));
+        var eventsToEnd = await _repository.GetAsync(
+            default, 
+            e => e.End <= currentDateTime && e.End > currentDateTime.AddMinutes(-1),
+            includes: [e => e.Condominium]
+            );
 
         // Notificar los eventos que terminan
         foreach (var eventItem in eventsToEnd)
         {
-            _logger.LogInformation($"Event {eventItem.Id} finished at {eventItem.End}");
-            eventItem.IsFinished = true;
-            await _hubContext.Clients.Group(eventItem.Id.ToString()).SendAsync("EventFinished", $"El evento '{eventItem.Title}' ha finalizado en el condominio {eventItem.Condominium.Name}.");
+            try {
+                _logger.LogInformation($"Event {eventItem.Id} finished at {eventItem.End}");
+                eventItem.IsFinished = true;
+                await _hubContext.Clients.All.SendAsync("EventFinished", $"El evento '{eventItem.Title}' ha finalizado en el condominio {eventItem.Condominium.Name}.");
+            } catch (Exception ex)
+            {
+                _logger.LogError(ex, "❌ Error al enviar notificación de evento finalizado");
+            }
+            
         }
 
         // Unimos ambas listas y hacemos un solo BulkUpdate

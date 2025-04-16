@@ -11,7 +11,7 @@ import {FormComponent} from '../../../../shared/components/form/form.component';
 import {Feedback} from '../../../../shared/components/form/feedback.interface';
 import {AuthenticationService} from '../../../services/authentication.service';
 import {Image} from 'primeng/image';
-import {Subject, takeUntil, tap} from 'rxjs';
+import {interval, startWith, Subject, takeUntil, tap} from 'rxjs';
 import {AutoUnsubscribe} from '../../../../shared/decorators/autounsuscribe.decorator';
 import {BadgeModule} from 'primeng/badge';
 import {Menu} from 'primeng/menu';
@@ -19,6 +19,7 @@ import { MenuItem } from 'primeng/api';
 import { User } from '../auth-layout/user.type';
 import { EventService } from '../../../../features/events/services/event.service';
 import { CondominiumEvent } from '../../../../features/events/event.type';
+import {differenceInMinutes} from "date-fns"
 
 @AutoUnsubscribe()
 @Component({
@@ -63,12 +64,16 @@ menuItems: MenuItem[] = [
           icon: 'pi pi-sign-out',
           command: () => {
             this.authenticationService.logOut()
+            this.router.navigate(['/home'])
           }
         },
         ]
     }
   ]
    events: CondominiumEvent[] = [];
+   upcomingEvents: CondominiumEvent[] = []
+  // Almacena los IDs de eventos a los que ya te has unido
+  private joinedEventIds = new Set<string>();
 
   constructor(private authenticationService: AuthenticationService, private router: Router, private eventService: EventService) {
     effect(() => {
@@ -78,14 +83,22 @@ menuItems: MenuItem[] = [
       };
     })
 
-    this.eventService.getSubscribedEvents().pipe(takeUntil(this.destroy$)).subscribe(res => {
+    /*this.eventService.getSubscribedEvents().pipe(takeUntil(this.destroy$)).subscribe(res => {
       this.events = [...res.data.events];
       console.log("Eventos obtenidos", this.events)
-      const subscribedEvents = this.events.filter(e => e.isSubscribed);
-      subscribedEvents.forEach(event => {
+      const nearSubscribedEvents = this.events
+        .filter(e => e.isSubscribed)
+        .filter(e => {
+          const eventDate = new Date(e.start);
+          const next15Minutes = new Date(Date.now() + 15 * 60 * 1000);
+          return eventDate.getDate() > Date.now() && eventDate < next15Minutes;
+        })
+      ;
+
+      nearSubscribedEvents.forEach(event => {
         this.eventService.joinEventGroup(event.id);
       });
-    })
+    })*/
 
     this.eventService.notification$.pipe(takeUntil(this.destroy$)).subscribe(notification => {
       this.notifications = [...notification];
@@ -93,6 +106,15 @@ menuItems: MenuItem[] = [
   }
 
   ngOnInit() {
+    interval(30000)
+      .pipe(
+        startWith(0), // Ejecuta inmediatamente al cargar el componente
+        takeUntil(this.destroy$)
+      )
+      .subscribe(() => {
+        this.refreshEventsAndJoinGroups();
+      });
+
     this.authenticationService.userData$
       .pipe(takeUntil(this.destroy$)) // Se detiene cuando `destroy$` emite un valor en el @AutoUnsubscribe()
       .subscribe(userData => {
@@ -291,6 +313,7 @@ menuItems: MenuItem[] = [
       fields: this.userProfileFormFields()
     });
   }
+
   private mapUserDataToForm(user: User) {
     return {
       name: user.name,
@@ -303,12 +326,27 @@ menuItems: MenuItem[] = [
     };
   }
 
+  private refreshEventsAndJoinGroups(): void {
+    this.eventService.getSubscribedEvents().subscribe(res => {
+      const events = res.data.events
+      console.log("EVENTOS SUSCRITOS: ", events)
+      this.upcomingEvents = events.filter(event =>
+        differenceInMinutes(new Date(event.start), new Date()) <= 15
+      );
+
+      // Si el evento empezara en menos de 15 minutos, nos unimos a su grupo
+      this.upcomingEvents.forEach(event => {
+        if(this.joinedEventIds.has(event.id)) return;
+        this.eventService.joinEventGroup(event.id);
+        this.joinedEventIds.add(event.id); // Agregamos el ID del evento a la lista de eventos unidos
+      });
+    });
+  }
+
   ngOnDestroy() {
     this.formGroup().reset();
     this.destroy$.next(); // Emite un valor para cancelar la suscripción
     this.destroy$.complete(); // Completa el Subject para cancelar la suscripción
-    this.events
-      .filter(e => e.isSubscribed)
-      .forEach(e => this.eventService.leaveEventGroup(e.id));
+    this.upcomingEvents.forEach(e => this.eventService.leaveEventGroup(e.id));
   }
 }

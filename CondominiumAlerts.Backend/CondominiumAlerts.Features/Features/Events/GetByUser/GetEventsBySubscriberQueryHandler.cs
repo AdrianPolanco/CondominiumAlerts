@@ -23,10 +23,14 @@ public class GetEventsBySubscriberQueryHandler: IQueryHandler<GetEventsBySubscri
 
     public async Task<Result<GetEventsBySubscriberQueryResponse>> Handle(GetEventsBySubscriberQuery request, CancellationToken cancellationToken)
     {
+        var now = DateTime.UtcNow;
         
         var events = await _eventRepository.GetAsync(
             cancellationToken,
-            e => e.Suscribers.Any(u => u.Id == request.UserId),
+            e => (e.Suscribers.Any(u => u.Id == request.UserId) 
+                  && !e.IsStarted 
+                  && !e.IsFinished 
+                  && e.Start > now),
             includes: [e => e.Suscribers]);
 
         events = events.OrderByDescending(e => e.CreatedAt).ToList();

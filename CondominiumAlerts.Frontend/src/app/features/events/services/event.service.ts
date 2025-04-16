@@ -21,6 +21,8 @@ export class EventService implements OnDestroy {
   private token: string|null = null;
   private user: User|null = null
   events$ = this.eventsBehaviorSubject.asObservable();
+  private isConnecting = false;
+
 
   constructor(private readonly httpClient: HttpClient, private readonly authenticationService: AuthenticationService) {
     this.authenticationService.userData$.pipe(takeUntil(this.destroy$)).subscribe(user => {
@@ -34,8 +36,9 @@ export class EventService implements OnDestroy {
   }
 
      // 🔌 Inicia la conexión al Hub si no existe
-  private initHubConnection(): void {
-    if (this.hubConnection) return;
+  private async initHubConnection(): Promise<void> {
+    if (this.hubConnection || this.isConnecting) return;
+    this.isConnecting = true;
 
     this.hubConnection = new HubConnectionBuilder()
       .withUrl(`/api/events/hubs`, {
@@ -46,34 +49,61 @@ export class EventService implements OnDestroy {
       .configureLogging(LogLevel.Information)
       .build();
 
-    this.hubConnection.on("EventStarted", (message: string) => {
-      console.log("Notificación: ", message);
-      this.notificationBehaviorSubject.next([message]);
-    });
 
-    this.hubConnection.on("EventFinished", (message: string) => {
-      console.log("Notificación: ", message);
-      this.notificationBehaviorSubject.next([message]);
-    });
 
-    this.hubConnection.start()
-      .then(() => console.log('✅ Conectado al hub de eventos'))
-      .catch(err => console.error('❌ Error al conectar al hub:', err));
+    return this.hubConnection.start()
+      .then(() => {
+        this.isConnecting = false
+        this.registerHandlers()
+        console.log('✅ Conectado al hub de eventos')
+      })
+      .catch(err => {
+        console.error('❌ Error al conectar al hub:', err)
+        throw err;
+      });
   }
 
   // 🔹 Unirse a un grupo
   joinEventGroup(eventId: string): void {
     if (!this.hubConnection) {
-      this.initHubConnection();
-      setTimeout(() => this.invokeJoinGroup(eventId), 1000);
+      this.initHubConnection().then(() => {
+        console.log('🔗 Conectado. Uniéndose al grupo...');
+        this.testConnection()
+        return this.invokeJoinGroup(eventId);
+      })
+        .catch(err => console.error('❌ No se pudo conectar al hub ni unirse al grupo:', err));
     } else {
       this.invokeJoinGroup(eventId);
     }
   }
 
+  testConnection(): void {
+    if (this.hubConnection && this.hubConnection.state === 'Connected') {
+      this.hubConnection.invoke('Echo', 'Test message')
+        .then((response) => console.log('✅ Eco recibido:', response))
+        .catch(err => console.error('❌ Error en eco:', err));
+    } else {
+      console.error('❌ No hay conexión activa para probar');
+    }
+  }
+
+  private registerHandlers(){
+    this.hubConnection?.on("EventStarted", (message: string) => {
+      console.log("Notificación: ", message);
+      const current = this.notificationBehaviorSubject.getValue();
+      this.notificationBehaviorSubject.next([...current, message]);
+    });
+
+    this.hubConnection?.on("EventFinished", (message: string) => {
+      console.log("Notificación: ", message);
+      const current = this.notificationBehaviorSubject.getValue();
+      this.notificationBehaviorSubject.next([...current, message]);
+    });
+  }
+
   private invokeJoinGroup(eventId: string): void {
     this.hubConnection?.invoke('JoinGroup', eventId, this.user?.id)
-      .then(() => console.log(`🟢 Unido al grupo de evento ${eventId}`))
+      .then(() => console.log(`🟢 Unido al grupo de evento ${eventId} a las ${new Date()}`))
       .catch(err => console.error('❌ Error al unirse al grupo:', err));
   }
 
@@ -84,6 +114,7 @@ export class EventService implements OnDestroy {
         .then(() => console.log(`🟡 Saliste del grupo de evento ${eventId}`))
         .catch(err => console.error('❌ Error al salir del grupo:', err));
     }
+    this.disconnectFromEventHub(eventId);
   }
 
   // 🔚 Desconectarse completamente del Hub y del grupo

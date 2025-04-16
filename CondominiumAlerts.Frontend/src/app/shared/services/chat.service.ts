@@ -191,7 +191,7 @@ export class ChatService implements OnDestroy{
 
       // Start the connection
       this.hubConnection.start().then(async() => {
-          console.log("FINALMENTE CONECTADO A SIGNALR");
+          //console.log("FINALMENTE CONECTADO A SIGNALR");
           if(this.hubConnection) await this.hubConnection.invoke('JoinGroup', condominiumId, condominiumName, userId);
         })
         .catch(err => {
@@ -211,10 +211,10 @@ export class ChatService implements OnDestroy{
 
   // Metodo para manejar eventos del hub
   private setupHubEventHandlers(): void {
-    console.log("Trying to set up hub event handlers...");
+    //console.log("Trying to set up hub event handlers...");
     if (!this.hubConnection) return;
 
-    console.log("Setting up hub event handlers...");
+    //console.log("Setting up hub event handlers...");
 
     this.hubConnection.on('RequestNewSummary', () => {
       // Broadcast that a new summary request has been initiated
@@ -224,18 +224,18 @@ export class ChatService implements OnDestroy{
     });
 
     this.hubConnection.on('NotifyProcessingStarted', (message: string) => {
-      console.log('Processing started: ', message);
+      //console.log('Processing started: ', message);
       this.processingStatus.next(message);
     });
 
     this.hubConnection.on('SendSummary', (summary: any) => {
-      console.log('Summary received: ', summary);
+      //console.log('Summary received: ', summary);
       this.summaryResult.next(summary);
       this.processingStatus.next(null);
     });
 
     this.hubConnection.on('NotifyProcessingError', (errorMessage: string) => {
-      console.error('Processing error: ', errorMessage);
+      //console.error('Processing error: ', errorMessage);
       this.processingError.next(errorMessage);
       this.processingStatus.next(null);
     });
@@ -243,8 +243,8 @@ export class ChatService implements OnDestroy{
     this.hubConnection.off('CancelledProcessing');
 
     this.hubConnection.on('CancelledProcessing', async (message: string) => {
-      console.log('Processing cancelled: ', message);
-      console.log('Summary cancelled');
+     // console.log('Processing cancelled: ', message);
+     // console.log('Summary cancelled');
       this.processingStatus.next(null);
       this.summaryStatus.next(SummaryStatus.Cancelled);
       this.summaryResult.next(null);
@@ -252,14 +252,14 @@ export class ChatService implements OnDestroy{
     });
 
     this.hubConnection.on("UserNotInCondominium", (errorMessage: string) => {
-      console.log("Processing failed: ", errorMessage);
+     // console.log("Processing failed: ", errorMessage);
       this.processingError.next(errorMessage);
       this.processingStatus.next(errorMessage)
       this.summaryResult.next(null)
     })
 
     this.hubConnection.on("ProcessingComplete", async (message: string) => {
-      console.log("Processing complete: ", message);
+      //console.log("Processing complete: ", message);
       this.processingStatus.next("COMPLETED");
 
       // Cargar el resumen cuando se completa

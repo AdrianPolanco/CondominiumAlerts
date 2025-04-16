@@ -126,18 +126,18 @@ export class CalendarComponent implements  OnInit, OnDestroy {
       const newEnd = info.event.end;
       const now = new Date();
       const selectedDate = new Date(newStart?.getTime()!);
-    
+
       const nowDateOnly = new Date(now);
       nowDateOnly.setHours(0, 0, 0, 0);
-    
+
       const selectedDateOnly = new Date(selectedDate);
       selectedDateOnly.setHours(0, 0, 0, 0);
-    
+
       if (selectedDateOnly < nowDateOnly) {
         info.revert(); // <- ¡Importante!
         return;
       }
-    
+
       if (event?.isStarted) {
         this.messageService.add({
           text: 'No puedes mover un evento que ya ha comenzado.',
@@ -147,7 +147,7 @@ export class CalendarComponent implements  OnInit, OnDestroy {
         info.revert(); // <- ¡Importante!
         return;
       }
-    
+
       if (event?.isFinished) {
         this.messageService.add({
           text: 'No puedes mover un evento que ya ha terminado.',
@@ -157,18 +157,18 @@ export class CalendarComponent implements  OnInit, OnDestroy {
         info.revert(); // <- ¡Importante!
         return;
       }
-    
+
       if(!event || !newStart || !newEnd) {
         info.revert(); // <- Por si acaso
         return;
       }
-    
+
       const updatedEvent: CondominiumEvent = {
         ...event,
         start: newStart,
         end: newEnd,
       };
-    
+
       this.eventService.update(updatedEvent, this.condominium?.id!).subscribe(res => {
         if (!res.isSuccess) {
           this.messageService.add({
@@ -218,7 +218,7 @@ export class CalendarComponent implements  OnInit, OnDestroy {
     this.form = this.fb.group({
       title: [{ value: '', disabled: true}, [Validators.required, Validators.maxLength(100)]],
       description: [{ value: '', disabled: true }, [Validators.required, Validators.minLength(20), Validators.maxLength(500)]],
-      start: [{ value: '', disabled: true }, [this.noPastDateValidator.bind(this)]],
+      start: [{ value: '', disabled: true }, [this.noPastDateValidator.bind(this), this.minimumOneMinuteValidator.bind(this)]],
       end: [{ value: '', disabled: true }]
     }, {
       validators: [this.validateDateRange]
@@ -262,6 +262,25 @@ export class CalendarComponent implements  OnInit, OnDestroy {
     return null;
   }
 
+  minimumOneMinuteValidator(control: AbstractControl): ValidationErrors | null {
+    const value = control.value;
+    if (!value) return null;
+
+    const selectedDate = new Date(value);
+    const now = new Date();
+
+    // Calcular la diferencia en milisegundos
+    const differenceInMilliseconds = selectedDate.getTime() - now.getTime();
+
+    // Convertir a minutos
+    const differenceInMinutes = differenceInMilliseconds / (1000 * 60);
+
+    if (differenceInMinutes < 1) {
+      return { minimumOneMinute: true };
+    }
+
+    return null;
+  }
 
   showDialog(selectedEvent: CondominiumEvent) {
     this.selectedEvent = selectedEvent;
@@ -307,7 +326,6 @@ export class CalendarComponent implements  OnInit, OnDestroy {
     if (!date) return '';
     const offset = date.getTimezoneOffset();
     const localDate = new Date(date.getTime() - offset * 60000);
-    console.log('FORMATTED DATE', localDate.toISOString().slice(0, 16));
     return localDate.toISOString().slice(0, 16);
   }
 

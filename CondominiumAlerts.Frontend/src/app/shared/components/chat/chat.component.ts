@@ -54,7 +54,6 @@ export class ChatComponent implements OnInit, OnDestroy {
   showSummary = false
   summaryStatus = signal<SummaryStatus | null>(null);
   SummaryStatusEnum = SummaryStatus;
-  isCondominium = this.options()?.type === "condominium";
   lastMessage = signal<ChatMessageDto | null>(null);
   wasLastMessageToday = computed(() => {
     const message = this.lastMessage();

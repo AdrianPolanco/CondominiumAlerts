@@ -3,19 +3,13 @@
         <ng-template #start>
             <img
                 (click)="onLogoClicked()"
-                ngSrc="images/condominiumAlertsLogo-removebg.png" 
-                alt="Condominium Alerts" 
+                ngSrc="images/condominiumAlertsLogo-removebg.png"
+                alt="Condominium Alerts"
                 height="40"
                 width="40"
                 class="cursor-pointer"
             />
         </ng-template>
-        <!--<ng-template #center>
-            <p-iconfield iconPosition="left" styleClass="sm:p-0">
-            <p-inputicon styleClass="pi pi-search" />
-            <input type="text" pInputText placeholder="Buscar" />
-            </p-iconfield>
-        </ng-template>-->
         <ng-template #end>
             <nav class="flex gap-4 items-center">
             <i class="pi pi-bell" pBadge [value]="notifications.length" style="font-size: 1.2rem" (click)="showNotificationsDialog()"></i>
@@ -26,7 +20,7 @@
                 }@else{
                 <p-avatar icon="pi pi-user" class="mr-2" size="large" shape="circle" />
                 }
-            </button>      
+            </button>
             </nav>
         </ng-template>
         </p-toolbar>
