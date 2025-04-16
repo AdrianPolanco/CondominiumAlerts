@@ -5,6 +5,7 @@ using CondominiumAlerts.Domain.Aggregates.Entities;
 using CondominiumAlerts.Domain.Repositories;
 using FluentValidation;
 using LightResults;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Logging;
 using CommentsEntity = CondominiumAlerts.Domain.Aggregates.Entities;
 
@@ -81,6 +82,7 @@ namespace CondominiumAlerts.Features.Features.Comment.Add
                 Text = request.Text,
                 ImageUrl = imageUrl,
                 UserId = userId,
+                PostId = request.PostId,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             }, cancellationToken);
@@ -91,6 +93,7 @@ namespace CondominiumAlerts.Features.Features.Comment.Add
                 Text = comment.Text,
                 ImageUrl = comment.ImageUrl,
                 UserId = comment.UserId,
+                PostId = comment.PostId,
                 CreatedAt = comment.CreatedAt,
                 UpdatedAt = comment.UpdatedAt
             };
