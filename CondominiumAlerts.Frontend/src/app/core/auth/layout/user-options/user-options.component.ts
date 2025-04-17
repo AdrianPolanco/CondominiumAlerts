@@ -1,7 +1,7 @@
-import {Component, effect, OnDestroy, OnInit, signal, viewChild} from '@angular/core';
+import {Component, computed, effect, OnDestroy, OnInit, signal, viewChild} from '@angular/core';
 import {Toolbar} from 'primeng/toolbar';
 import {Router} from '@angular/router';
-import {NgFor, NgOptimizedImage} from '@angular/common';
+import {NgClass, NgFor, NgOptimizedImage} from '@angular/common';
 import {Avatar} from 'primeng/avatar';
 import {Dialog, DialogModule} from 'primeng/dialog';
 import {SharedFormField} from '../../../../shared/components/form/shared-form-field.interface';
@@ -11,7 +11,7 @@ import {FormComponent} from '../../../../shared/components/form/form.component';
 import {Feedback} from '../../../../shared/components/form/feedback.interface';
 import {AuthenticationService} from '../../../services/authentication.service';
 import {Image} from 'primeng/image';
-import {interval, startWith, Subject, takeUntil, tap} from 'rxjs';
+import {interval, startWith, Subject, switchMap, takeUntil, tap} from 'rxjs';
 import {AutoUnsubscribe} from '../../../../shared/decorators/autounsuscribe.decorator';
 import {BadgeModule} from 'primeng/badge';
 import {Menu} from 'primeng/menu';
@@ -20,6 +20,9 @@ import { User } from '../auth-layout/user.type';
 import { EventService } from '../../../../features/events/services/event.service';
 import { CondominiumEvent } from '../../../../features/events/event.type';
 import {differenceInMinutes} from "date-fns"
+import {CondominiumNotification} from '../../../../features/events/types/condominiumNotification.type';
+import {NotificationService} from '../../../../features/notifications/notification.service';
+import {TimeAgoPipe} from '../../../../shared/pipes/time-ago.pipe';
 
 @AutoUnsubscribe()
 @Component({
@@ -34,7 +37,9 @@ import {differenceInMinutes} from "date-fns"
     DialogModule,
     NgFor,
     BadgeModule,
-    Menu
+    Menu,
+    NgClass,
+    TimeAgoPipe
   ],
   templateUrl: './user-options.component.html',
   styleUrl: './user-options.component.css'
@@ -75,30 +80,17 @@ menuItems: MenuItem[] = [
   // Almacena los IDs de eventos a los que ya te has unido
   private joinedEventIds = new Set<string>();
 
-  constructor(private authenticationService: AuthenticationService, private router: Router, private eventService: EventService) {
+  constructor(
+    private authenticationService: AuthenticationService,
+    private router: Router,
+    private eventService: EventService,
+    private notificationService: NotificationService) {
     effect(() => {
       if(!this.visible()) {
         this.formGroup().reset();
         this.imageUrl.set(this.userData?.profilePictureUrl);
       };
     })
-
-    /*this.eventService.getSubscribedEvents().pipe(takeUntil(this.destroy$)).subscribe(res => {
-      this.events = [...res.data.events];
-      console.log("Eventos obtenidos", this.events)
-      const nearSubscribedEvents = this.events
-        .filter(e => e.isSubscribed)
-        .filter(e => {
-          const eventDate = new Date(e.start);
-          const next15Minutes = new Date(Date.now() + 15 * 60 * 1000);
-          return eventDate.getDate() > Date.now() && eventDate < next15Minutes;
-        })
-      ;
-
-      nearSubscribedEvents.forEach(event => {
-        this.eventService.joinEventGroup(event.id);
-      });
-    })*/
 
     this.eventService.notification$.pipe(takeUntil(this.destroy$)).subscribe(notification => {
       this.notifications = [...notification];
@@ -138,13 +130,29 @@ menuItems: MenuItem[] = [
   token: string | null = null;
   imageUrl = signal(this.userData?.profilePictureUrl)
   showNotifications = false;
-  showDrawer = false;
   userProfileFormFields = signal<SharedFormField[]>([]);
-  notifications: string[] = [];
+  notifications: CondominiumNotification[] = [];
+  get unreadNotifications(): CondominiumNotification[] {
+    return this.notifications.filter(n => !n.read);
+  }
+  get unreadNotificationsCount(): number {
+    return this.unreadNotifications.length;
+  }
 
   onLogoClicked(){
     if(this.userData) this.router.navigate(['/condominiums']);
     else this.router.navigate(['/home']);
+  }
+
+  onNotificationsClosed(){
+    this.notificationService.markAsRead(this.unreadNotifications).pipe(
+      switchMap(() => this.notificationService.get()),
+      takeUntil(this.destroy$)
+    ).subscribe((res) => {
+      if (res.isSuccess) {
+        this.notifications = res.data.notifications;
+      }
+    });
   }
 
   onSubmit(value: any) {
@@ -185,11 +193,18 @@ menuItems: MenuItem[] = [
 
   showNotificationsDialog(): void {
     this.showNotifications = true;
+
+    this.notificationService.get().subscribe({
+      next: (res) => {
+        this.notifications = res.data.notifications;
+        console.log("NOTIFICACIONES", this.notifications)
+      },
+      error: (err) => {
+        console.error('Error al cargar notificaciones', err);
+      }
+    });
   }
 
-  showDrawerDialog(): void {
-    this.showDrawer = true;
-  }
   profileFormSettings = signal<SharedForm>({
     fields: this.userProfileFormFields(),
     baseButtonLabel: 'Editar perfil',
@@ -329,10 +344,14 @@ menuItems: MenuItem[] = [
   private refreshEventsAndJoinGroups(): void {
     this.eventService.getSubscribedEvents().subscribe(res => {
       const events = res.data.events
-      console.log("EVENTOS SUSCRITOS: ", events)
-      this.upcomingEvents = events.filter(event =>
-        differenceInMinutes(new Date(event.start), new Date()) <= 15
-      );
+
+      this.upcomingEvents = events.filter(event => {
+        const minutesUntilStart = differenceInMinutes(new Date(event.start), new Date());
+        const minutesUntilEnd = differenceInMinutes(new Date(event.end), new Date());
+        return (minutesUntilStart >= 0 && minutesUntilStart <= 15) || (minutesUntilEnd >= 0 && minutesUntilEnd <= 15);
+        });
+
+      console.log("EVENTOS SUSCRITOS QUE EMPEZARAN PROXIMAMENTE: ", this.upcomingEvents)
 
       // Si el evento empezara en menos de 15 minutos, nos unimos a su grupo
       this.upcomingEvents.forEach(event => {

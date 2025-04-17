@@ -44,13 +44,13 @@ namespace CondominiumAlerts.Api.Endpoints
                     return Results.BadRequest(result);
                 }
 
-                var responce = new
+                var response = new
                 {
                     IsSuccess = result.IsSuccess,
                     Data = result.Value,
                 };
 
-                return Results.Ok(responce);
+                return Results.Ok(response);
 
             });
 
@@ -63,13 +63,13 @@ namespace CondominiumAlerts.Api.Endpoints
                     return Results.BadRequest(result);
                 }
 
-                var responce = new
+                var response = new
                 {
                     IsSuccess = result.IsSuccess,
                     Data = result.Value,
                 };
 
-                return Results.Ok(responce);
+                return Results.Ok(response);
 
             });
 

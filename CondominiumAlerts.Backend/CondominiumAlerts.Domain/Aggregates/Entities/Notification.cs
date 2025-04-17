@@ -11,14 +11,16 @@ namespace CondominiumAlerts.Domain.Aggregates.Entities;
         public string? Description { get; set; } 
         // if receiver user id is null means that the notification is global 
         public string? ReceiverUserId { get; set; }
-        public Guid CondominiumId { get; set; }
-        public Guid LevelOfPriorityId { get; set; }
+        public Guid? CondominiumId { get; set; }
+        public Guid? EventId { get; set; }
+        public Guid? LevelOfPriorityId { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
         
         public User? ReceiverUser { get; set; }
         public Condominium? Condominium { get; set; }
-        public LevelOfPriority LevelOfPriority { get; set; }
-
+        public LevelOfPriority? LevelOfPriority { get; set; }
+        public Event? Event { get; set; }
+        public bool Read { get; set; } = false;
     }
 

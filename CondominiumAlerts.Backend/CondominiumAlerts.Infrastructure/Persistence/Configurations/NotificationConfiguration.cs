@@ -19,6 +19,11 @@ public class NotificationConfiguration : IEntityTypeConfiguration<Notification>
             .HasForeignKey(n => n.LevelOfPriorityId)
             .OnDelete(DeleteBehavior.Cascade);
         
+        builder.HasOne(n => n.Event)
+            .WithMany(e => e.Notifications)
+            .HasForeignKey(n => n.EventId)
+            .OnDelete(DeleteBehavior.Cascade);
+        
         builder.Property(b => b.CreatedAt)
             .HasDefaultValueSql("CURRENT_TIMESTAMP")
             .ValueGeneratedOnAdd();

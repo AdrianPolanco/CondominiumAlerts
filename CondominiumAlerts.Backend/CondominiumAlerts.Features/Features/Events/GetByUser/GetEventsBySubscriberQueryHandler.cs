@@ -28,9 +28,8 @@ public class GetEventsBySubscriberQueryHandler: IQueryHandler<GetEventsBySubscri
         var events = await _eventRepository.GetAsync(
             cancellationToken,
             e => (e.Suscribers.Any(u => u.Id == request.UserId) 
-                  && !e.IsStarted 
-                  && !e.IsFinished 
-                  && e.Start > now),
+                  && (!e.IsStarted || !e.IsFinished)
+                  && (e.Start > now || e.End > now)),
             includes: [e => e.Suscribers]);
 
         events = events.OrderByDescending(e => e.CreatedAt).ToList();

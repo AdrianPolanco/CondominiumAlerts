@@ -12,13 +12,17 @@
         </ng-template>
         <ng-template #end>
             <nav class="flex gap-4 items-center">
-            <i class="pi pi-bell" pBadge [value]="notifications.length" style="font-size: 1.2rem" (click)="showNotificationsDialog()"></i>
+              @if(unreadNotificationsCount > 0){
+                <i class="pi pi-bell" pBadge [value]="unreadNotificationsCount" style="font-size: 1.2rem" (click)="showNotificationsDialog()"></i>
+              }@else{
+                <i class="pi pi-bell" style="font-size: 1.2rem" (click)="showNotificationsDialog()"></i>
+              }
             <p-menu #menu [model]="menuItems" [popup]="true" />
             <button (click)="menu.toggle($event)" class="flex justify-center items-center">
                 @if(userData?.profilePictureUrl){
-                <p-avatar [image]="userData?.profilePictureUrl" class="mr-2" size="large" shape="circle" />
+                  <p-avatar [image]="userData?.profilePictureUrl" class="mr-2" size="large" shape="circle" />
                 }@else{
-                <p-avatar icon="pi pi-user" class="mr-2" size="large" shape="circle" />
+                  <p-avatar icon="pi pi-user" class="mr-2" size="large" shape="circle" />
                 }
             </button>
             </nav>
@@ -40,14 +44,32 @@
             (onFormSubmitted)="onSubmit($event)">
         </shared-form>
     </p-dialog>
-    <p-dialog header="Notificaciones" [modal]="true" [(visible)]="showNotifications" [style]="{ width: '50rem' }" [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }" [maximizable]="true">
+    <p-dialog
+      header="Notificaciones"
+      [modal]="true"
+      [(visible)]="showNotifications"
+      [style]="{ width: '50rem' }"
+      [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }"
+      [maximizable]="true"
+      (onHide)="onNotificationsClosed()"
+    >
         <div class="w-50 p-5">
-        <div *ngFor="let notification of notifications" class="mb-3">
-            <div class="flex items-center space-x-2">
-            <i class="pi pi-bell text-red-500"></i>
-            <p class="text-sm">{{ notification }}</p>
+          @if(notifications.length){
+            <div *ngFor="let notification of notifications" class="mb-3 p-3 rounded"
+                 [ngClass]="{ 'bg-white': notification.read, 'bg-gray-100': !notification.read }">
+              <div class="flex justify-end">
+                <span class="text-xs text-gray-400 justify-end">
+                  {{ notification.createdAt | timeAgo }}
+                </span>
+              </div>
+              <div class="flex items-center space-x-2">
+                <i class="pi pi-bell text-primary"></i>
+                <p class="text-sm">{{ notification.title }}</p>
+              </div>
+              <span class="text-xs text-gray-400">{{ notification.description }}</span>
             </div>
-            <span class="text-xs text-gray-400">{{ notification }}</span>
-        </div>
+          }@else{
+            <h1 class="text-center text-xl mb-5">No tienes notificaciones</h1>
+          }
         </div>
     </p-dialog>

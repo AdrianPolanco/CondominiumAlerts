@@ -1,4 +1,4 @@
-import {Injectable, OnDestroy} from '@angular/core';
+import {inject, Injectable, OnDestroy} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {BehaviorSubject, catchError, of, Subject, switchMap, takeUntil, tap} from 'rxjs';
 import {CondominiumEvent, PartialEvent} from '../event.type';
@@ -6,6 +6,8 @@ import {AutoUnsubscribe} from '../../../shared/decorators/autounsuscribe.decorat
 import {AuthenticationService} from '../../../core/services/authentication.service';
 import {User} from '../../../core/auth/layout/auth-layout/user.type';
 import { HttpTransportType, HubConnection, HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
+import {CondominiumNotification} from '../types/condominiumNotification.type';
+import {NotificationService} from '../../notifications/notification.service';
 
 @AutoUnsubscribe()
 @Injectable({
@@ -15,19 +17,21 @@ export class EventService implements OnDestroy {
 
   private hubConnection: HubConnection | null = null;
   private eventsBehaviorSubject = new BehaviorSubject<CondominiumEvent[]>([]);
-  private notificationBehaviorSubject = new BehaviorSubject<string[]>([]);
+  private notificationBehaviorSubject = new BehaviorSubject<CondominiumNotification[]>([]);
   notification$ = this.notificationBehaviorSubject.asObservable();
   private readonly destroy$ = new Subject<void>();
   private token: string|null = null;
   private user: User|null = null
   events$ = this.eventsBehaviorSubject.asObservable();
   private isConnecting = false;
+  private notificationService = inject(NotificationService)
 
 
   constructor(private readonly httpClient: HttpClient, private readonly authenticationService: AuthenticationService) {
     this.authenticationService.userData$.pipe(takeUntil(this.destroy$)).subscribe(user => {
       console.log("USER FROM EVENT SERVICE", user)
       if (user?.data) this.user = user?.data!
+      this.loadInitialNotifications();
     });
     this.authenticationService.userToken$.pipe(takeUntil(this.destroy$)).subscribe(token => {
       console.log("TOKEN FROM EVENT SERVICE", token)
@@ -88,16 +92,18 @@ export class EventService implements OnDestroy {
   }
 
   private registerHandlers(){
-    this.hubConnection?.on("EventStarted", (message: string) => {
-      console.log("Notificación: ", message);
+    this.hubConnection?.on("EventStarted", (notification: CondominiumNotification) => {
+      console.log("Notificación: ", notification);
       const current = this.notificationBehaviorSubject.getValue();
-      this.notificationBehaviorSubject.next([...current, message]);
+      console.log("Valor actual en notificationBehaviorSubject:", current, "tipo:", typeof current);
+      this.notificationBehaviorSubject.next([...current, notification]);
     });
 
-    this.hubConnection?.on("EventFinished", (message: string) => {
-      console.log("Notificación: ", message);
+    this.hubConnection?.on("EventFinished", (notification: CondominiumNotification) => {
+      console.log("Notificación: ", notification);
       const current = this.notificationBehaviorSubject.getValue();
-      this.notificationBehaviorSubject.next([...current, message]);
+      console.log("Valor actual en notificationBehaviorSubject:", current, "tipo:", typeof current);
+      this.notificationBehaviorSubject.next([...current, notification]);
     });
   }
 
@@ -129,6 +135,15 @@ export class EventService implements OnDestroy {
         .catch(err => console.error('❌ Error al desconectarse del evento:', err));
     }
   }
+
+  private loadInitialNotifications(): void {
+    this.notificationService.get().pipe(takeUntil(this.destroy$)).subscribe(response => {
+      if (response.isSuccess) {
+        this.notificationBehaviorSubject.next(response.data.notifications);
+      }
+    });
+  }
+
 
   get(condominiumId: string) {
     console.log("USER FROM EVENT SERVICE", this.user)
