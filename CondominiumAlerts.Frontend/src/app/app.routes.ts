@@ -73,12 +73,6 @@ export const routes: Routes = [
         .then((c) => c.IndexComponent)
   },
   {
-    path: 'posts/create/:condominiumId',
-    loadComponent: () =>
-      import('./features/posts/pages/create-post-page/create-post-page.component')
-        .then(c => c.PostPageComponent)
-  },
-  {
     path: 'posts/edit/:condominiumId/:postId',
     loadComponent: () =>
       import('./features/posts/pages/edit-post-page/edit-post-page.component')

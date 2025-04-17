@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { NgFor, CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PostService } from '../../../posts/services/post.service';
@@ -11,13 +11,25 @@ import { ChatsDrawerComponent } from "../../../../shared/components/chats-drawer
 import { BackArrowComponent } from "../../../../shared/components/back-arrow/back-arrow.component";
 import { ButtonModule } from 'primeng/button';
 import { AuthService } from '../../../../core/auth/services/auth.service';
+import { FormsModule } from '@angular/forms';
+import { priorityLevelService } from '../../../services/services.service'; 
+import { priorityDto } from '../../../priority-levels/models/priorityDto';
+import { CommetService } from '../../../Comments/services/comment.service';
+import { AddCommentCommand } from '../../../Comments/models/AddComment.Command'
+import { AddCommentResponse } from '../../../Comments/models/AddComment.Response'
+import { getCommentByPostCommand } from '../../../Comments/models/getCommentByPost.Command'
+import { getCommentByPostResponse } from '../../../Comments/models/getCommentByPost.Reponse'
+import { CreatePostsResponse, UpdatePostCommand, PostFormData } from '../../../posts/models/posts.model';
+import { TimeAgoPipe } from '../../../../shared/pipes/time-ago.pipe';
 
 @Component({
   selector: 'app-condominium-index',
   standalone: true,
   imports: [
     NgFor,
+    TimeAgoPipe,
     CommonModule,
+    FormsModule,
     CondominiumsLayoutComponent,
     ChatsDrawerComponent,
     BackArrowComponent,
@@ -27,6 +39,12 @@ import { AuthService } from '../../../../core/auth/services/auth.service';
   styleUrls: ['./condominum-index.component.css'],
 })
 export class CondominumIndexComponent implements OnInit {
+  priorityLevels: priorityDto[] = [];
+  @Input() postId!: string;
+  
+  comments: { [postId: string]: getCommentByPostResponse[] } = {};
+  showComments: { [postId: string]: boolean } = {};
+  newComments: { [postId: string]: { text: string; imageFile?: File } } = {};
   users: GetCondominiumsUsersResponse[] = [
     {
       id: 'dddddfsdfdfs',
@@ -37,6 +55,16 @@ export class CondominumIndexComponent implements OnInit {
     },
   ];
 
+  postForm: {
+    title: string;
+    description: string;
+    imageFile: File | null;
+    currentImageUrl: string;
+    levelOfPriorityId: string;
+    condominiumId: string;
+    userId: string | null;
+  };
+
   condominium: GetCondominiumResponse | null = null;
   notifications = [
     { message: 'Nuevo mensaje de Juan', time: 'Hace 5 minutos' },
@@ -46,6 +74,9 @@ export class CondominumIndexComponent implements OnInit {
 
   publications: any[] = [];
   condominiumId: string | null = null;
+  showPostModal = false;
+  editingPost: CreatePostsResponse['data'] | null = null;
+
 
   constructor(
     private router: Router,
@@ -53,8 +84,22 @@ export class CondominumIndexComponent implements OnInit {
     private postService: PostService,
     private userService: UserService,
     private condominiumService: CondominiumService,
-    private authService: AuthService
-  ) { }
+    private authService: AuthService,
+    private priorityService: priorityLevelService,
+    private commentService: CommetService
+  )
+  {
+    this.postForm = {
+      title: '',
+      description: '',
+      imageFile: null as File | null,
+      currentImageUrl: '',
+      levelOfPriorityId: '',
+      condominiumId: '',
+      userId: this.authService.currentUser?.uid ?? null
+    };
+
+  }
 
   ngOnInit(): void {
     this.condominiumId = this.route.snapshot.paramMap.get("condominiumId");
@@ -69,11 +114,98 @@ export class CondominumIndexComponent implements OnInit {
     this.getCondominiumData();
     this.loadPosts();
     this.loadUsers();
+    this.loadComments(this.postId);
+    this.loadPriorityLevels();
   }
+
+  toggleComments(postId: string): void {
+    this.showComments[postId] = !this.showComments[postId];
+    console.log('Toggle comments para post:', postId);
+    if (this.showComments[postId] && !this.comments[postId]) {
+      this.loadComments(postId);
+    }
+    if (!this.newComments[postId]) {
+      this.newComments[postId] = { text: '', imageFile: undefined };
+    }
+  }
+
+  loadComments(postId: string): void {
+    if (!postId) return;
+
+    const command: getCommentByPostCommand = { postid: postId };
+
+    this.commentService.getCommentsByPost(command).subscribe({
+      next: (comments) => {
+        this.comments[postId] = comments?.data || [];
+        this.initializeNewComments(postId);
+        console.log('Comentarios cargados:', this.comments[postId]);
+      },
+      error: (err) => {
+        console.error('Error al cargar comentarios:', err);
+        this.comments[postId] = [];
+      }
+    });
+  }
+
+  initializeNewComments(postId: string): void {
+    if (!this.newComments[postId]) {
+      this.newComments[postId] = { text: '', imageFile: undefined };
+    }
+  }
+
+  onCommentFileSelected(event: Event, postId: string): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      this.newComments[postId].imageFile = input.files[0];
+    }
+  }
+
+
+  submitComment(postId: string): void {
+    const commentData = this.newComments[postId];
+    const command: AddCommentCommand = {
+      text: commentData.text,
+      ImageFile: commentData.imageFile
+    };
+
+    this.commentService.createComment(command, postId).subscribe(() => {
+      this.newComments[postId] = { text: '', imageFile: undefined };
+      this.loadComments(postId);
+    });
+  }
+
+
 
   onCondominiumSelected(): void {
     this.router.navigate(['/condominium/chat']);
   }
+
+  loadPriorityLevels(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      if (!this.condominiumId) {
+        resolve();
+        return;
+      }
+
+      const query = {
+        condominiumId: this.condominiumId,
+        pageNumber: 1,
+        pageSize: 100
+      };
+
+      this.priorityService.getPriorityLevels(query).subscribe({
+        next: (result) => {
+          this.priorityLevels = result.data.priorities;
+          resolve();
+        },
+        error: (err) => {
+          console.error('Error al cargar niveles de prioridad', err);
+          reject(err);
+        }
+      });
+    });
+  }
+
 
   goToCreatePosts(): void {
     console.log('Creating a new post');
@@ -94,6 +226,12 @@ export class CondominumIndexComponent implements OnInit {
       next: (data) => {
         console.log('Publicaciones recibidas:', data);
         this.publications = data;
+
+        this.publications.forEach(publication => {
+          this.showComments[publication.id] = false; // Inicialmente ocultos
+          this.newComments[publication.id] = { text: '', imageFile: undefined };
+          this.loadComments(publication.id); // Cargar comentarios en segundo plano
+        });
       },
       error: (err) => {
         console.error('Error al cargar las publicaciones:', err);
@@ -137,13 +275,124 @@ export class CondominumIndexComponent implements OnInit {
       this.router.navigate(['/priority-levels/index', this.condominiumId]);
     }
   }
+  
 
-  editPost(postId: string): void {
-    if (!this.condominiumId) {
-      console.error('No hay condominiumId disponible');
-      return;
+  async openPostModal(postId?: string) {
+    this.showPostModal = true;
+
+    if (this.priorityLevels.length === 0) {
+      await this.loadPriorityLevels();
     }
 
-    this.router.navigate([`/posts/edit/${this.condominiumId}/${postId}`]);
+    if (postId) {
+      // Modo edición
+      this.postService.getPostById(postId).subscribe({
+        next: (post) => {
+          this.editingPost = post;
+          this.postForm = {
+            ...this.postForm,
+            title: post.title,
+            description: post.description,
+            currentImageUrl: post.imageUrl,
+            levelOfPriorityId: post.levelOfPriorityId
+          };
+        },
+        error: (err) => console.error('Error al cargar post', err)
+      });
+    } else {
+      this.editingPost = null;
+      this.resetPostForm();
+    }
   }
+
+  resetPostForm() {
+    this.postForm = {
+      title: '',
+      description: '',
+      imageFile: null,
+      currentImageUrl: '',
+      levelOfPriorityId: '',
+      condominiumId: this.condominiumId || '',
+      userId: this.authService.currentUser?.uid || ''
+    };
+  }
+
+  onFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files?.length) {
+      const file = input.files[0];
+      if (file.size > 0) { 
+        this.postForm.imageFile = file;
+
+        const reader = new FileReader();
+        reader.onload = () => {
+          this.postForm.currentImageUrl = reader.result as string;
+        };
+        reader.readAsDataURL(file);
+      } else {
+        this.postForm.imageFile = null;
+        this.postForm.currentImageUrl = '';
+      }
+    } else {
+      this.postForm.imageFile = null;
+      this.postForm.currentImageUrl = '';
+    }
+  }
+
+  savePost() {
+    if (!this.condominiumId) return;
+
+    if (this.editingPost) {
+
+      // Edicion de post
+      const updateData: UpdatePostCommand = {
+        title: this.postForm.title,
+        description: this.postForm.description,
+        levelOfPriorityId: this.postForm.levelOfPriorityId,
+        imageFile: this.postForm.imageFile || undefined
+      };
+
+      this.postService.updatePost(this.editingPost.id, updateData).subscribe({
+        next: () => {
+          this.loadPosts();
+          this.closePostModal();
+        },
+        error: (err) => console.error('Error al actualizar', err)
+      });
+    } else {
+
+      // Crear post
+      if (!this.condominiumId) return;
+
+      const formData: PostFormData = {
+        title: this.postForm.title,
+        description: this.postForm.description,
+        imageFile: this.postForm.imageFile || undefined,
+        LevelOfPriorityId: this.postForm.levelOfPriorityId,
+      };
+
+      this.postService.createPost(formData, this.condominiumId).subscribe({
+        next: () => {
+          this.loadPosts();
+          this.closePostModal();
+        },
+        error: (err) => {
+          console.error('Error al crear post:', err);
+        }
+      });
+    }
+  }
+
+
+
+  closePostModal() {
+    this.showPostModal = false;
+    this.editingPost = null;
+    this.resetPostForm();
+  }
+
+  editPost(postId: string): void {
+    this.openPostModal(postId);
+  }
+
 }

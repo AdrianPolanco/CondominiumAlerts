@@ -37,7 +37,9 @@ public static class DependencyInjection
         services.AddScoped<IEmailService, EmailService>();
         services.AddScoped(typeof(IRepository<,>), typeof(Repository<,>));
         services.AddScoped<ICondominiumRepository, CondominiumRepository>();
-        
+        services.AddScoped<ICommentRepository, CommentRepository>();
+
+
         services.Configure<AISettings>(configuration.GetSection("AISettings"));
 
         /*services.AddSingleton(sp =>

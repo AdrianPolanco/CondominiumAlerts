@@ -24,7 +24,7 @@ namespace CondominiumAlerts.Features.Features.Posts.Get
                     Id = p.Id,
                     Title = p.Title,
                     Description = p.Description,
-                    ImageUrl = p.ImageUrl,
+                    ImageUrl = p.ImageUrl ?? string.Empty,
                     CreatedAt = p.CreatedAt,
                     UpdatedAt = p.UpdatedAt,
                     CondominiumId = p.CondominiumId,
