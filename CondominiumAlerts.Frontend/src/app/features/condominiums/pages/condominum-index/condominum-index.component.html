@@ -46,13 +46,46 @@
                class="w-full h-auto object-contain rounded-lg" />
         </div>
 
-        <div class="mt-4 flex items-center space-x-4">
-          <button class="text-primary-500 hover:text-primary-600">
-            <i class="pi pi-thumbs-up hover:pi-thumbs-up-fill"></i> Me gusta
-          </button>
-          <button class="text-secondary-400 hover:text-secondary-300">
-            <i class="pi pi-comment"></i> Comentar
-          </button>
+        <button class="text-gray-300 hover:text-white ml-2"
+                (click)="toggleComments(publication.id)">
+          <i class="pi pi-comments mr-1"></i> Comentarios
+        </button>
+
+        <div *ngIf="showComments[publication.id]" class="mt-4 space-y-4">
+
+          <div *ngIf="comments[publication.id]?.length; else noComments">
+            <div *ngFor="let comment of comments[publication.id]" class="p-3 rounded-md text-white">
+              <p class="mb-1">{{ comment.text }}</p>
+              <div *ngIf="comment.imageUrl" class="mb-2">
+                <img [src]="comment.imageUrl" alt="Imagen del comentario" class="max-w-xs rounded-md object-contain">
+              </div>
+            </div>
+          </div>
+
+          <ng-template #noComments>
+            <p class="text-gray-400 italic">No hay comentarios todavía.</p>
+          </ng-template>
+
+
+          <form (ngSubmit)="submitComment(publication.id)" class="mt-4">
+            <textarea [(ngModel)]="newComments[publication.id].text" name="text" placeholder="Escribe un comentario..." class="w-full p-2 rounded bg-gray-800 text-white" required></textarea>
+
+            <div class="flex items-center space-x-2 mt-2">
+              <!-- Botón de subir imagen ajustado a la izquierda -->
+              <label class="flex items-center justify-center px-4 py-2 bg-white border border-gray-300 text-black rounded-md cursor-pointer hover:bg-gray-50 transition-colors text-sm">
+                <span class="mr-1">+</span> Subir imagen
+                <input type="file" (change)="onCommentFileSelected($event, publication.id)" accept="image/*" class="hidden">
+              </label>
+
+              <!-- Botón de comentar al lado -->
+              <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded text-sm">
+                Comentar
+              </button>
+            </div>
+          </form>
+
+
+
         </div>
       </div>
     </div>

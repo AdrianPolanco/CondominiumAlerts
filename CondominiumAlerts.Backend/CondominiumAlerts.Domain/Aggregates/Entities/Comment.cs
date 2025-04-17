@@ -8,7 +8,7 @@ namespace CondominiumAlerts.Domain.Aggregates.Entities;
     {
         public Guid Id { get; set; }
         public string Text { get; set; } = string.Empty!;
-        public string ImageUrl { get; set; } = string.Empty!;
+        public string? ImageUrl { get; set; } = string.Empty!;
         public Guid PostId { get; set; }
         public string UserId { get; set; }
         // if it has a parent comment id it is a comment repling to another comment

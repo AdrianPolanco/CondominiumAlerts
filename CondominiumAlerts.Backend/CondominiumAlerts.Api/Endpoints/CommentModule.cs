@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using LightResults;
 using MediatR;
 using CondominiumAlerts.Features.Features.Comment.Add;
-using CondominiumAlerts.Features.Features.Posts.Get;
 using CondominiumAlerts.Features.Features.Comment.GetCommentByPost;
 
 
@@ -11,6 +10,7 @@ namespace CondominiumAlerts.Api.Endpoints
 {
     public class CommentModule : ICarterModule
     {
+
         public void AddRoutes(IEndpointRouteBuilder app)
         {
             app.MapGet("/comment", async (ISender sender, [FromQuery] Guid postId, CancellationToken cancellationToken) =>
