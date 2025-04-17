@@ -12,7 +12,7 @@ import { BackArrowComponent } from "../../../../shared/components/back-arrow/bac
 import { ButtonModule } from 'primeng/button';
 import { AuthService } from '../../../../core/auth/services/auth.service';
 import { FormsModule } from '@angular/forms';
-import { priorityLevelService } from '../../../services/services.service'; 
+import { PriorityLevelService } from '../../../services/priorityLevel.service';
 import { priorityDto } from '../../../priority-levels/models/priorityDto';
 import { CommetService } from '../../../Comments/services/comment.service';
 import { AddCommentCommand } from '../../../Comments/models/AddComment.Command'
@@ -41,7 +41,7 @@ import { TimeAgoPipe } from '../../../../shared/pipes/time-ago.pipe';
 export class CondominumIndexComponent implements OnInit {
   priorityLevels: priorityDto[] = [];
   @Input() postId!: string;
-  
+
   comments: { [postId: string]: getCommentByPostResponse[] } = {};
   showComments: { [postId: string]: boolean } = {};
   newComments: { [postId: string]: { text: string; imageFile?: File } } = {};
@@ -85,7 +85,7 @@ export class CondominumIndexComponent implements OnInit {
     private userService: UserService,
     private condominiumService: CondominiumService,
     private authService: AuthService,
-    private priorityService: priorityLevelService,
+    private priorityService: PriorityLevelService,
     private commentService: CommetService
   )
   {
@@ -275,7 +275,7 @@ export class CondominumIndexComponent implements OnInit {
       this.router.navigate(['/priority-levels/index', this.condominiumId]);
     }
   }
-  
+
 
   async openPostModal(postId?: string) {
     this.showPostModal = true;
@@ -321,7 +321,7 @@ export class CondominumIndexComponent implements OnInit {
     const input = event.target as HTMLInputElement;
     if (input.files?.length) {
       const file = input.files[0];
-      if (file.size > 0) { 
+      if (file.size > 0) {
         this.postForm.imageFile = file;
 
         const reader = new FileReader();
