@@ -20,12 +20,14 @@ import { AddCommentResponse } from '../../../Comments/models/AddComment.Response
 import { getCommentByPostCommand } from '../../../Comments/models/getCommentByPost.Command'
 import { getCommentByPostResponse } from '../../../Comments/models/getCommentByPost.Reponse'
 import { CreatePostsResponse, UpdatePostCommand, PostFormData } from '../../../posts/models/posts.model';
+import { TimeAgoPipe } from '../../../../shared/pipes/time-ago.pipe';
 
 @Component({
   selector: 'app-condominium-index',
   standalone: true,
   imports: [
     NgFor,
+    TimeAgoPipe,
     CommonModule,
     FormsModule,
     CondominiumsLayoutComponent,

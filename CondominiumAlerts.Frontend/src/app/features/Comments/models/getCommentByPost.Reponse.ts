@@ -5,6 +5,8 @@ export interface getCommentByPostResponse
   imageUrl?: string;
   postid: string;
   userid: string;
-  CreatedAt: string;
-  UpdatedAt: string;
+  userProfilePicture: string;
+  username: string;
+  createdAt: string;
+  updatedAt: string;
 }

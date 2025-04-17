@@ -28,7 +28,10 @@ namespace CondominiumAlerts.Features.Features.Posts.Get
                     CreatedAt = p.CreatedAt,
                     UpdatedAt = p.UpdatedAt,
                     UserId = p.UserId,
+                    UserProfilePicture = p.User.ProfilePictureUrl,
+                    Username = p.User.Username,
                     PostId = p.PostId
+
                 })
                 .ToListAsync(cancellationToken);
 
