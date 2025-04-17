@@ -242,7 +242,7 @@ public class EventsModule: ICarterModule
                 return Results.Ok(successResponse);
             }).RequireAuthorization();
 
-        app.MapPut("/events/{eventId}/suscribe/{userId}",
+        app.MapPut("/events/{eventId}/subscribe/{userId}",
             async (
                 Guid eventId,
                 string userId,
@@ -294,7 +294,7 @@ public class EventsModule: ICarterModule
                 return Results.Ok(successResponse);
             }) /*.RequireAuthorization()*/;
         
-        app.MapPut("/events/{eventId}/unsuscribe/{userId}",
+        app.MapPut("/events/{eventId}/unsubscribe/{userId}",
             async (
                 Guid eventId,
                 string userId,

@@ -74,10 +74,10 @@ export class CondominiumsMainPageComponent implements OnDestroy{
 
     this.condominiumService.join(formData).subscribe({
       next: (result) => {
-        // console.log('Joined successfully:', result);
+         console.log('Joined successfully:', result);
       },
       error: (err) => {
-        // console.error('Error joining condominium:', err);
+         console.error('Error joining condominium:', err);
         this.errorText = err.error.Errors[0].Message;
       },
     });

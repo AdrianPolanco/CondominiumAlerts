@@ -97,6 +97,13 @@ export class EventService implements OnDestroy {
       const current = this.notificationBehaviorSubject.getValue();
       console.log("Valor actual en notificationBehaviorSubject:", current, "tipo:", typeof current);
       this.notificationBehaviorSubject.next([...current, notification]);
+
+      if (notification.condominiumId) {
+        this.get(notification.condominiumId).subscribe({
+          next: () => console.log("✅ Eventos actualizados por EventStarted"),
+          error: (err) => console.error("❌ Error actualizando eventos por EventStarted", err)
+        });
+      }
     });
 
     this.hubConnection?.on("EventFinished", (notification: CondominiumNotification) => {
@@ -263,6 +270,46 @@ export class EventService implements OnDestroy {
         console.error('Error al actualizar evento:', err);
         return of({ isSuccess: false, data: [...this.eventsBehaviorSubject.getValue()] });
       }));
+  }
+
+  addSubscription(eventId: string, condominiumId: string){
+    return this.httpClient.put<{isSuccess: boolean, data:{eventTitle: string}}>(`/api/events/${eventId}/subscribe/${this.user?.id}`, {}, {
+      headers: {
+        Authorization: `Bearer ${this.token}`
+      }
+    }).pipe(
+      switchMap(
+        res => {
+          if (res.isSuccess) {
+            // Vuelve a obtener la lista de eventos actualizada desde el backend
+            return this.get(condominiumId).pipe(
+              tap(() => console.log('Eventos actualizados tras suscripción')),
+            );
+          } else {
+            return of({ isSuccess: false, data: {events: []} });
+          }
+        })
+    )
+  }
+
+  removeSubscription(eventId: string, condominiumId: string){
+    return this.httpClient.put<{isSuccess: boolean, data:{eventTitle: string}}>(`/api/events/${eventId}/unsubscribe/${this.user?.id}`, {}, {
+      headers: {
+        Authorization: `Bearer ${this.token}`
+      }
+    }).pipe(
+      switchMap(
+        res => {
+          if (res.isSuccess) {
+            // Vuelve a obtener la lista de eventos actualizada desde el backend
+            return this.get(condominiumId).pipe(
+              tap(() => console.log('Eventos actualizados tras desuscripción')),
+            );
+          } else {
+            return of({ isSuccess: false, data: {events: []} });
+          }
+        })
+    )
   }
 
   ngOnDestroy(): void {

@@ -47,6 +47,7 @@ public class RemoveSuscriberCommandHandler: ICommandHandler<RemoveSuscriberComma
 
         var response = new RemoveSuscriberResponse(
             Removed: true,
+            EventTitle: foundEvent.Title,
             EventId: request.EventId,
             RemovedUser: userDto,
             RemovedAt: DateTime.UtcNow

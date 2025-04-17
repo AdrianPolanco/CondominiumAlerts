@@ -17,7 +17,7 @@ export type CondominiumEvent = PartialEvent & {
     suscribers: CondominiumEventSubscriber[]
     createdAt: Date;
     updatedAt: Date;
-    isSubscribed: boolean;
+    isSuscribed: boolean;
 }
 
 type CondominiumEventSubscriber = {

@@ -55,6 +55,7 @@ public async Task<Result<AddSuscriberResponse>> Handle(AddSuscriberCommand reque
 
         var response = new AddSuscriberResponse(
             Added: true,
+            EventTitle: foundEvent.Title,
             EventId: request.EventId,
             AddedUser: userDto,
             AddedAt: DateTime.UtcNow

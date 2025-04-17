@@ -2,4 +2,4 @@
 
 namespace CondominiumAlerts.Features.Features.Events.Suscribers.Add;
 
-public record AddSuscriberResponse(bool Added, Guid EventId, UserDto AddedUser, DateTime AddedAt);
+public record AddSuscriberResponse(bool Added, string EventTitle, Guid EventId, UserDto AddedUser, DateTime AddedAt);

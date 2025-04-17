@@ -21,16 +21,20 @@ import {
   ValidationErrors,
   Validators
 } from '@angular/forms';
-import {DatePipe, NgClass, NgIf} from '@angular/common';
+import {DatePipe, NgClass, NgIf, TitleCasePipe} from '@angular/common';
 import {InputText} from 'primeng/inputtext';
 import {Textarea} from 'primeng/textarea';
 import {MessageService} from 'primeng/api';
 import {Toast} from 'primeng/toast';
 import {ProgressSpinner} from 'primeng/progressspinner';
+import {User} from '../../../../core/auth/layout/auth-layout/user.type';
+import {AuthenticationService} from '../../../../core/services/authentication.service';
+import {Avatar} from 'primeng/avatar';
+import {Tooltip} from 'primeng/tooltip';
 
 @AutoUnsubscribe()
 @Component({
-  imports: [FullCalendarModule, Dialog, NgClass, InputText, ReactiveFormsModule, ButtonDirective, NgIf, Textarea, DatePipe, Button, Toast, ProgressSpinner],
+  imports: [FullCalendarModule, Dialog, NgClass, InputText, ReactiveFormsModule, ButtonDirective, NgIf, Textarea, DatePipe, Button, Toast, ProgressSpinner, Avatar, TitleCasePipe, Tooltip],
   templateUrl: './calendar.component.html',
   styleUrl: './calendar.component.css',
   selector: 'feature-calendar',
@@ -169,7 +173,8 @@ export class CalendarComponent implements  OnInit, OnDestroy {
         end: newEnd,
       };
 
-      this.eventService.update(updatedEvent, this.condominium?.id!).subscribe(res => {
+      this.eventService.update(updatedEvent, this.condominium?.id!).subscribe({
+        next: res=> {
         if (!res.isSuccess) {
           this.messageService.add({
             text: 'Error al actualizar el evento',
@@ -185,18 +190,25 @@ export class CalendarComponent implements  OnInit, OnDestroy {
             summary: 'Evento actualizado correctamente'
           });
         }
-      }, err => {
+      }
+    , error: err => {
         this.messageService.add({
           text: 'Error de red al actualizar el evento',
           severity: 'error',
           summary: 'Error'
         });
         info.revert(); // <- Si falla la petición
-      });
+      }
+    });
     }
   }
+  user: User|null = null;
 
-  constructor(private readonly fb: FormBuilder,private readonly eventService: EventService, private readonly chatService: ChatService) {
+  constructor(
+    private readonly fb: FormBuilder,
+    private readonly eventService: EventService,
+    private readonly chatService: ChatService,
+    private readonly authenticationService: AuthenticationService) {
     this.chatService.chatOptions$.pipe(takeUntil(this.destroy$)).subscribe((options) => {
       // Actualizar la opción de chat actual
       if (options?.condominium) {
@@ -215,6 +227,10 @@ export class CalendarComponent implements  OnInit, OnDestroy {
       }
     });
 
+    this.authenticationService.userData$.pipe(takeUntil(this.destroy$)).subscribe(user => {
+      if (user?.data) this.user = user?.data!;
+    });
+
     this.form = this.fb.group({
       title: [{ value: '', disabled: true}, [Validators.required, Validators.maxLength(100)]],
       description: [{ value: '', disabled: true }, [Validators.required, Validators.minLength(20), Validators.maxLength(500)]],
@@ -231,6 +247,62 @@ export class CalendarComponent implements  OnInit, OnDestroy {
       this.events = [...res.data];
       this.isLoading = false;
     });
+  }
+
+  subscribeToEvent(eventId: string){
+    const event = this.events?.filter((event) => event.id === eventId)[0];
+
+    if(!event) return;
+
+    this.eventService.addSubscription(eventId, this.condominium?.id!).pipe(takeUntil(this.destroy$)).subscribe(
+      {
+        next: res => {
+          console.log("EVENT SUBSCRIPTION", res);
+          this.messageService.add({
+            text: `Te has suscrito al evento ${event?.title}`,
+            severity: 'success',
+            summary: 'Suscripción exitosa'
+          });
+          this.visible = false;
+        },
+        error: err => {
+          this.messageService.add({
+            text: `Error al suscribirse al evento ${event?.title}`,
+            severity: 'error',
+            summary: 'Error'
+          });
+          this.visible = false;
+        }
+      }
+    )
+  }
+
+  unsubscribeFromEvent(eventId: string){
+    const event = this.events?.filter((event) => event.id === eventId)[0];
+
+    if(!event) return;
+
+    this.eventService.removeSubscription(eventId, this.condominium?.id!).pipe(takeUntil(this.destroy$)).subscribe(
+      {
+        next: res => {
+          console.log("EVENT UNSUBSCRIPTION", res);
+          this.messageService.add({
+            text: `Has cancelado la subscripción al evento ${event?.title}`,
+            severity: 'success',
+            summary: 'Cancelación de subscripción exitosa'
+          });
+          this.visible = false;
+        },
+        error: err => {
+          this.messageService.add({
+            text: `Error al cancelar la subscripción al evento ${event?.title}`,
+            severity: 'error',
+            summary: 'Error'
+          });
+          this.visible = false;
+        }
+      }
+    )
   }
 
   validateDateRange(group: AbstractControl): ValidationErrors | null {
@@ -285,6 +357,8 @@ export class CalendarComponent implements  OnInit, OnDestroy {
   showDialog(selectedEvent: CondominiumEvent) {
     this.selectedEvent = selectedEvent;
     this.visible = true;
+
+    console.log("SELECTED EVENT", selectedEvent);
 
     // Asegúrate de que las fechas son objetos Date
     const startDate = selectedEvent.start ? new Date(selectedEvent.start) : null;
@@ -372,7 +446,7 @@ export class CalendarComponent implements  OnInit, OnDestroy {
         suscribers: this.selectedEvent?.suscribers!,
         createdAt: this.selectedEvent?.createdAt!,
         updatedAt: this.selectedEvent?.updatedAt!,
-        isSubscribed: true
+        isSuscribed: true
       }
 
       this.eventService.update(event, this.condominium?.id!).subscribe(res => {
