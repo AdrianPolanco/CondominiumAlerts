@@ -190,7 +190,6 @@ menuItems: MenuItem[] = [
     });
   }
 
-
   showNotificationsDialog(): void {
     this.showNotifications = true;
 
