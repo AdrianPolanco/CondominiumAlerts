@@ -18,11 +18,7 @@ namespace CondominiumAlerts.Features.Extensions
 
             string errors = string.Join(", ", result.Errors.Select(e => e.ErrorMessage));
 
-            if (logger != default)
-            {
-                logger.LogWarning($"Validation failed {errors}");
-            }
-
+            logger?.LogWarning("Validation failed {errors}",errors);
             return Result<T>.Fail(errors);
         }
 
@@ -35,11 +31,8 @@ namespace CondominiumAlerts.Features.Extensions
 
             string errors = string.Join(", ", result.Errors.Select(e => e.ErrorMessage));
 
-            if (logger != default)
-            {
-                logger.LogWarning($"Validation failed {errors}");
-            }
 
+            logger?.LogWarning("Validation failed {errors}", errors);
             return Result.Fail(errors);
         }
     }

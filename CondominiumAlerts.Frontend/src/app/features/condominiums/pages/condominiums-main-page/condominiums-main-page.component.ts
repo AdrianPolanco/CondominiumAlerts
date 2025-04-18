@@ -67,6 +67,7 @@ export class CondominiumsMainPageComponent implements OnDestroy{
 
     if (this.form.invalid) {
       console.log('Form is invalid.');
+      this.errorText = "Favor introducir un codigo"
       return;
     }
     const formData = this.form.value;
@@ -75,6 +76,8 @@ export class CondominiumsMainPageComponent implements OnDestroy{
     this.condominiumService.join(formData).subscribe({
       next: (result) => {
          console.log('Joined successfully:', result);
+         this.isModalOpen = false;
+         this.loadUserCondominiums()
       },
       error: (err) => {
          console.error('Error joining condominium:', err);
