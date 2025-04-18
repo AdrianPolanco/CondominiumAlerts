@@ -28,30 +28,33 @@
     </div>
 
     <div
-    *ngFor="let condominium of condominiums"
-    class="relative w-full max-w-[17rem] min-w-[10rem] aspect-square flex flex-col justify-center items-center text-white rounded-lg p-4 cursor-pointer transition group"
-    (click)="viewCondominium(condominium)"
-  >
-    <!-- Imagen de fondo -->
-    <div
-      class="absolute inset-0 bg-cover bg-center rounded-lg"
-      [ngStyle]="{'background-image': getBackgroundImage(condominium.imageUrl)}"
-    ></div>
-  
-    <!-- Capa oscura -->
-    <div
-      class="absolute inset-0 bg-black/50 rounded-lg backdrop-blur-sm transition-all duration-300 group-hover:bg-black/20 group-hover:backdrop-blur-none"
-    ></div>
-  
-    <!-- Contenido -->
-    <div class="relative text-center">
-      <h3 class="text-xl font-semibold">{{ condominium.name }}</h3>
-      <p class="text-sm mt-2 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-        {{ condominium.address }}
-      </p>
+      *ngFor="let condominium of condominiums"
+      class="relative w-full max-w-[17rem] min-w-[10rem] aspect-square flex flex-col justify-center items-center text-white rounded-lg p-4 cursor-pointer transition group"
+      (click)="viewCondominium(condominium)"
+    >
+      <!-- Imagen de fondo -->
+      <div
+        class="absolute inset-0 bg-cover bg-center rounded-lg"
+        [ngStyle]="{
+          'background-image': getBackgroundImage(condominium.imageUrl)
+        }"
+      ></div>
+
+      <!-- Capa oscura -->
+      <div
+        class="absolute inset-0 bg-black/50 rounded-lg backdrop-blur-sm transition-all duration-300 group-hover:bg-black/20 group-hover:backdrop-blur-none"
+      ></div>
+
+      <!-- Contenido -->
+      <div class="relative text-center">
+        <h3 class="text-xl font-semibold">{{ condominium.name }}</h3>
+        <p
+          class="text-sm mt-2 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+        >
+          {{ condominium.address }}
+        </p>
+      </div>
     </div>
-  </div>
-  
   </div>
 </section>
 
@@ -61,29 +64,37 @@
 >
   <div class="bg-white p-1 rounded-lg shadow-lg w-96">
     <div class="flex justify-end">
-      <p-button icon="pi pi-times" (onClick)="changeModalState()" [rounded]="true" [text]="true" severity="danger" styleClass="self-end"/>
+      <p-button
+        icon="pi pi-times"
+        (onClick)="changeModalState()"
+        [rounded]="true"
+        [text]="true"
+        severity="danger"
+        styleClass="self-end"
+      />
     </div>
     <div class="p-6">
       <h2 class="text-xl font-semibold">Introduce un código de condominio</h2>
-      <p class="text-gray-600 mt-2">Por favor, introduce un código de condominio aquí abajo.</p>
+      <p class="text-gray-600 mt-2">
+        Por favor, introduce un código de condominio aquí abajo.
+      </p>
 
       <form [formGroup]="form" (ngSubmit)="joinCondominium()">
         <div class="mt-4">
           <input
             type="text"
             formControlName="condominiumCode"
-            max="11"
+            maxlength="11"
             name="condominiumCode"
             class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
             placeholder="Introduce el código de condominio"
             required
           />
         </div>
-
+        <p *ngIf="errorText" class="text-red-500">{{ errorText }}</p>
         <div class="mt-4 flex justify-end">
           <button
             type="submit"
-            [disabled]="form.invalid"
             class="px-4 py-2 bg-primary-500 text-white rounded-md hover:bg-primary-600 transition"
           >
             Unirse
@@ -94,4 +105,6 @@
   </div>
 </div>
 
-<shared-chats-drawer (onCondominiumSelected)="onCondominiumSelected()"></shared-chats-drawer>
+<shared-chats-drawer
+  (onCondominiumSelected)="onCondominiumSelected()"
+></shared-chats-drawer>

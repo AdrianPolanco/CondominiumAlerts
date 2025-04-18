@@ -8,7 +8,7 @@ namespace CondominiumAlerts.Features.Features.Condominiums.GetCondominiumsJoined
     {
         public GetCondominiumsJoinedByUserValidator()
         {
-            RuleFor(gc => gc.UserId).NotEmpty().WithMessage("The user was not especified");
+            RuleFor(gc => gc.UserId).NotEmpty().WithMessage("The user was not specified");
         }
     }
 }

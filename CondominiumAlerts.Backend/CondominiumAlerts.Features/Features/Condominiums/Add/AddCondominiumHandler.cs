@@ -54,7 +54,7 @@ namespace CondominiumAlerts.Features.Features.Condominiums.Add
             while (await _condominiumRepository.AnyAsync(x => x.InviteCode == inviteCode, cancellationToken))
             {
                 _logger.LogTrace("Failed to create invite code {InviteCode}, already exists.", inviteCode);
-                inviteCode = ByteHelpers.GenerateBase64String(7);
+                inviteCode = ByteHelpers.GenerateBase64String(11);
             }
             CondominiumEntity.Condominium condominium = await _condominiumRepository.CreateAsync(new CondominiumEntity.Condominium()
             {
