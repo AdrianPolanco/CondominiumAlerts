@@ -8,12 +8,12 @@ namespace CondominiumAlerts.Features.Extensions
 {
     public static class FluentToLightResult
     {
-        public static Result<T> ToLightResult<T>(this ValidationResult result, ILogger? logger = default, T request = default)
+        public static Result<T> ToLightResult<T>(this ValidationResult result, ILogger? logger = null, T response = default)
         {
 
             if (result.IsValid)
             {
-                return Result<T>.Ok(request);
+                return Result<T>.Ok(response);
             }
 
             string errors = string.Join(", ", result.Errors.Select(e => e.ErrorMessage));

@@ -77,6 +77,11 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/posts/pages/edit-post-page/edit-post-page.component')
         .then(c => c.EditPostPageComponent)
+  },{
+    path: 'condominium/joinWithToken/:token',
+    loadComponent: () =>
+      import('./features/condominiums/pages/joinwith-token/joinwith-token.component')
+    .then(c => c.JoinwithTokenComponent)
   },
   {
     path: '',

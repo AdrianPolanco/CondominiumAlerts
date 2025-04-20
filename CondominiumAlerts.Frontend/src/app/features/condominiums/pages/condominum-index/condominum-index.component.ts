@@ -1,5 +1,5 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { NgFor, CommonModule } from '@angular/common';
+import { Component, Input, OnInit, OnDestroy } from '@angular/core';
+import { NgFor, CommonModule, Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PostService } from '../../../posts/services/post.service';
 import { GetCondominiumsUsersResponse } from '../../../users/models/user.model';
@@ -16,11 +16,14 @@ import { PriorityLevelService } from '../../../services/priorityLevel.service';
 import { priorityDto } from '../../../priority-levels/models/priorityDto';
 import { CommetService } from '../../../Comments/services/comment.service';
 import { AddCommentCommand } from '../../../Comments/models/AddComment.Command'
-import { AddCommentResponse } from '../../../Comments/models/AddComment.Response'
 import { getCommentByPostCommand } from '../../../Comments/models/getCommentByPost.Command'
 import { getCommentByPostResponse } from '../../../Comments/models/getCommentByPost.Reponse'
 import { CreatePostsResponse, UpdatePostCommand, PostFormData } from '../../../posts/models/posts.model';
 import { TimeAgoPipe } from '../../../../shared/pipes/time-ago.pipe';
+import { getCondominiumTokenResponse } from '../../models/getCondominiumToken.response';
+import { AuthenticationService } from '../../../../core/services/authentication.service';
+import { User } from '../../../../core/auth/layout/auth-layout/user.type';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-condominium-index',
@@ -76,7 +79,7 @@ export class CondominumIndexComponent implements OnInit {
   condominiumId: string | null = null;
   showPostModal = false;
   editingPost: CreatePostsResponse['data'] | null = null;
-
+  currentToken: getCondominiumTokenResponse | null = null;
 
   constructor(
     private router: Router,
@@ -86,7 +89,9 @@ export class CondominumIndexComponent implements OnInit {
     private condominiumService: CondominiumService,
     private authService: AuthService,
     private priorityService: PriorityLevelService,
-    private commentService: CommetService
+    private commentService: CommetService,
+    private authenticationService: AuthenticationService,
+    private location: Location
   )
   {
     this.postForm = {
@@ -98,7 +103,11 @@ export class CondominumIndexComponent implements OnInit {
       condominiumId: '',
       userId: this.authService.currentUser?.uid ?? null
     };
-
+this.authenticationService.userData$.pipe(takeUntil(this.destroy$)).subscribe((userData) => {
+      if(userData?.data) {
+        this.user = userData?.data
+      };
+    })
   }
 
   ngOnInit(): void {
@@ -117,7 +126,51 @@ export class CondominumIndexComponent implements OnInit {
     this.loadComments(this.postId);
     this.loadPriorityLevels();
   }
+  user: User  | null= null
+destroy$ = new Subject<void>;
+  getLink(): void{
 
+    let url = `${window.location.origin}/condominium/joinWithToken/`
+    if(this.currentToken != null && this.currentToken.token && new Date(this.currentToken?.expirDate) > new Date() ){
+     // console.log("not server response")
+      url += encodeURIComponent(this.currentToken.token) 
+   //   console.log(url)
+      this.copyToClipBoard(url)
+
+      alert("Link copiado en el portapapeles")
+      return;
+    }
+
+    this.condominiumService.getCondominiumToken({
+      UserId: this.user?.id === undefined ? "": this.user.id,
+      condominiumId: this.condominiumId ?? ""
+
+    }).subscribe({
+      next:  (result) => {
+        this.currentToken = result.data
+        url += encodeURIComponent(this.currentToken.token)
+      //  console.log(this.currentToken)     
+    //    console.log(url)
+        this.copyToClipBoard(url)
+        alert("Link copiado en el portapapeles")
+      },
+      error: (err)=>{
+      //  console.error(err)
+      }
+    })
+  }
+  //TODO: When changing to  https remove this code and use the modern approach (await navigator.clipboard.writeText(text))
+  copyToClipBoard(value:string){
+    const textArea = document.createElement('textarea')
+    textArea.value = value;
+    textArea.style.position = 'fixed'
+    document.body.appendChild(textArea)
+    textArea.focus();
+    textArea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textArea)
+  }
+  
   toggleComments(postId: string): void {
     this.showComments[postId] = !this.showComments[postId];
     console.log('Toggle comments para post:', postId);

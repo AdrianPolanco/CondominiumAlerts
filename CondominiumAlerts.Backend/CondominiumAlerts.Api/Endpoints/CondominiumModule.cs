@@ -3,6 +3,7 @@ using Carter;
 using CondominiumAlerts.Domain.Aggregates.Entities;
 using CondominiumAlerts.Domain.Repositories;
 using CondominiumAlerts.Features.Features.Condominiums.Add;
+using CondominiumAlerts.Features.Features.Condominiums.GenerateLink;
 using CondominiumAlerts.Features.Features.Condominiums.GetCondominiumsJoinedByUser;
 using CondominiumAlerts.Features.Features.Condominiums.Get;
 using CondominiumAlerts.Features.Features.Condominiums.Join;
@@ -39,7 +40,7 @@ namespace CondominiumAlerts.Api.Endpoints
                     var response = new
                     {
                         IsSuccess = result.IsSuccess,
-                        Data = result.Value.Adapt<JoinCondominiumResponse>()
+                        Data = result.Value
                     };
                     return Results.Ok(response);
                 }).DisableAntiforgery();
@@ -577,6 +578,24 @@ namespace CondominiumAlerts.Api.Endpoints
             });
 
             app.MapHub<SummaryHub>("/condominiums/hubs/summary");
+            
+            app.MapGet("/condominiums/getCondominiumToken", 
+                async (ISender sender, [AsParameters] GetCondominiumTokenCommand command, CancellationToken cancellationToken) =>
+            {
+               Result<GetCondominiumTokenResponse>  result = await sender.Send(command, cancellationToken);
+
+               if (result.IsFailed)
+               {
+                   return Results.BadRequest(result);
+               }
+               var response = new
+               {
+                   isSuccess = result.IsSuccess,
+                   data = result.Value,
+               };
+               
+                return Results.Ok(response);
+            });
         }
     }
 }
