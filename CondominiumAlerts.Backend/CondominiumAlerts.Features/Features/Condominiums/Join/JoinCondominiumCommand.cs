@@ -5,8 +5,9 @@ namespace CondominiumAlerts.Features.Features.Condominiums.Join
 {
     public class JoinCondominiumCommand : ICommand<Result<JoinCondominiumResponse>>
     {
-        public string UserId { get; set; } = String.Empty;
-        public string CondominiumCode { get; set; } = String.Empty;
+        public string UserId { get; set; } = string.Empty;
+        public string CondominiumCode { get; set; } = string.Empty;
+        public string? CondominiumToken { get; set; }
 
     }
 }
