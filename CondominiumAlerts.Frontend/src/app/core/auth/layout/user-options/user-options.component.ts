@@ -8,7 +8,7 @@ import { AuthenticationService } from "../../../services/authentication.service"
 import { Router } from "@angular/router";
 import { NotificationDto } from "../../../../features/notifications/models/notification.model";
 import { FormComponent } from "../../../../shared/components/form/form.component";
-import { FormGroup, Validators } from "@angular/forms";
+import { FormGroup, FormsModule, Validators } from "@angular/forms";
 import { User } from "../auth-layout/user.type";
 import { SharedFormField } from "../../../../shared/components/form/shared-form-field.interface";
 import { SharedForm } from "../../../../shared/components/form/shared-form.interface";
@@ -16,6 +16,12 @@ import { MenuItem } from "primeng/api";
 import { Subject, takeUntil } from "rxjs";
 import { CommonModule } from "@angular/common";
 import { ButtonModule } from "primeng/button";
+import { ImageModule } from "primeng/image";
+import { Feedback } from "../../../../shared/components/form/feedback.interface";
+import { AvatarModule } from "primeng/avatar";
+import { MenuModule } from "primeng/menu";
+import { BadgeModule } from "primeng/badge";
+import { ToolbarModule } from "primeng/toolbar";
 
 @AutoUnsubscribe()
 @Component({
@@ -23,10 +29,15 @@ import { ButtonModule } from "primeng/button";
     imports: [
         Dialog,
         DialogModule,
-        // BadgeModule,
-        // MenuModule,
+        BadgeModule,
+        MenuModule,
         ButtonModule,
         CommonModule,
+        FormsModule,
+        FormComponent,
+        ImageModule,
+        AvatarModule,
+        ToolbarModule,
     ],
     templateUrl: './user-options.component.html',
     styleUrl: './user-options.component.css',
