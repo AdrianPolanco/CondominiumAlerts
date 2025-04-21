@@ -6,6 +6,7 @@ import {catchError, of, Subject, takeUntil, tap} from 'rxjs';
 import {AutoUnsubscribe} from '../../shared/decorators/autounsuscribe.decorator';
 import {CondominiumNotification} from '../events/types/condominiumNotification.type';
 import {CondominiumEvent} from '../events/event.type';
+import { NotificationDto } from './models/notification.model';
 
 @AutoUnsubscribe()
 @Injectable({
@@ -29,7 +30,7 @@ export class NotificationService {
   private destroy$ = new Subject<void>();
 
   get(){
-    return this.httpClient.get<{ isSuccess: boolean, data: { notifications: CondominiumNotification[] }}>(`/api/notifications/user/${this.user?.id}`, {
+    return this.httpClient.get<{ isSuccess: boolean, data: NotificationDto[]}>(`/api/notifications/user/${this.user?.id}`, {
       headers: {
         Authorization: `Bearer ${this.token}`
       }
@@ -39,15 +40,15 @@ export class NotificationService {
       }),
       catchError((error) => {
         console.error('Error fetching notifications:', error);
-        return of<{ isSuccess: boolean, data: { notifications: CondominiumNotification[] }}>({ isSuccess: false, data: {notifications: []} });
+        return of<{ isSuccess: boolean, data: NotificationDto[]}>({ isSuccess: false, data: [] });
       })
     )
   }
 
-  markAsRead(condominiumNotifications: CondominiumNotification[]){
+  markAsRead(condominiumNotifications: NotificationDto[]){
     const condominiumEventsIds = condominiumNotifications.map(event => event.id);
 
-    return this.httpClient.put<{ isSuccess: boolean, data: { notifications: CondominiumNotification[] }}>('/api/notifications/read', condominiumEventsIds, {
+    return this.httpClient.put<{ isSuccess: boolean, data: { notifications: NotificationDto[] }}>('/api/notifications/read', condominiumEventsIds, {
       headers: {
         Authorization: `Bearer ${this.token}`
       }
@@ -57,7 +58,7 @@ export class NotificationService {
       }),
       catchError((error) => {
         console.error('Error fetching notifications:', error);
-        return of<{ isSuccess: boolean, data: { notifications: CondominiumNotification[] }}>({ isSuccess: false, data: {notifications: []} });
+        return of<{ isSuccess: boolean, data: { notifications: NotificationDto[] }}>({ isSuccess: false, data: {notifications: []} });
       })
     )
   }

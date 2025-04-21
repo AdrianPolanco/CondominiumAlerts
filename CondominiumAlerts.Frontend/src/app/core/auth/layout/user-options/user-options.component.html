@@ -17,7 +17,7 @@
               }@else{
                 <i class="pi pi-bell" style="font-size: 1.2rem" (click)="showNotificationsDialog()"></i>
               }
-            <p-menu #menu [model]="menuItems" [popup]="true" />
+            <p-menu #menu [model]="menuItems()" [popup]="true" />
             <button (click)="menu.toggle($event)" class="flex justify-center items-center">
                 @if(userData?.profilePictureUrl){
                   <p-avatar [image]="userData?.profilePictureUrl" class="mr-2" size="large" shape="circle" />

@@ -1,6 +1,21 @@
-import { Component } from "@angular/core";
+import { Component, computed, effect, inject, model, OnDestroy, OnInit, signal, viewChild } from "@angular/core";
 import { AutoUnsubscribe } from "../../../../shared/decorators/autounsuscribe.decorator";
 import { Dialog, DialogModule } from "primeng/dialog";
+import { NotificationService } from "../../../../features/notifications/notification.service";
+import { NotificationSignalRService } from "../../../services/notification-signal-r.service";
+import { CondominiumService } from "../../../../features/condominiums/services/condominium.service";
+import { AuthenticationService } from "../../../services/authentication.service";
+import { Router } from "@angular/router";
+import { NotificationDto } from "../../../../features/notifications/models/notification.model";
+import { FormComponent } from "../../../../shared/components/form/form.component";
+import { FormGroup, Validators } from "@angular/forms";
+import { User } from "../auth-layout/user.type";
+import { SharedFormField } from "../../../../shared/components/form/shared-form-field.interface";
+import { SharedForm } from "../../../../shared/components/form/shared-form.interface";
+import { MenuItem } from "primeng/api";
+import { Subject, takeUntil } from "rxjs";
+import { CommonModule } from "@angular/common";
+import { ButtonModule } from "primeng/button";
 
 @AutoUnsubscribe()
 @Component({
@@ -8,8 +23,8 @@ import { Dialog, DialogModule } from "primeng/dialog";
     imports: [
         Dialog,
         DialogModule,
-        BadgeModule,
-        MenuModule,
+        // BadgeModule,
+        // MenuModule,
         ButtonModule,
         CommonModule,
     ],
@@ -91,6 +106,11 @@ export class UserOptionsComponent implements OnInit, OnDestroy {
                 this.imageUrl.set(this.userData?.profilePictureUrl);
             }
         });
+
+        effect(() => {
+            this.loadNotifications();
+            this.joinNotificationGroup();
+        })
     }
 
     ngOnInit() {
@@ -131,11 +151,11 @@ export class UserOptionsComponent implements OnInit, OnDestroy {
             .subscribe({
                 next: (userData) => {
                     if (!userData) return;
-                    this.notificationService.getUserNotifications(userData.data.id)
+                    this.notificationService.get()
                         .pipe(takeUntil(this.destroy$))
                         .subscribe({
                             next: (notifications) => {
-                                this.notifications.set(notifications);
+                                this.notifications.set(notifications.data);
                                 console.log(this.notifications());
                                 console.log("Loaded notifications");
                             },

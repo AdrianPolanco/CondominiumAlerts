@@ -4,6 +4,7 @@ export interface NotificationDto {
   description?: string;
   createdAt: Date;
   levelOfPriority: LevelOfPriorityDto;
+    condominiumId?: string;
 }
 
 export interface LevelOfPriorityDto {

@@ -40,6 +40,7 @@ namespace CondominiumAlerts.Features.Features.Notifications
                         Title: notifcationWithLvl.Title,
                         Description: notifcationWithLvl.Description,
                         CreatedAt: notifcationWithLvl.CreatedAt,
+                        CondominiumId: notifcationWithLvl.CondominiumId,
                         LevelOfPriority: new LevelOfPriorityDto(
                             Id: notifcationWithLvl.LevelOfPriority.Id,
                             Title: notifcationWithLvl.LevelOfPriority.Title,

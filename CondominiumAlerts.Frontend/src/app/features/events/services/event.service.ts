@@ -8,6 +8,7 @@ import {User} from '../../../core/auth/layout/auth-layout/user.type';
 import { HttpTransportType, HubConnection, HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
 import {CondominiumNotification} from '../types/condominiumNotification.type';
 import {NotificationService} from '../../notifications/notification.service';
+import { NotificationDto } from '../../notifications/models/notification.model';
 
 @AutoUnsubscribe()
 @Injectable({
@@ -17,7 +18,7 @@ export class EventService implements OnDestroy {
 
   private hubConnection: HubConnection | null = null;
   private eventsBehaviorSubject = new BehaviorSubject<CondominiumEvent[]>([]);
-  private notificationBehaviorSubject = new BehaviorSubject<CondominiumNotification[]>([]);
+  private notificationBehaviorSubject = new BehaviorSubject<NotificationDto[]>([]);
   notification$ = this.notificationBehaviorSubject.asObservable();
   private readonly destroy$ = new Subject<void>();
   private token: string|null = null;
@@ -92,7 +93,7 @@ export class EventService implements OnDestroy {
   }
 
   private registerHandlers(){
-    this.hubConnection?.on("EventStarted", (notification: CondominiumNotification) => {
+    this.hubConnection?.on("EventStarted", (notification: NotificationDto) => {
       console.log("Notificación: ", notification);
       const current = this.notificationBehaviorSubject.getValue();
       console.log("Valor actual en notificationBehaviorSubject:", current, "tipo:", typeof current);
@@ -106,7 +107,7 @@ export class EventService implements OnDestroy {
       }
     });
 
-    this.hubConnection?.on("EventFinished", (notification: CondominiumNotification) => {
+    this.hubConnection?.on("EventFinished", (notification: NotificationDto) => {
       console.log("Notificación: ", notification);
       const current = this.notificationBehaviorSubject.getValue();
       console.log("Valor actual en notificationBehaviorSubject:", current, "tipo:", typeof current);
@@ -146,7 +147,7 @@ export class EventService implements OnDestroy {
   private loadInitialNotifications(): void {
     this.notificationService.get().pipe(takeUntil(this.destroy$)).subscribe(response => {
       if (response.isSuccess) {
-        this.notificationBehaviorSubject.next(response.data.notifications);
+        this.notificationBehaviorSubject.next(response.data);
       }
     });
   }
