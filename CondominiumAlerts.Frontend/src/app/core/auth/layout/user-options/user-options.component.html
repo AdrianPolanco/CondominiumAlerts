@@ -60,6 +60,7 @@
       <div *ngIf="notification.description" class="notification-description">
         {{ notification.description }}
       </div>
+      @if(notification.levelOfPriority != null) {
       <div class="notification-priority" [ngClass]="{
         'priority-high': notification.levelOfPriority.priority >= 7,
         'priority-medium': notification.levelOfPriority.priority >= 4 && notification.levelOfPriority.priority < 7,
@@ -67,6 +68,7 @@
       }">
         {{ notification.levelOfPriority.title }}
       </div>
+      }
     </div>
     
     <div *ngIf="notifications().length === 0" class="no-notifications">

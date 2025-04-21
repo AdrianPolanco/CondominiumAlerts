@@ -30,7 +30,7 @@ export class NotificationService {
   private destroy$ = new Subject<void>();
 
   get(){
-    return this.httpClient.get<{ isSuccess: boolean, data: NotificationDto[]}>(`/api/notifications/user/${this.user?.id}`, {
+      return this.httpClient.get<{ isSuccess: boolean, data: NotificationDto[]}>(`/api/user/notifications/${this.user?.id}`, {
       headers: {
         Authorization: `Bearer ${this.token}`
       }
