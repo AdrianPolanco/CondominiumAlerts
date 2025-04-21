@@ -1,14 +1,49 @@
-<!-- User menu button -->
-<button 
-  pButton 
-  icon="pi pi-user" 
-  class="p-button-rounded p-button-text"
-    (click)="menu.toggle($event)">
-</button>
-
-<p-menu #menu [model]="menuItems()" [popup]="true"></p-menu>
-
-<!-- Notifications Dialog -->
+    <header class="card">
+        <p-toolbar styleClass="rounded-none">
+        <ng-template #start>
+            <img
+                (click)="onLogoClicked()"
+                ngSrc="images/condominiumAlertsLogo-removebg.png"
+                alt="Condominium Alerts"
+                height="40"
+                width="40"
+                class="cursor-pointer"
+            />
+        </ng-template>
+        <ng-template #end>
+            <nav class="flex gap-4 items-center">
+              @if(unreadNotificationsCount > 0){
+                <i class="pi pi-bell" pBadge [value]="unreadNotificationsCount" style="font-size: 1.2rem" (click)="showNotificationsDialog()"></i>
+              }@else{
+                <i class="pi pi-bell" style="font-size: 1.2rem" (click)="showNotificationsDialog()"></i>
+              }
+            <p-menu #menu [model]="menuItems" [popup]="true" />
+            <button (click)="menu.toggle($event)" class="flex justify-center items-center">
+                @if(userData?.profilePictureUrl){
+                  <p-avatar [image]="userData?.profilePictureUrl" class="mr-2" size="large" shape="circle" />
+                }@else{
+                  <p-avatar icon="pi pi-user" class="mr-2" size="large" shape="circle" />
+                }
+            </button>
+            </nav>
+        </ng-template>
+        </p-toolbar>
+    </header>
+    <p-dialog [(visible)]="visible" [modal]="true" [style]="{ width: '25rem' }">
+        <h1 class="text-center text-3xl mb-5">Mi perfil</h1>
+        <div class="flex justify-center items-center w-full rounded-full">
+        @if(imageUrl()){
+            <p-image styleClass="rounded-full" src="{{imageUrl()}}" alt="Image" width="200" [preview]="true" />
+        }@else{
+            <p-image styleClass="rounded-full" src="images/default-profile-pic.png" alt="Image" width="200" [preview]="true" />
+        }
+        </div>
+        <shared-form
+            [formSettingsInput]="profileFormSettings()"
+            (onFormCreated)="onFormCreated($event)"
+            (onFormSubmitted)="onSubmit($event)">
+        </shared-form>
+    </p-dialog>
 <p-dialog 
   header="Notificaciones" 
   [(visible)]="showNotificationsDialog" 

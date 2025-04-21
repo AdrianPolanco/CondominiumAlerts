@@ -1,37 +1,25 @@
-import {
-  Component,
-  computed,
-  inject,
-  OnDestroy,
-  OnInit,
-  signal,
-} from '@angular/core';
-import { ChatBoxComponent } from '../chat-box/chat-box.component';
-import { ChatBubleComponent } from '../chat-buble/chat-buble.component';
-import { NgClass, NgFor } from '@angular/common';
-import { ChatService } from '../../services/chat.service';
-import { AutoUnsubscribe } from '../../decorators/autounsuscribe.decorator';
-import {
-  combineLatest,
-  firstValueFrom,
-  map,
-  shareReplay,
-  Subject,
-  takeUntil,
-} from 'rxjs';
-import { ChatOptions } from './chat.type';
-import { ChatMessageDto } from '../../../core/models/chatMessage.dto';
-import { FormsModule } from '@angular/forms';
-import { Button } from 'primeng/button';
-import { AuthenticationService } from '../../../core/services/authentication.service';
-import { User } from '../../../core/auth/layout/auth-layout/user.type';
-import { SummaryResult } from '../../../features/condominiums/models/summaryResult';
-import { Dialog } from 'primeng/dialog';
-import { MessageService } from 'primeng/api';
-import { Toast } from 'primeng/toast';
-import { SummaryStatus } from '../../../features/condominiums/models/summaryStatus.enum';
-import { BackArrowComponent } from '../back-arrow/back-arrow.component';
+import {Component, computed, inject, OnDestroy, OnInit, signal,} from '@angular/core';
+import {ChatBoxComponent} from '../chat-box/chat-box.component';
+import {ChatBubleComponent} from '../chat-buble/chat-buble.component';
+import {NgClass, NgFor, NgIf} from '@angular/common';
+import {ChatService} from '../../services/chat.service';
+import {AutoUnsubscribe} from '../../decorators/autounsuscribe.decorator';
+import {combineLatest, firstValueFrom, map, shareReplay, Subject, takeUntil} from 'rxjs';
+import {ChatOptions} from './chat.type';
+import {ChatMessageDto} from '../../../core/models/chatMessage.dto';
+import {FormsModule} from '@angular/forms';
+import {Button} from 'primeng/button';
+import {AuthenticationService} from '../../../core/services/authentication.service';
+import {User} from '../../../core/auth/layout/auth-layout/user.type';
+import {SummaryResult} from '../../../features/condominiums/models/summaryResult';
+import {Dialog} from 'primeng/dialog';
+import {MessageService} from 'primeng/api';
+import {Toast} from 'primeng/toast';
+import {SummaryStatus} from '../../../features/condominiums/models/summaryStatus.enum';
+import { BackArrowComponent } from "../back-arrow/back-arrow.component";
+import { CalendarComponent } from "../../../features/events/components/calendar/calendar.component";
 import { ChatSignalRService } from '../../../core/services/chat-signal-r.service';
+
 
 @AutoUnsubscribe()
 @Component({
@@ -44,8 +32,10 @@ import { ChatSignalRService } from '../../../core/services/chat-signal-r.service
     Button,
     Toast,
     Dialog,
-    BackArrowComponent
-],
+    BackArrowComponent,
+    CalendarComponent,
+    NgClass
+  ],
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.css',
   providers: [MessageService],
@@ -66,7 +56,6 @@ export class ChatComponent implements OnInit, OnDestroy {
   showSummary = false;
   summaryStatus = signal<SummaryStatus | null>(null);
   SummaryStatusEnum = SummaryStatus;
-  isCondominium = this.options()?.type === 'condominium';
   lastMessage = signal<ChatMessageDto | null>(null);
   wasLastMessageToday = computed(() => {
     const message = this.lastMessage();
@@ -94,31 +83,66 @@ export class ChatComponent implements OnInit, OnDestroy {
     shareReplay(1)
   );
 
-  async ngOnInit() {
-    await this.chatSignalRService.start();
-    this.subcrisbeToHubSubject();
+  ngOnInit(): void {
+    this.authenticationService.userData$.pipe(takeUntil(this.destroy$)).subscribe((userData) => {
+      if(userData) this.currentUser = userData?.data;
+      console.log("TOKEN", this.currentUser);
+    });
 
-    this.authenticationService.userData$
+    this.chatService.chatOptions$.pipe(takeUntil(this.destroy$)).subscribe((options) => {
+      // Actualizar la opción de chat actual
+      this.options.set(options);
+
+      // Reaccionar a nuevas opciones de chat
+      if (options && options.type === 'condominium' && options.condominium) {
+        console.log("COND FROM SUBSCRIPTION", options.condominium.id);
+
+        // Cargar mensajes
+        this.chatService
+          .getMessagesByCondominium(options.condominium.id)
+          .pipe(takeUntil(this.destroy$))
+          .subscribe((response) => {
+            console.log("MESSAGES RECOVERED: ", response);
+            this.messages.set(response.data);
+            this.lastMessage.set(response.data[response.data.length - 1]);
+            console.log("LAST MESSAGE", this.lastMessage())
+          });
+
+        // Cargar el estado del resumen y el resultado al inicializar
+        this.loadSummaryState();
+
+        // Suscribirse a actualizaciones
+         // Suscripción para manejar el estado del resumen
+    this.summaryState$
+    .pipe(takeUntil(this.destroy$))
+    .subscribe(({ status, result, canShowSummary }) => {
+      // Actualiza las señales basadas en el estado
+      this.summaryStatus.set(status);
+      this.summaryState$
       .pipe(takeUntil(this.destroy$))
       .subscribe((userData) => {
         if (userData) this.currentUser = userData?.data;
       });
 
-    this.chatService.chatOptions$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((options) => {
-        // Actualizar la opción de chat actual
-        if (options?.condominium?.id) {
-          this.chatSignalRService.leftToGroup(options.condominium.id);
+        // Conectar automáticamente al SignalR hub para recibir actualizaciones en tiempo real
+        if (this.currentUser?.id) {
+          this.chatService.connectToCondominiumHub(
+            options.condominium.id,
+            options.condominium.name,
+            this.currentUser.id
+          ).catch(error => {
+            console.error("Error connecting to hub during initialization", error);
+          });
         }
-        this.options.set(options);
-        this.joinToGroup();
+
+      }
+    });
 
         // Reaccionar a nuevas opciones de chat
-        if (options && options.type === 'condominium' && options.condominium) {
+          if (this.options() && this.options()?.type === 'condominium' && this.options()?.condominium) {
           // Cargar mensajes
           this.chatService
-            .getMessagesByCondominium(options.condominium.id)
+              .getMessagesByCondominium(this.options()!.condominium!.id)
             .pipe(takeUntil(this.destroy$))
             .subscribe((response) => {
               this.messages.set(response.data);
@@ -198,14 +222,13 @@ export class ChatComponent implements OnInit, OnDestroy {
       });
   }
 
-  private subcrisbeToHubSubject() {
-    this.chatSignalRService.onNewMessage
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (value) => {
-          this.messages.update((c) => [...c, value]);
-        },
-      });
+  goTo(page: "chat" | "calendar"){
+    this.show = page;
+    if(page === "calendar") {
+      this.chatService.disconnectFromHub();
+      this.showSummary = false;
+      console.log("CHATOPTIONS FROM CALENDAR", this.options());
+    }
   }
   // Nuevo método para cargar el estado del resumen
   private loadSummaryState() {
@@ -214,7 +237,8 @@ export class ChatComponent implements OnInit, OnDestroy {
 
     // Cargar resultado si existe
     this.chatService
-      .getCurrentSummaryResult()
+  
+    .getCurrentSummaryResult()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (summary) => {
@@ -347,9 +371,7 @@ export class ChatComponent implements OnInit, OnDestroy {
     if (this.isThereSummaryResult()) {
       try {
         // Siempre intentar cargar el resumen fresco desde el servidor
-        const summary = await firstValueFrom(
-          this.chatService.getCurrentSummaryResult()
-        );
+        const summary = await firstValueFrom(this.chatService.getCurrentSummaryResult());
 
         if (summary && summary.data?.content) {
           // Actualiza el resumen local con los datos del servidor

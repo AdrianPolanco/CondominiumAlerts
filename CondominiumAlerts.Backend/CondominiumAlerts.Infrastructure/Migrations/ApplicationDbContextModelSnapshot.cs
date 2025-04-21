@@ -142,6 +142,67 @@ namespace CondominiumAlerts.Infrastructure.Migrations
                     b.ToTable("CondominiumUsers");
                 });
 
+            modelBuilder.Entity("CondominiumAlerts.Domain.Aggregates.Entities.Event", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CondominiumId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<string>("CreatedById")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<DateTime>("End")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsFinished")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<bool>("IsStarted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<bool>("IsToday")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime>("Start")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CondominiumId");
+
+                    b.HasIndex("CreatedById");
+
+                    b.ToTable("Event");
+                });
+
             modelBuilder.Entity("CondominiumAlerts.Domain.Aggregates.Entities.LevelOfPriority", b =>
                 {
                     b.Property<Guid>("Id")
@@ -234,7 +295,7 @@ namespace CondominiumAlerts.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("CondominiumId")
+                    b.Property<Guid?>("CondominiumId")
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedAt")
@@ -245,8 +306,14 @@ namespace CondominiumAlerts.Infrastructure.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("text");
 
-                    b.Property<Guid>("LevelOfPriorityId")
+                    b.Property<Guid?>("EventId")
                         .HasColumnType("uuid");
+
+                    b.Property<Guid?>("LevelOfPriorityId")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("Read")
+                        .HasColumnType("boolean");
 
                     b.Property<string>("ReceiverUserId")
                         .HasColumnType("text");
@@ -263,6 +330,8 @@ namespace CondominiumAlerts.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CondominiumId");
+
+                    b.HasIndex("EventId");
 
                     b.HasIndex("LevelOfPriorityId");
 
@@ -390,6 +459,21 @@ namespace CondominiumAlerts.Infrastructure.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("EventUser", b =>
+                {
+                    b.Property<Guid>("SuscribedToEventsId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("SuscribersId")
+                        .HasColumnType("text");
+
+                    b.HasKey("SuscribedToEventsId", "SuscribersId");
+
+                    b.HasIndex("SuscribersId");
+
+                    b.ToTable("EventUser");
+                });
+
             modelBuilder.Entity("CondominiumAlerts.Domain.Aggregates.Entities.Comment", b =>
                 {
                     b.HasOne("CondominiumAlerts.Domain.Aggregates.Entities.Comment", "ParentComment")
@@ -432,6 +516,25 @@ namespace CondominiumAlerts.Infrastructure.Migrations
                     b.Navigation("Condominium");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("CondominiumAlerts.Domain.Aggregates.Entities.Event", b =>
+                {
+                    b.HasOne("CondominiumAlerts.Domain.Aggregates.Entities.Condominium", "Condominium")
+                        .WithMany("Events")
+                        .HasForeignKey("CondominiumId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("CondominiumAlerts.Domain.Aggregates.Entities.User", "CreatedBy")
+                        .WithMany("CreatedEvents")
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Condominium");
+
+                    b.Navigation("CreatedBy");
                 });
 
             modelBuilder.Entity("CondominiumAlerts.Domain.Aggregates.Entities.LevelOfPriority", b =>
@@ -479,14 +582,17 @@ namespace CondominiumAlerts.Infrastructure.Migrations
                     b.HasOne("CondominiumAlerts.Domain.Aggregates.Entities.Condominium", "Condominium")
                         .WithMany()
                         .HasForeignKey("CondominiumId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("CondominiumAlerts.Domain.Aggregates.Entities.Event", "Event")
+                        .WithMany("Notifications")
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("CondominiumAlerts.Domain.Aggregates.Entities.LevelOfPriority", "LevelOfPriority")
                         .WithMany("Notifications")
                         .HasForeignKey("LevelOfPriorityId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("CondominiumAlerts.Domain.Aggregates.Entities.User", "ReceiverUser")
                         .WithMany("NotificationsReceivedByUser")
@@ -494,6 +600,8 @@ namespace CondominiumAlerts.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Condominium");
+
+                    b.Navigation("Event");
 
                     b.Navigation("LevelOfPriority");
 
@@ -582,6 +690,21 @@ namespace CondominiumAlerts.Infrastructure.Migrations
                     b.Navigation("Address");
                 });
 
+            modelBuilder.Entity("EventUser", b =>
+                {
+                    b.HasOne("CondominiumAlerts.Domain.Aggregates.Entities.Event", null)
+                        .WithMany()
+                        .HasForeignKey("SuscribedToEventsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CondominiumAlerts.Domain.Aggregates.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("SuscribersId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("CondominiumAlerts.Domain.Aggregates.Entities.Comment", b =>
                 {
                     b.Navigation("Replies");
@@ -589,6 +712,8 @@ namespace CondominiumAlerts.Infrastructure.Migrations
 
             modelBuilder.Entity("CondominiumAlerts.Domain.Aggregates.Entities.Condominium", b =>
                 {
+                    b.Navigation("Events");
+
                     b.Navigation("LevelOfPriorities");
 
                     b.Navigation("Messages");
@@ -598,6 +723,11 @@ namespace CondominiumAlerts.Infrastructure.Migrations
                     b.Navigation("Summaries");
 
                     b.Navigation("Users");
+                });
+
+            modelBuilder.Entity("CondominiumAlerts.Domain.Aggregates.Entities.Event", b =>
+                {
+                    b.Navigation("Notifications");
                 });
 
             modelBuilder.Entity("CondominiumAlerts.Domain.Aggregates.Entities.LevelOfPriority", b =>
@@ -617,6 +747,8 @@ namespace CondominiumAlerts.Infrastructure.Migrations
                     b.Navigation("Comments");
 
                     b.Navigation("Condominiums");
+
+                    b.Navigation("CreatedEvents");
 
                     b.Navigation("MessagesCreatedByUser");
 

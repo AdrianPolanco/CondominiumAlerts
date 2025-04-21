@@ -12,6 +12,8 @@ import { AddCondominiumCommand } from "../models/addCondominium.command";
 import { AuthenticationService } from '../../../core/services/authentication.service';
 import { AutoUnsubscribe } from '../../../shared/decorators/autounsuscribe.decorator';
 import { Condominium } from '../models/condominium.model';
+import { getCondominiumTokenComamd } from '../models/getCondominiumToken.comamd';
+import { getCondominiumTokenResponse } from '../models/getCondominiumToken.response';
 
 @AutoUnsubscribe()
 @Injectable({
@@ -58,6 +60,7 @@ export class CondominiumService implements OnDestroy{
       const fb = new FormData();
       fb.append('userId', cmd.userId)
       fb.append('condominiumCode', cmd.condominiumCode)
+      fb.append('condominiumToken', cmd.condominiumToken)
 
       return this.httpClient.post<JoinCondominiumResponse>(
         "/api/condominium/join", fb)
@@ -79,6 +82,11 @@ export class CondominiumService implements OnDestroy{
             data: GetCondominiumsJoinedByUserResponse[]
           }>(
         "/api/condominium/GetCondominiumsJoinedByUser",  {params: {userId: cmd.userId}, headers: {Authorization: `Bearer ${this.token}`}})
+    }
+
+    getCondominiumToken(cmd: getCondominiumTokenComamd ): Observable<{isSuccess: boolean, data:getCondominiumTokenResponse}>{
+       return this.httpClient.get<{isSuccess: boolean, data:getCondominiumTokenResponse}>
+        ('/api/condominiums/getCondominiumToken',{params:{UserId: cmd.UserId, CondominiumId: cmd.condominiumId}})
     }
 
     ngOnDestroy(): void {

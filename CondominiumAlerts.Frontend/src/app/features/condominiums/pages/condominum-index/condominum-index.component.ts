@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, Input, OnInit, OnDestroy } from '@angular/core';
+import { NgFor, CommonModule, Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PostService } from '../../../posts/services/post.service';
 import { GetCondominiumsUsersResponse } from '../../../users/models/user.model';
@@ -9,17 +9,27 @@ import { GetCondominiumResponse } from "../../models/getCondominium.response";
 import { ButtonModule } from 'primeng/button';
 import { AuthService } from '../../../../core/auth/services/auth.service';
 import { FormsModule } from '@angular/forms';
-import { priorityLevelService } from '../../../services/services.service'; 
+import { PriorityLevelService } from '../../../services/priorityLevel.service';
 import { priorityDto } from '../../../priority-levels/models/priorityDto';
+import { CommetService } from '../../../Comments/services/comment.service';
+import { AddCommentCommand } from '../../../Comments/models/AddComment.Command'
+import { getCommentByPostCommand } from '../../../Comments/models/getCommentByPost.Command'
+import { getCommentByPostResponse } from '../../../Comments/models/getCommentByPost.Reponse'
 import { CreatePostsResponse, UpdatePostCommand, PostFormData } from '../../../posts/models/posts.model';
+import { TimeAgoPipe } from '../../../../shared/pipes/time-ago.pipe';
+import { getCondominiumTokenResponse } from '../../models/getCondominiumToken.response';
+import { AuthenticationService } from '../../../../core/services/authentication.service';
+import { User } from '../../../../core/auth/layout/auth-layout/user.type';
+import { Subject, takeUntil } from 'rxjs';
 import { ChatsDrawerComponent } from '../../../../shared/components/chats-drawer/chats-drawer.component';
 import { BackArrowComponent } from '../../../../shared/components/back-arrow/back-arrow.component';
 import { CondominiumsLayoutComponent } from '../../../../shared/components/condominiums-layout/condominiums-layout.component';
-
 @Component({
   selector: 'app-condominium-index',
   standalone: true,
   imports: [
+    NgFor,
+    TimeAgoPipe,
     CommonModule,
     FormsModule,
       ButtonModule,
@@ -32,6 +42,11 @@ import { CondominiumsLayoutComponent } from '../../../../shared/components/condo
 })
 export class CondominumIndexComponent implements OnInit {
   priorityLevels: priorityDto[] = [];
+  @Input() postId!: string;
+
+  comments: { [postId: string]: getCommentByPostResponse[] } = {};
+  showComments: { [postId: string]: boolean } = {};
+  newComments: { [postId: string]: { text: string; imageFile?: File } } = {};
   users: GetCondominiumsUsersResponse[] = [
     {
       id: 'dddddfsdfdfs',
@@ -63,7 +78,7 @@ export class CondominumIndexComponent implements OnInit {
   condominiumId: string | null = null;
   showPostModal = false;
   editingPost: CreatePostsResponse['data'] | null = null;
-
+  currentToken: getCondominiumTokenResponse | null = null;
 
   constructor(
     private router: Router,
@@ -72,7 +87,10 @@ export class CondominumIndexComponent implements OnInit {
     private userService: UserService,
     private condominiumService: CondominiumService,
     private authService: AuthService,
-    private priorityService: priorityLevelService,
+    private priorityService: PriorityLevelService,
+    private commentService: CommetService,
+    private authenticationService: AuthenticationService,
+    private location: Location
   )
   {
     this.postForm = {
@@ -84,7 +102,11 @@ export class CondominumIndexComponent implements OnInit {
       condominiumId: '',
       userId: this.authService.currentUser?.uid ?? null
     };
-
+this.authenticationService.userData$.pipe(takeUntil(this.destroy$)).subscribe((userData) => {
+      if(userData?.data) {
+        this.user = userData?.data
+      };
+    })
   }
 
   ngOnInit(): void {
@@ -100,8 +122,111 @@ export class CondominumIndexComponent implements OnInit {
     this.getCondominiumData();
     this.loadPosts();
     this.loadUsers();
+    this.loadComments(this.postId);
     this.loadPriorityLevels();
   }
+  user: User  | null= null
+destroy$ = new Subject<void>;
+  getLink(): void{
+
+    let url = `${window.location.origin}/condominium/joinWithToken/`
+    if(this.currentToken != null && this.currentToken.token && new Date(this.currentToken?.expirDate) > new Date() ){
+     // console.log("not server response")
+      url += encodeURIComponent(this.currentToken.token) 
+   //   console.log(url)
+      this.copyToClipBoard(url)
+
+      alert("Link copiado en el portapapeles")
+      return;
+    }
+
+    this.condominiumService.getCondominiumToken({
+      UserId: this.user?.id === undefined ? "": this.user.id,
+      condominiumId: this.condominiumId ?? ""
+
+    }).subscribe({
+      next:  (result) => {
+        this.currentToken = result.data
+        url += encodeURIComponent(this.currentToken.token)
+      //  console.log(this.currentToken)     
+    //    console.log(url)
+        this.copyToClipBoard(url)
+        alert("Link copiado en el portapapeles")
+      },
+      error: (err)=>{
+      //  console.error(err)
+      }
+    })
+  }
+  //TODO: When changing to  https remove this code and use the modern approach (await navigator.clipboard.writeText(text))
+  copyToClipBoard(value:string){
+    const textArea = document.createElement('textarea')
+    textArea.value = value;
+    textArea.style.position = 'fixed'
+    document.body.appendChild(textArea)
+    textArea.focus();
+    textArea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textArea)
+  }
+  
+  toggleComments(postId: string): void {
+    this.showComments[postId] = !this.showComments[postId];
+    console.log('Toggle comments para post:', postId);
+    if (this.showComments[postId] && !this.comments[postId]) {
+      this.loadComments(postId);
+    }
+    if (!this.newComments[postId]) {
+      this.newComments[postId] = { text: '', imageFile: undefined };
+    }
+  }
+
+  loadComments(postId: string): void {
+    if (!postId) return;
+
+    const command: getCommentByPostCommand = { postid: postId };
+
+    this.commentService.getCommentsByPost(command).subscribe({
+      next: (comments) => {
+        this.comments[postId] = comments?.data || [];
+        this.initializeNewComments(postId);
+        console.log('Comentarios cargados:', this.comments[postId]);
+      },
+      error: (err) => {
+        console.error('Error al cargar comentarios:', err);
+        this.comments[postId] = [];
+      }
+    });
+  }
+
+  initializeNewComments(postId: string): void {
+    if (!this.newComments[postId]) {
+      this.newComments[postId] = { text: '', imageFile: undefined };
+    }
+  }
+
+  onCommentFileSelected(event: Event, postId: string): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      this.newComments[postId].imageFile = input.files[0];
+    }
+  }
+
+
+  submitComment(postId: string): void {
+    const commentData = this.newComments[postId];
+    const command: AddCommentCommand = {
+      text: commentData.text,
+      ImageFile: commentData.imageFile
+    };
+
+    this.commentService.createComment(command, postId).subscribe(() => {
+      this.newComments[postId] = { text: '', imageFile: undefined };
+      this.loadComments(postId);
+    });
+  }
+
+
 
   onCondominiumSelected(): void {
     this.router.navigate(['/condominium/chat']);
@@ -153,6 +278,12 @@ export class CondominumIndexComponent implements OnInit {
       next: (data) => {
         console.log('Publicaciones recibidas:', data);
         this.publications = data;
+
+        this.publications.forEach(publication => {
+          this.showComments[publication.id] = false; // Inicialmente ocultos
+          this.newComments[publication.id] = { text: '', imageFile: undefined };
+          this.loadComments(publication.id); // Cargar comentarios en segundo plano
+        });
       },
       error: (err) => {
         console.error('Error al cargar las publicaciones:', err);
@@ -196,7 +327,7 @@ export class CondominumIndexComponent implements OnInit {
       this.router.navigate(['/priority-levels/index', this.condominiumId]);
     }
   }
-  
+
 
   async openPostModal(postId?: string) {
     this.showPostModal = true;
@@ -242,7 +373,7 @@ export class CondominumIndexComponent implements OnInit {
     const input = event.target as HTMLInputElement;
     if (input.files?.length) {
       const file = input.files[0];
-      if (file.size > 0) { 
+      if (file.size > 0) {
         this.postForm.imageFile = file;
 
         const reader = new FileReader();
@@ -303,6 +434,8 @@ export class CondominumIndexComponent implements OnInit {
       });
     }
   }
+
+
 
   closePostModal() {
     this.showPostModal = false;

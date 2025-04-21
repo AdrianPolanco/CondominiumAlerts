@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { CalendarPageComponent } from './calendar-page.component';
+import { JoinwithTokenComponent } from './joinwith-token.component';
 
-describe('CalendarPageComponent', () => {
-  let component: CalendarPageComponent;
-  let fixture: ComponentFixture<CalendarPageComponent>;
+describe('JoinwithTokenComponent', () => {
+  let component: JoinwithTokenComponent;
+  let fixture: ComponentFixture<JoinwithTokenComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [CalendarPageComponent]
+      imports: [JoinwithTokenComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(CalendarPageComponent);
+    fixture = TestBed.createComponent(JoinwithTokenComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

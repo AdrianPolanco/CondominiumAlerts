@@ -14,7 +14,7 @@ public record CreateEventResponse(
     bool IsToday,
     UserDto CreatedBy,
     List<UserDto> Suscribers,
-    EventsOfCondominiumDto Condominium,
+    CondominiumDto Condominium,
     DateTime CreatedAt,
     DateTime UpdatedAt
     );

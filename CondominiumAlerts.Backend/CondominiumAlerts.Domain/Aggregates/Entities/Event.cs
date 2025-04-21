@@ -19,4 +19,5 @@ public class Event : IEntity<Guid>
     public Condominium Condominium { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
+    public IReadOnlyCollection<Notification>? Notifications { get; set; }
 }

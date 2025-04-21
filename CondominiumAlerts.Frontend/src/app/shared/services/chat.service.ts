@@ -43,7 +43,7 @@ export class ChatService implements OnDestroy{
   summarizing$ = this.summarizingSubject.asObservable();
   isConnecting = false;
 
-  constructor(private httpClient: HttpClient, private authenticationService: AuthenticationService) {
+  constructor(private readonly httpClient: HttpClient, private readonly authenticationService: AuthenticationService) {
     this.authenticationService.userToken$.pipe(takeUntil(this.destroy$)).subscribe((token) => {
       this.token = token;
     })
@@ -70,9 +70,9 @@ export class ChatService implements OnDestroy{
   if (!condominiumId) {
     return throwError(() => new Error('No hay condominio seleccionado'));
   }
-  
+
   return this.httpClient.get<{isSuccess: boolean, data:SummaryResult}>(
-    `api/condominiums/${condominiumId}/summary`, 
+    `api/condominiums/${condominiumId}/summary`,
     {
       headers: {
         Authorization: `Bearer ${this.token}`
@@ -113,7 +113,7 @@ export class ChatService implements OnDestroy{
     // Restea los resultados previos
     this.summaryResult.next(null);
     this.processingError.next(null);
-    this.summaryStatus.next(SummaryStatus.Created); 
+    this.summaryStatus.next(SummaryStatus.Created);
 
     // Hace una solicitud al endpoint para empezar un resumen
     return this.httpClient.post<RequestCondominiumSummaryResponse>(`api/condominiums/${currentOptions.condominium.id}/summary/${this.userData?.id}`,
@@ -161,12 +161,12 @@ export class ChatService implements OnDestroy{
       console.log("Ya hay una conexión en curso, esperando...");
       return;
     }
-    
+
     this.isConnecting = true;
-    
+
     try {
       // Si ya estamos conectados al mismo grupo, no volver a conectar
-      if (this.hubConnection && 
+      if (this.hubConnection &&
         this.hubConnection.state === signalR.HubConnectionState.Connected) {
       console.log("Ya estamos conectados al hub");
       this.isConnecting = false;
@@ -191,7 +191,7 @@ export class ChatService implements OnDestroy{
 
       // Start the connection
       this.hubConnection.start().then(async() => {
-          console.log("FINALMENTE CONECTADO A SIGNALR");
+          //console.log("FINALMENTE CONECTADO A SIGNALR");
           if(this.hubConnection) await this.hubConnection.invoke('JoinGroup', condominiumId, condominiumName, userId);
         })
         .catch(err => {
@@ -211,10 +211,10 @@ export class ChatService implements OnDestroy{
 
   // Metodo para manejar eventos del hub
   private setupHubEventHandlers(): void {
-    console.log("Trying to set up hub event handlers...");
+    //console.log("Trying to set up hub event handlers...");
     if (!this.hubConnection) return;
 
-    console.log("Setting up hub event handlers...");
+    //console.log("Setting up hub event handlers...");
 
     this.hubConnection.on('RequestNewSummary', () => {
       // Broadcast that a new summary request has been initiated
@@ -224,18 +224,18 @@ export class ChatService implements OnDestroy{
     });
 
     this.hubConnection.on('NotifyProcessingStarted', (message: string) => {
-      console.log('Processing started: ', message);
+      //console.log('Processing started: ', message);
       this.processingStatus.next(message);
     });
 
     this.hubConnection.on('SendSummary', (summary: any) => {
-      console.log('Summary received: ', summary);
+      //console.log('Summary received: ', summary);
       this.summaryResult.next(summary);
       this.processingStatus.next(null);
     });
 
     this.hubConnection.on('NotifyProcessingError', (errorMessage: string) => {
-      console.error('Processing error: ', errorMessage);
+      //console.error('Processing error: ', errorMessage);
       this.processingError.next(errorMessage);
       this.processingStatus.next(null);
     });
@@ -243,8 +243,8 @@ export class ChatService implements OnDestroy{
     this.hubConnection.off('CancelledProcessing');
 
     this.hubConnection.on('CancelledProcessing', async (message: string) => {
-      console.log('Processing cancelled: ', message);
-      console.log('Summary cancelled');
+     // console.log('Processing cancelled: ', message);
+     // console.log('Summary cancelled');
       this.processingStatus.next(null);
       this.summaryStatus.next(SummaryStatus.Cancelled);
       this.summaryResult.next(null);
@@ -252,16 +252,16 @@ export class ChatService implements OnDestroy{
     });
 
     this.hubConnection.on("UserNotInCondominium", (errorMessage: string) => {
-      console.log("Processing failed: ", errorMessage);
+     // console.log("Processing failed: ", errorMessage);
       this.processingError.next(errorMessage);
       this.processingStatus.next(errorMessage)
       this.summaryResult.next(null)
     })
 
     this.hubConnection.on("ProcessingComplete", async (message: string) => {
-      console.log("Processing complete: ", message);
+      //console.log("Processing complete: ", message);
       this.processingStatus.next("COMPLETED");
-      
+
       // Cargar el resumen cuando se completa
       this.getCurrentSummaryResult().subscribe({
         next: (response) => {
@@ -315,13 +315,13 @@ export class ChatService implements OnDestroy{
   async disconnectFromHub(): Promise<void> {
     if (this.hubConnection) {
       const currentOptions = this.chatOptions.value;
-  
+
       try {
         // Check connection state before attempting to leave group
         if (this.hubConnection.state === signalR.HubConnectionState.Connected &&
             currentOptions?.type === 'condominium' &&
             currentOptions.condominium && this.userData) {
-  
+
           try {
             await this.hubConnection.invoke('LeaveGroup',
               currentOptions.condominium.id,
@@ -331,7 +331,7 @@ export class ChatService implements OnDestroy{
             console.warn('No se pudo dejar el grupo, pero continuamos con la desconexión:', leaveError);
           }
         }
-  
+
         // Only stop if not already disconnected
         if (this.hubConnection.state !== signalR.HubConnectionState.Disconnected) {
           await this.hubConnection.stop();

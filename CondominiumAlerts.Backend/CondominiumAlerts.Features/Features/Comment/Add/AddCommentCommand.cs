@@ -8,7 +8,7 @@ namespace CondominiumAlerts.Features.Features.Comment.Add
     {
         public Guid Id { get; set; }
         public string Text { get; set; } = string.Empty!;
-        public required IFormFile ImageFile { get; set; }
+        public IFormFile ImageFile { get; set; }
         public Guid PostId { get; set; }
         public string UserId { get; set; }
     }

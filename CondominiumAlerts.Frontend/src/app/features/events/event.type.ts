@@ -5,7 +5,7 @@ export type PartialEvent = {
     id: string;
     title: string;
     start: Date;
-    end?: Date;
+    end: Date;
     description?: string;
 }
 
@@ -13,8 +13,17 @@ export type CondominiumEvent = PartialEvent & {
     isStarted: boolean;
     isFinished: boolean;
     isToday: boolean;
-    createdBy: User;
-    condominium: Pick<Condominium, "address" | "id" | "name" | "imageUrl">
+    createdBy: CondominiumEventSubscriber;
+    suscribers: CondominiumEventSubscriber[]
     createdAt: Date;
     updatedAt: Date;
+    isSuscribed: boolean;
+}
+
+type CondominiumEventSubscriber = {
+  id: string;
+  name: string;
+  lastname: string;
+  profilePictureUrl: string | null;
+  username: string;
 }

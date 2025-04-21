@@ -32,7 +32,7 @@ public static class DependencyInjection
     {
         services.AddDbContext<ApplicationDbContext>(options =>
             options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")!), ServiceLifetime.Scoped);
-        services.AddSingleton<IAuthenticationProvider, AuthenticationProvider>();
+        services.AddScoped<IAuthenticationProvider, AuthenticationProvider>();
         services.Configure<SmtpSettings>(configuration.GetSection("SmtpSettings"));
         services.AddScoped<IEmailService, EmailService>();
         services.AddScoped(typeof(IRepository<,>), typeof(Repository<,>));

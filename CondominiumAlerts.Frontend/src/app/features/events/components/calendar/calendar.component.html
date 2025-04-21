@@ -1,4 +1,186 @@
-<div class="bg-white w-full h-full">
+<div class="bg-white w-full h-full p-5">
     <full-calendar [options]="options" [events]="events" lang="ES"/>
 </div>
+@if (isLoading) {
+  <div class="fixed inset-0 flex items-center justify-center bg-black/10 z-50">
+    <p-progress-spinner
+      [style]="{width: '40px', height: '40px'}"
+      styleClass="custom-spinner"
+      strokeWidth="4"
+      fill="var(--surface-ground)"
+      animationDuration=".5s"
+    />
+  </div>
+}
+
+@if(selectedEvent || visible){
+  <p-dialog header="Detalles del Evento" [modal]="true" [(visible)]="visible" [style]="{ width: '30rem' }">
+    <form [formGroup]="form" class="flex flex-col gap-4">
+      <div class="flex justify-between items-center">
+        <div class="flex gap-2">
+          @if(selectedEvent?.createdBy && modalMode !== 'create'){
+            <span class="text-md text-gray-500">Creado por: </span>
+            <p-avatar [image]="selectedEvent?.createdBy?.profilePictureUrl!" size="normal" shape="circle"></p-avatar>
+            <div class="flex flex-col">
+              <p class="text-sm font-semibold">{{ selectedEvent?.createdBy?.name | titlecase}} {{selectedEvent?.createdBy?.lastname | titlecase}}</p>
+              <p class="text-xs text-gray-500">{{ selectedEvent?.createdBy?.username }}</p>
+            </div>
+          }
+        </div>
+        <div class="flex justify-end items-center gap-2">
+          @if(!isDue(selectedEvent?.end) && !isDue(selectedEvent?.start) && selectedEvent?.createdBy?.id !== user?.id){
+            @if(selectedEvent && selectedEvent?.isSuscribed === true && selectedEvent.id){
+              <p-button
+                size="small"
+                type="button"
+                pButton
+                icon="pi pi-bell-slash"
+                class="p-button-sm"
+                (click)="unsubscribeFromEvent(selectedEvent.id)"
+                pTooltip="Cancelar subscripción al evento"
+                tooltipPosition="top"/>
+            }@else if(selectedEvent && selectedEvent?.isSuscribed === false && selectedEvent.id){
+              <p-button
+                size="small"
+                type="button"
+                pButton
+                icon="pi pi-bell"
+                class="p-button-sm"
+                (click)="subscribeToEvent(selectedEvent.id)"
+                pTooltip="Suscribirse al evento"
+                tooltipPosition="top"/>
+            }
+          }
+          @if(!isDue(selectedEvent?.end) && !isDue(selectedEvent?.start) && selectedEvent?.createdBy?.id === user?.id){
+            <div class="flex gap-1">
+              <p-button
+                size="small"
+                type="button"
+                pButton
+                icon="pi pi-pencil"
+                class="p-button-sm"
+                *ngIf="!isEditable"
+                (click)="toggleEdit()"
+                pTooltip="Editar evento"
+                tooltipPosition="top"
+              />
+              <p-button
+                size="small"
+                type="button"
+                pButton
+                icon="pi pi-trash"
+                class="p-button-sm"
+                *ngIf="!isEditable"
+                (click)="isDeleteModalOpen = true"
+                pTooltip="Eliminar evento"
+                tooltipPosition="top"
+              />
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <div class="flex items-center gap-4">
+          <label class="w-24">Título</label>
+          <input pInputText formControlName="title" class="flex-1"
+                 [ngClass]="{ 'p-disabled': !isEditable }" />
+        </div>
+        <div *ngIf="form.get('title')?.touched && form.get('title')?.invalid"
+             class="ml-[7.5rem] text-sm text-primary">
+          <div *ngIf="form.get('title')?.errors?.['required']">El título es obligatorio.</div>
+          <div *ngIf="form.get('title')?.errors?.['maxlength']">Solo se admiten 100 caracteres como máximo en el título.</div>
+        </div>
+      </div>
+
+
+      <div class="flex flex-col gap-1">
+        <div class="flex items-center gap-4">
+          <label class="w-24">Descripción</label>
+          <textarea pTextarea formControlName="description" class="flex-1"
+                    [ngClass]="{ 'p-disabled': !isEditable }"></textarea>
+        </div>
+        <div *ngIf="form.get('description')?.touched && form.get('description')?.invalid"
+             class="ml-[7.5rem] text-sm text-primary">
+          <div *ngIf="form.get('description')?.errors?.['required']">La descripción es obligatoria.</div>
+          <div *ngIf="form.get('description')?.errors?.['maxlength']">Solo se admiten 500 caracteres como máximo en la descripción.</div>
+          <div *ngIf="form.get('description')?.errors?.['minlength']">El mínimo permitido son 20 caracteres ¡Da una descripción más detallada!</div>
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <div class="flex items-center gap-4">
+          <label class="w-24">Inicio</label>
+
+          <span *ngIf="!isEditable && form.get('start')?.value">
+            {{ form.get('start')?.value | date: 'EEEE d MMMM y, HH:mm':'UTC-4':'es-ES' }}
+          </span>
+          <span *ngIf="!isEditable && !form.get('start')?.value">
+            Sin fecha
+          </span>
+
+          <input *ngIf="isEditable"
+                 type="datetime-local"
+                 pInputText
+                 formControlName="start"
+                 class="flex-1 w-full" />
+        </div>
+
+        <div *ngIf="form.get('start')?.touched && form.get('start')?.errors?.['pastDate']"
+             class="ml-[7.5rem] text-sm text-primary">
+          La fecha de inicio no puede estar en el pasado.
+        </div>
+
+        <div *ngIf="form.get('start')?.hasError('minimumOneMinute')" class="ml-[7.5rem] text-sm text-primary">
+          La fecha de inicio debe ser al menos 1 minuto después del tiempo actual.
+        </div>
+      </div>
+
+      <!-- Input de FIN -->
+      <div class="flex flex-col gap-1">
+        <div class="flex items-center gap-4">
+          <label class="w-24">Fin</label>
+
+          <span *ngIf="!isEditable && form.get('end')?.value">
+            {{ form.get('end')?.value | date: 'EEEE d MMMM y, HH:mm':'UTC-4':'es-ES' }}
+          </span>
+          <span *ngIf="!isEditable && !form.get('end')?.value">
+            Sin fecha
+          </span>
+
+          <input *ngIf="isEditable"
+                 type="datetime-local"
+                 pInputText
+                 formControlName="end"
+                 class="flex-1 w-full" />
+        </div>
+
+        <div *ngIf="form.errors?.['invalidDateRange'] && form.get('end')?.touched"
+             class="ml-[7.5rem] text-primary p-error">
+          La fecha de fin debe ser posterior a la fecha de inicio.
+        </div>
+      </div>
+
+
+      <div class="flex justify-end gap-2 mt-4">
+        <button type="button" pButton [disabled]="form.invalid" *ngIf="isEditable" severity="secondary" (click)="visible = false">Cancelar</button>
+        <button type="submit" pButton *ngIf="isEditable" [disabled]="!form.valid || !isEditable" (click)="saveEvent()">Guardar</button>
+      </div>
+    </form>
+  </p-dialog>
+}
+
+@if(selectedEvent){
+  <p-dialog header="Eliminación de evento" [modal]="true" [(visible)]="isDeleteModalOpen" [style]="{ width: '30rem' }">
+    <span>¿Estas seguro de que deseas eliminar el evento "{{selectedEvent.title}}" programado
+      para el {{selectedEvent.start | date: 'EEEE d MMMM y, HH:mm':'UTC-4':'es-ES'}}?</span>
+
+    <div class="flex justify-end gap-2 mt-4">
+      <button type="button" pButton severity="secondary" (click)="isDeleteModalOpen = false">Cancelar</button>
+      <button type="button" pButton (click)="deleteEvent()" [disabled]="!isDeleteModalOpen">Eliminar</button>
+    </div>
+  </p-dialog>
+}
+
+<p-toast position="bottom-right"></p-toast>
 

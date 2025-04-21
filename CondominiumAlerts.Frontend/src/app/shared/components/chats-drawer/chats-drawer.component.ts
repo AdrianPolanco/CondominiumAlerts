@@ -36,7 +36,7 @@ export class ChatsDrawerComponent implements OnInit, OnDestroy{
     this.authenticationService.userData$.pipe(takeUntil(this.destroy$)).subscribe((userData) => {
       this.currentUser = userData?.data!;
       // Solo llamamos getUserCondominiums() cuando this.currentUser está definido
-      if (this.currentUser?.id) this.getUserCondominiums(); 
+      if (this.currentUser?.id) this.getUserCondominiums();
     });
   }
 
@@ -47,6 +47,7 @@ export class ChatsDrawerComponent implements OnInit, OnDestroy{
   getUserCondominiums(): void {
     this.condominiumService.getCondominiumsJoinedByUser({userId: this.currentUser?.id!}).pipe(takeUntil(this.destroy$)).subscribe((response) => {
       this.condominiumsSubject.next(response.data);
+      console.log("CONDOMINIUMS OBTENIDOS", response.data)
       this.areCondominiumsLoading.set(false);
     });
   }
@@ -56,7 +57,7 @@ export class ChatsDrawerComponent implements OnInit, OnDestroy{
         this.currentCondominium = condominium;
         this.chatService.setChatOptions({ type: "condominium", condominium, user: null})
         this.onCondominiumSelected.emit(condominium);
-      } 
+      }
   }
 
   ngOnDestroy(): void {

@@ -84,18 +84,17 @@
           <input
             type="text"
             formControlName="condominiumCode"
-            max="11"
+            maxlength="11"
             name="condominiumCode"
             class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
             placeholder="Introduce el código de condominio"
             required
           />
         </div>
-
+        <p *ngIf="errorText" class="text-red-500">{{ errorText }}</p>
         <div class="mt-4 flex justify-end">
           <button
             type="submit"
-            [disabled]="form.invalid"
             class="px-4 py-2 bg-primary-500 text-white rounded-md hover:bg-primary-600 transition"
           >
             Unirse

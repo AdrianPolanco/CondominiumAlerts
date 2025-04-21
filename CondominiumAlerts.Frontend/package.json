@@ -25,6 +25,7 @@
     "@fullcalendar/timegrid": "^6.1.17",
     "@microsoft/signalr": "^8.0.7",
     "@primeng/themes": "^19.0.5",
+    "date-fns": "^4.1.0",
     "firebase": "^11.2.0",
     "primeicons": "^7.0.0",
     "primeng": "^19.0.9",

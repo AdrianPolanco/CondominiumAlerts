@@ -11,8 +11,5 @@ public record UpdateEventResponse(
     bool IsStarted,
     bool IsFinished,
     bool IsToday,
-    UserDto CreatedBy,
-    List<UserDto> Suscribers,
-    EventsOfCondominiumDto Condominium,
     DateTime CreatedAt,
     DateTime UpdatedAt);

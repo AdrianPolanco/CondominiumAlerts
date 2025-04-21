@@ -1,37 +1,6 @@
-import {
-    Component,
-    effect,
-    OnDestroy,
-    OnInit,
-    signal,
-    viewChild,
-    computed,
-    inject,
-    model,
-} from '@angular/core';
-import { Toolbar } from 'primeng/toolbar';
-import { Router } from '@angular/router';
-import { CommonModule, NgFor, NgOptimizedImage } from '@angular/common';
-import { Avatar } from 'primeng/avatar';
-import { Dialog, DialogModule } from 'primeng/dialog';
-import { SharedFormField } from '../../../../shared/components/form/shared-form-field.interface';
-import { FormGroup, Validators } from '@angular/forms';
-import { SharedForm } from '../../../../shared/components/form/shared-form.interface';
-import { FormComponent } from '../../../../shared/components/form/form.component';
-import { Feedback } from '../../../../shared/components/form/feedback.interface';
-import { AuthenticationService } from '../../../services/authentication.service';
-import { Image } from 'primeng/image';
-import { Subject, takeUntil, tap } from 'rxjs';
-import { AutoUnsubscribe } from '../../../../shared/decorators/autounsuscribe.decorator';
-import { BadgeModule } from 'primeng/badge';
-import { Menu, MenuModule } from 'primeng/menu';
-import { MenuItem } from 'primeng/api';
-import { User } from '../auth-layout/user.type';
-import { ButtonModule } from 'primeng/button';
-import { NotificationService } from '../../../../features/notifications/services/notification.service';
-import { NotificationSignalRService } from '../../../services/notification-signal-r.service';
-import { CondominiumService } from '../../../../features/condominiums/services/condominium.service';
-import { NotificationDto } from '../../../../features/notifications/models/notification.model';
+import { Component } from "@angular/core";
+import { AutoUnsubscribe } from "../../../../shared/decorators/autounsuscribe.decorator";
+import { Dialog, DialogModule } from "primeng/dialog";
 
 @AutoUnsubscribe()
 @Component({
@@ -76,6 +45,7 @@ export class UserOptionsComponent implements OnInit, OnDestroy {
         baseButtonLabel: 'Editar perfil',
         submittedButtonLabel: '¡Perfil editado satisfactoriamente!',
     });
+
     // Menu items with notifications
     menuItems = computed<MenuItem[]>(() => [
         {
@@ -103,7 +73,10 @@ export class UserOptionsComponent implements OnInit, OnDestroy {
                 {
                     label: 'Cerrar sesión',
                     icon: 'pi pi-sign-out',
-                    command: () => this.authenticationService.logOut()
+                    command: () => {
+                        this.authenticationService.logOut();
+                        this.router.navigate(['/home']);
+                    }
                 }
             ]
         }
@@ -117,11 +90,6 @@ export class UserOptionsComponent implements OnInit, OnDestroy {
                 this.formGroup().reset();
                 this.imageUrl.set(this.userData?.profilePictureUrl);
             }
-        });
-
-        effect(() => {
-            this.loadNotifications();
-            this.joinNotificationGroup();
         });
     }
 
@@ -175,11 +143,9 @@ export class UserOptionsComponent implements OnInit, OnDestroy {
                         });
                 }
             });
-
     }
 
     private joinNotificationGroup() {
-
         this.authenticationService.userData$
             .pipe(takeUntil(this.destroy$))
             .subscribe({
@@ -204,7 +170,6 @@ export class UserOptionsComponent implements OnInit, OnDestroy {
         this.unreadCount.set(0);
     }
 
-    // Existing methods remain the same...
     onLogoClicked() {
         if (this.userData) this.router.navigate(['/condominiums']);
         else this.router.navigate(['/home']);
@@ -239,6 +204,7 @@ export class UserOptionsComponent implements OnInit, OnDestroy {
             },
         });
     }
+
     onFormCreated(form: FormGroup) {
         this.formGroup.set(form);
     }
@@ -292,8 +258,7 @@ export class UserOptionsComponent implements OnInit, OnDestroy {
                 errorMessages: {
                     required: 'El nombre de usuario es requerido.',
                     minLength: 'El nombre de usuario debe tener al menos 4 caracteres.',
-                    maxLength:
-                        'El nombre de usuario no puede tener más de 25 caracteres.',
+                    maxLength: 'El nombre de usuario no puede tener más de 25 caracteres.',
                 },
             },
             {
@@ -374,6 +339,7 @@ export class UserOptionsComponent implements OnInit, OnDestroy {
             fields: this.userProfileFormFields(),
         });
     }
+
     private mapUserDataToForm(user: User) {
         return {
             name: user.name,

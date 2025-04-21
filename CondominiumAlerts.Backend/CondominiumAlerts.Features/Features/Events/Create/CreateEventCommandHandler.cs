@@ -1,8 +1,7 @@
 ﻿using CondominiumAlerts.CrossCutting.CQRS.Interfaces.Handlers;
 using CondominiumAlerts.Domain.Aggregates.Entities;
 using CondominiumAlerts.Domain.Repositories;
-using CondominiumAlerts.Features.Features.Events.Create;
-using Coravel.Scheduling.Schedule.Interfaces;
+using CondominiumAlerts.Infrastructure.Auth.Interfaces;
 using LightResults;
 using Mapster;
 
@@ -13,15 +12,18 @@ public class CreateEventCommandHandler: ICommandHandler<CreateEventCommand, Resu
     private readonly IRepository<Event, Guid> _eventRepository;
     private readonly IRepository<Condominium, Guid> _condominiumRepository;
     private readonly IRepository<User, string> _userRepository;
+    private readonly IAuthenticationProvider _authenticationProvider;
 
     public CreateEventCommandHandler(
         IRepository<Event, Guid> eventRepository, 
         IRepository<Condominium, Guid> condominiumRepository, 
-        IRepository<User, string> userRepository)
+        IRepository<User, string> userRepository,
+        IAuthenticationProvider authenticationProvider)
     {
         _eventRepository = eventRepository;
         _condominiumRepository = condominiumRepository;
         _userRepository = userRepository;
+        _authenticationProvider = authenticationProvider;
     }
     
     
@@ -33,36 +35,31 @@ public class CreateEventCommandHandler: ICommandHandler<CreateEventCommand, Resu
         if (createdBy is null || condominium is null)
             return Result.Fail<CreateEventResponse>("Usuario o condominio no encontrado.");
 
-        DateTime startLocal = request.Start;
-        DateTime endLocal = request.End;
+        var start = request.Start;
+        var end = request.End;
+        
+        if(start <= DateTime.UtcNow) return Result.Fail<CreateEventResponse>("No se puede crear un evento con una fecha de inicio anterior o igual al tiempo actual.");
+        if(end <= DateTime.UtcNow) return Result.Fail<CreateEventResponse>("No se puede crear un evento con una fecha de finalizacion anterior o igual al tiempo actual.");
+        if(end == start) return Result.Fail<CreateEventResponse>("No se puede crear un evento con una fecha de inicio y finalizacion iguales.");
+        if(end < start) return Result.Fail<CreateEventResponse>("No se puede crear un evento con una fecha de inicio posterior a la fecha de finalizacion.");
+        
+        var isUserInCondominium = await _authenticationProvider.IsUserInCondominiumAsync(request.CreatedById, condominium.Id, cancellationToken);
 
-        TimeZoneInfo rdTimeZone;
-
-        if (OperatingSystem.IsWindows())
-        {
-            rdTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SA Western Standard Time");
-        }
-        else
-        {
-            rdTimeZone = TimeZoneInfo.FindSystemTimeZoneById("America/Santo_Domingo");
-        }
-
-        // Convertir correctamente a UTC
-        var startDateTimeUtc = TimeZoneInfo.ConvertTimeToUtc(startLocal, rdTimeZone);
-        var endDateTimeUtc = TimeZoneInfo.ConvertTimeToUtc(endLocal, rdTimeZone);
-
+        if (!isUserInCondominium) return Result.Fail<CreateEventResponse>("No tienes los permisos necesarios para esta accion. Debes pertenecer al condominio.");
+        
         var newEvent = new Event
         {
             Id = Guid.NewGuid(),
             Title = request.Title,
             Description = request.Description,
-            Start = startDateTimeUtc,
-            End = endDateTimeUtc,
+            Start = start,
+            End = end,
             CreatedById = createdBy.Id,
             CreatedBy = createdBy,
             CondominiumId = condominium.Id,
             Condominium = condominium,
-            IsToday = startDateTimeUtc.Date == DateTime.UtcNow.Date
+            IsToday = start.Date == DateTime.UtcNow.Date,
+            Suscribers = new(){createdBy}
         };
 
         await _eventRepository.CreateAsync(newEvent, cancellationToken);

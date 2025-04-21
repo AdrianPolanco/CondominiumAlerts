@@ -31,7 +31,6 @@ public class EventConfiguration : IEntityTypeConfiguration<Event>
 
         builder.HasMany(e => e.Suscribers)
             .WithMany(u => u.SuscribedToEvents);
-            
         
         builder.Property(e => e.CreatedAt)
             .HasDefaultValueSql("CURRENT_TIMESTAMP")

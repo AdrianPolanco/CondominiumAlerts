@@ -39,37 +39,62 @@ public static class DependencyInjection
             config.AddOpenBehavior(typeof(LoggingBehavior<,>));
             //config.AddOpenBehavior(typeof(ValidationBehavior<,>));
         });
-
-        services.AddScoped<IValidator<RegisterUserCommand>, RegisterUserValidator>();
-        services.AddScoped<IValidator<JoinCondominiumCommand>, JoinCondominiumValidator>();
-        services.AddScoped<IValidator<AddCondominiumCommand>, AddCondominiumValidator>();
-        services.AddScoped<IValidator<GetCondominiumCommand>, GetCondominiumValidator>();
-        services.AddScoped<IValidator<UpdatePostsCommand>, UpdatePostsCommandValidator>();
-        services.AddScoped<IValidator<GetCondominiumsJoinedByUserCommand>, GetCondominiumsJoinedByUserValidator>();
-        services.AddScoped<IValidator<UpdateUserCommand>, UpdateUserValidator>();
-        services.AddScoped<IValidator<GetPriorityLevelsQuery>, GetPriorityLevelValidator>();
-        services.AddScoped<IValidator<AddPriorityLevelCommand>, AddPriorityLevelValidator>();
-        services.AddScoped<IValidator<UpdatePriorityLevelCommand>, UpdatePriorityLevelValidator>();
-        services.AddScoped<IValidator<DeletePriorityLevelCommand>, DeletePriorityLevelValidator>();
-        services.AddScoped<IValidator<GetByIdPriorityLevelQuery>, GetByIdPriorityLevelValidator>();
-        services.AddScoped<IValidator<Address>, AddressValidator>();
-        services.AddScoped<IValidator<GetCondominiumsUsersCommand>, GetCondominiumsUsersValidator>();
+        services.AddScoped<INotificationService, NotificationService>();
         services.AddScoped<IRequestHandler<GetPostsCommand, Result<List<GetPostsResponse>>>, GetPostsHandler>();
 
-        services.AddScoped<INotificationService, NotificationService>();
-        services.AddScoped<IValidator<CreatePostCommand>, CreatePostValidator>();
-        services.AddScoped<IValidator<AddCommentCommand>, AddCommentValidator>();
+        AddValidators(services);
+
         services.AddTransient<EmailConfirmationJob>();
         services.AddTransient<MessagesSummarizationJob>();
 
         services.AddScoped<BasicUpdateUserStrategy>();
-        services.AddScoped<IUpdateUserStrategy>(sp => 
+        services.AddScoped<IUpdateUserStrategy>(sp =>
         {
             var basic = sp.GetRequiredService<BasicUpdateUserStrategy>();
             return basic;
         });
         services.Decorate<IUpdateUserStrategy, UpdateUserWithPhotoStrategy>();
         services.AddSingleton<ScheduledEventsService>();
+        return services;
+    }
+
+    private static IServiceCollection AddValidators(IServiceCollection services)
+    {
+        #region Backup old commented validation injection
+
+        /*services.AddScoped<IValidator<RegisterUserCommand>, RegisterUserValidator>();
+services.AddScoped<IValidator<JoinCondominiumCommand>, JoinCondominiumValidator>();
+services.AddScoped<IValidator<AddCondominiumCommand>, AddCondominiumValidator>();
+services.AddScoped<IValidator<GetCondominiumCommand>, GetCondominiumValidator>();
+services.AddScoped<IValidator<UpdatePostsCommand>, UpdatePostsCommandValidator>();
+services.AddScoped<IValidator<GetCondominiumsJoinedByUserCommand>, GetCondominiumsJoinedByUserValidator>();
+services.AddScoped<IValidator<UpdateUserCommand>, UpdateUserValidator>();
+services.AddScoped<IValidator<GetPriorityLevelsQuery>, GetPriorityLevelValidator>();
+services.AddScoped<IValidator<AddPriorityLevelCommand>, AddPriorityLevelValidator>();
+services.AddScoped<IValidator<UpdatePriorityLevelCommand>, UpdatePriorityLevelValidator>();
+services.AddScoped<IValidator<DeletePriorityLevelCommand>, DeletePriorityLevelValidator>();
+services.AddScoped<IValidator<GetByIdPriorityLevelQuery>, GetByIdPriorityLevelValidator>();
+services.AddScoped<IValidator<Address>, AddressValidator>();
+services.AddScoped<IValidator<GetCondominiumsUsersCommand>, GetCondominiumsUsersValidator>();
+services.AddScoped<IValidator<CreatePostCommand>, CreatePostValidator>();
+services.AddScoped<IValidator<AddCommentCommand>, AddCommentValidator>();*/
+
+        #endregion Backup old commented validation injection
+
+        IEnumerable<Type> validationsTypes = Assembly.GetExecutingAssembly().GetTypes()
+            .Where(t => (!t.IsAbstract || !t.IsInterface) && t.Name.EndsWith("Validator"));
+
+        foreach (Type validationType in validationsTypes)
+        {
+            IEnumerable<Type> interfaces = validationType.GetInterfaces()
+                .Where(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IValidator<>));
+
+            foreach (Type interfaceType in interfaces)
+            {
+                services.AddScoped(interfaceType, validationType);
+            }
+        }
+
         return services;
     }
 }
