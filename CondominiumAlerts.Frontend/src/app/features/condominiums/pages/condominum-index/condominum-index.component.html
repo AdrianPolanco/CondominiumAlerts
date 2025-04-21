@@ -6,21 +6,23 @@
       <div class="flex gap-1">
         <button
           class="bg-primary-contrast text-primary-700 px-4 py-2 rounded-md flex items-center hover:bg-primary-emphasis-alt hover:text-primary-contrast"
-          (click)="goToCreatePosts()"
-        >
-      <div class="flex space-x-2">
-        <button class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md flex items-center"
-                (click)="openPostModal()">
-          <i class="pi pi-plus mr-2"></i>
-          Nuevo post
+          (click)="goToCreatePosts()">
+          <!-- Add button content here or remove if empty -->
         </button>
 
-        <p-button
-          label="Mantenimiento Niveles"
-          styleClass="bg-primary-contrast text-primary-700 px-4 py-2 rounded-md flex items-center hover:bg-primary-emphasis-alt hover:text-primary-contrast"
-          (onClick)="goToLevels()"
-        />
+        <div class="flex space-x-2">
+          <button class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md flex items-center"
+                  (click)="openPostModal()">
+            <i class="pi pi-plus mr-2"></i>
+            Nuevo post
+          </button>
 
+          <p-button
+            label="Mantenimiento Niveles"
+            styleClass="bg-primary-contrast text-primary-700 px-4 py-2 rounded-md flex items-center hover:bg-primary-emphasis-alt hover:text-primary-contrast"
+            (onClick)="goToLevels()"
+          />
+        </div>
       </div>
     </div>
 
@@ -74,14 +76,12 @@
       </h2>
 
       <form (ngSubmit)="savePost()" class="space-y-5">
-
         <div class="form-group">
           <label class="block mb-1 text-sm font-semibold">Título</label>
           <input type="text" [(ngModel)]="postForm.title" name="title"
                  class="w-full p-3 rounded-md bg-gray-900 text-white border border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary"
                  required>
         </div>
-
 
         <div class="form-group">
           <label class="block mb-1 text-sm font-semibold">Descripción</label>
@@ -110,7 +110,6 @@
             <img [src]="postForm.currentImageUrl" alt="Vista previa" class="rounded-md max-h-64 object-contain">
           </div>
 
-
           <label class="flex items-center justify-center px-4 py-2 bg-white border border-gray-300 text-black rounded-md cursor-pointer hover:bg-gray-50 transition-colors">
             <span class="mr-1">+</span> Subir imagen
             <input type="file" (change)="onFileSelected($event)" accept="image/*" class="hidden">
@@ -120,7 +119,6 @@
             Dejar en blanco para mantener la imagen actual
           </small>
         </div>
-
 
         <div class="flex justify-end space-x-3 pt-4 border-t border-gray-700 mt-6">
           <button type="button"

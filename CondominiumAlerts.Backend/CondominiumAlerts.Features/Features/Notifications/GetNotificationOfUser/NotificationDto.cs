@@ -1,6 +1,6 @@
 namespace CondominiumAlerts.Features.Features.Notifications.Get
 {
-    public record NotificationDto(
+    public record class NotificationDto(
         Guid Id,
         string Title,
         string? Description,

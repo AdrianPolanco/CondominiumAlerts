@@ -25,13 +25,15 @@ public class CreatePostHandler : ICommandHandler<CreatePostCommand, Result<Creat
     private readonly ILogger<CreatePostHandler> _logger;
     private readonly IValidator<CreatePostCommand> _validator;
     private readonly INotificationService _notificationService;
+    private readonly IRepository<LevelOfPriority, Guid> _levelOfPriorityRepository;
 
     public CreatePostHandler(Cloudinary cloudinary,
                             IPostsRepository postsRepository,
                             IRepository<User, string> userRepository,
                             ILogger<CreatePostHandler> logger,
                             IValidator<CreatePostCommand> validator,
-                            INotificationService notificationService)
+                            INotificationService notificationService,
+                            IRepository<LevelOfPriority, Guid> levelOfPriorityRepository)
     {
         _cloudinary = cloudinary;
         _postsRepository = postsRepository;
@@ -39,6 +41,7 @@ public class CreatePostHandler : ICommandHandler<CreatePostCommand, Result<Creat
         _logger = logger;
         _validator = validator;
         _notificationService = notificationService;
+        _levelOfPriorityRepository = levelOfPriorityRepository;
     }
 
     public async Task<Result<CreatePostResponse>> Handle(CreatePostCommand request, CancellationToken cancellationToken)
@@ -102,16 +105,20 @@ public class CreatePostHandler : ICommandHandler<CreatePostCommand, Result<Creat
         }, cancellationToken);
 
 
-        await _notificationService.Notify(new Notification
+        var lvlOfPriority = await _levelOfPriorityRepository.GetByIdAsync(request.LevelOfPriorityId, cancellationToken);
+        if (lvlOfPriority?.Priority >= 7)
         {
-            Id = Guid.NewGuid(),
-            Title = "New Post Created",
-            Description = $"New post: {posts.Title}",
-            CondominiumId = posts.CondominiumId,
-            LevelOfPriorityId = posts.LevelOfPriorityId,
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
-        }, posts.CondominiumId.ToString(), cancellationToken);
+            await _notificationService.Notify(new Notification
+            {
+                Id = Guid.NewGuid(),
+                Title = "New Post Created",
+                Description = $"New post: {posts.Title}",
+                CondominiumId = posts.CondominiumId,
+                LevelOfPriorityId = posts.LevelOfPriorityId,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            }, posts.CondominiumId.ToString(), cancellationToken);
+        }
 
         return new CreatePostResponse()
         {

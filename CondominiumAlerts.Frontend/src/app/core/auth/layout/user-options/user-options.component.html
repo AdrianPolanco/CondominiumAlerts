@@ -3,7 +3,7 @@
   pButton 
   icon="pi pi-user" 
   class="p-button-rounded p-button-text"
-  [pMenuTriggerFor]="menu">
+    (click)="menu.toggle($event)">
 </button>
 
 <p-menu #menu [model]="menuItems()" [popup]="true"></p-menu>
@@ -11,7 +11,7 @@
 <!-- Notifications Dialog -->
 <p-dialog 
   header="Notificaciones" 
-  [(visible)]="showNotificationsDialog()" 
+  [(visible)]="showNotificationsDialog" 
   [style]="{ width: '90vw', maxWidth: '500px' }"
   [modal]="true"
   [dismissableMask]="true">
@@ -47,4 +47,4 @@
       (click)="showNotificationsDialog.set(false)">
     </button>
   </ng-template>
-</p-dialog>>
+</p-dialog>

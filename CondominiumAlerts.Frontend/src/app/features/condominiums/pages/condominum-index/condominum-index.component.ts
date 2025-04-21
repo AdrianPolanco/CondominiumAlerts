@@ -1,32 +1,31 @@
 import { Component, OnInit } from '@angular/core';
-import { NgFor, CommonModule } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PostService } from '../../../posts/services/post.service';
 import { GetCondominiumsUsersResponse } from '../../../users/models/user.model';
 import { UserService } from '../../../users/services/user.service';
 import { CondominiumService } from '../../services/condominium.service';
 import { GetCondominiumResponse } from "../../models/getCondominium.response";
-import { CondominiumsLayoutComponent } from '../../../../shared/components/condominiums-layout/condominiums-layout.component';
-import { ChatsDrawerComponent } from "../../../../shared/components/chats-drawer/chats-drawer.component";
-import { BackArrowComponent } from "../../../../shared/components/back-arrow/back-arrow.component";
 import { ButtonModule } from 'primeng/button';
 import { AuthService } from '../../../../core/auth/services/auth.service';
 import { FormsModule } from '@angular/forms';
 import { priorityLevelService } from '../../../services/services.service'; 
 import { priorityDto } from '../../../priority-levels/models/priorityDto';
 import { CreatePostsResponse, UpdatePostCommand, PostFormData } from '../../../posts/models/posts.model';
+import { ChatsDrawerComponent } from '../../../../shared/components/chats-drawer/chats-drawer.component';
+import { BackArrowComponent } from '../../../../shared/components/back-arrow/back-arrow.component';
+import { CondominiumsLayoutComponent } from '../../../../shared/components/condominiums-layout/condominiums-layout.component';
 
 @Component({
   selector: 'app-condominium-index',
   standalone: true,
   imports: [
-    NgFor,
     CommonModule,
     FormsModule,
-    CondominiumsLayoutComponent,
-    ChatsDrawerComponent,
-    BackArrowComponent,
-    ButtonModule
+      ButtonModule,
+      ChatsDrawerComponent,
+      BackArrowComponent,
+      CondominiumsLayoutComponent
   ],
   templateUrl: './condominum-index.component.html',
   styleUrls: ['./condominum-index.component.css'],

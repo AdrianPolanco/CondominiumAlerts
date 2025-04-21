@@ -7,10 +7,11 @@ import {
     viewChild,
     computed,
     inject,
+    model,
 } from '@angular/core';
 import { Toolbar } from 'primeng/toolbar';
 import { Router } from '@angular/router';
-import { NgFor, NgOptimizedImage } from '@angular/common';
+import { CommonModule, NgFor, NgOptimizedImage } from '@angular/common';
 import { Avatar } from 'primeng/avatar';
 import { Dialog, DialogModule } from 'primeng/dialog';
 import { SharedFormField } from '../../../../shared/components/form/shared-form-field.interface';
@@ -23,7 +24,7 @@ import { Image } from 'primeng/image';
 import { Subject, takeUntil, tap } from 'rxjs';
 import { AutoUnsubscribe } from '../../../../shared/decorators/autounsuscribe.decorator';
 import { BadgeModule } from 'primeng/badge';
-import { Menu } from 'primeng/menu';
+import { Menu, MenuModule } from 'primeng/menu';
 import { MenuItem } from 'primeng/api';
 import { User } from '../auth-layout/user.type';
 import { ButtonModule } from 'primeng/button';
@@ -36,17 +37,12 @@ import { NotificationDto } from '../../../../features/notifications/models/notif
 @Component({
     selector: 'core-user-options',
     imports: [
-        Toolbar,
-        NgOptimizedImage,
-        Avatar,
         Dialog,
-        FormComponent,
-        Image,
         DialogModule,
-        NgFor,
         BadgeModule,
-        Menu,
+        MenuModule,
         ButtonModule,
+        CommonModule,
     ],
     templateUrl: './user-options.component.html',
     styleUrl: './user-options.component.css',
@@ -61,7 +57,7 @@ export class UserOptionsComponent implements OnInit, OnDestroy {
 
     // State signals
     visible = signal(false);
-    showNotificationsDialog = signal(false);
+    showNotificationsDialog = model(false);
     showDrawer = signal(false);
     unreadCount = signal(0);
     notifications = signal<NotificationDto[]>([]);
@@ -83,17 +79,17 @@ export class UserOptionsComponent implements OnInit, OnDestroy {
     // Menu items with notifications
     menuItems = computed<MenuItem[]>(() => [
         {
-            label: 'Notificaciones',
-            icon: 'pi pi-bell',
-            badge: this.unreadCount() > 0 ? this.unreadCount().toString() : '',
-            command: () => {
-                this.showNotificationsDialog.set(true);
-                this.markAsRead();
-            }
-        },
-        {
             label: 'Opciones',
             items: [
+                {
+                    label: 'Notificaciones',
+                    icon: 'pi pi-bell',
+                    badge: this.unreadCount() > 0 ? this.unreadCount().toString() : '',
+                    command: () => {
+                        this.showNotificationsDialog.set(true);
+                        this.markAsRead();
+                    }
+                },
                 {
                     label: 'Mi perfil',
                     icon: 'pi pi-user-edit',
@@ -124,10 +120,8 @@ export class UserOptionsComponent implements OnInit, OnDestroy {
         });
 
         effect(() => {
-            if (this.currentCondominiumId()) {
-                this.loadNotifications();
-                this.joinNotificationGroup();
-            }
+            this.loadNotifications();
+            this.joinNotificationGroup();
         });
     }
 
@@ -164,20 +158,46 @@ export class UserOptionsComponent implements OnInit, OnDestroy {
     }
 
     private loadNotifications() {
-        if (!this.userData?.id || !this.currentCondominiumId()) return;
-
-        this.notificationService.getUserNotifications(this.userData.id)
+        this.authenticationService.userData$
             .pipe(takeUntil(this.destroy$))
             .subscribe({
-                next: (notifications) => this.notifications.set(notifications),
-                error: (err) => console.error('Error loading notifications', err)
+                next: (userData) => {
+                    if (!userData) return;
+                    this.notificationService.getUserNotifications(userData.data.id)
+                        .pipe(takeUntil(this.destroy$))
+                        .subscribe({
+                            next: (notifications) => {
+                                this.notifications.set(notifications);
+                                console.log(this.notifications());
+                                console.log("Loaded notifications");
+                            },
+                            error: (err) => console.error('Error loading notifications', err)
+                        });
+                }
             });
+
     }
 
     private joinNotificationGroup() {
-        if (this.currentCondominiumId() && this.userData?.id) {
-            this.notificationSignalR.joinCondominiumGroup(this.currentCondominiumId()!);
-        }
+
+        this.authenticationService.userData$
+            .pipe(takeUntil(this.destroy$))
+            .subscribe({
+                next: (userData) => {
+                    if (!userData) return;
+                    this.condominiumService.getCondominiumsJoinedByUser({
+                        userId: userData.data.id
+                    }).pipe(takeUntil(this.destroy$))
+                        .subscribe({
+                            next: (condos) => {
+                                condos.data.forEach(condo => {
+                                    this.notificationSignalR
+                                        .joinCondominiumGroup(condo.id);
+                                })
+                            }
+                        });
+                }
+            });
     }
 
     markAsRead() {

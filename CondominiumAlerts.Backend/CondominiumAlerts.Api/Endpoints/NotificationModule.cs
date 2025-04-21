@@ -11,7 +11,7 @@ namespace CondominiumAlerts.Api.Endpoints
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            app.MapHub<NotificationHub>("/hubs/notification");
+            app.MapHub<NotificationHub>("/hubs/notifications");
             app.MapGet("/user/notifications", async (ISender sender,
                                       [AsParameters] GetNotificationsOfUserQuery query) =>
            {

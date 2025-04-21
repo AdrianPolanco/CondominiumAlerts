@@ -26,9 +26,26 @@ namespace CondominiumAlerts.Features.Features.Notifications
 
             await _notificationRepository.CreateAsync(notification, cancellationToken);
 
+            var notifcationWithLvl = await _notificationRepository.GetByIdAsync(
+                notification.Id,
+                cancellationToken,
+                true,
+                includes: [x => x.LevelOfPriority]
+            )!;
             await _notificationHubContext.Clients.Group(condominiumId)
                 .SendAsync(
-                    NotificationHub.ReciveNotification, notification.Adapt<NotificationDto>()
+                    NotificationHub.ReciveNotification,
+                    new NotificationDto(
+                        Id: notifcationWithLvl!.Id,
+                        Title: notifcationWithLvl.Title,
+                        Description: notifcationWithLvl.Description,
+                        CreatedAt: notifcationWithLvl.CreatedAt,
+                        LevelOfPriority: new LevelOfPriorityDto(
+                            Id: notifcationWithLvl.LevelOfPriority.Id,
+                            Title: notifcationWithLvl.LevelOfPriority.Title,
+                            Priority: notifcationWithLvl.LevelOfPriority.Priority
+                        )
+                    )
                 );
         }
     }
