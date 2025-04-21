@@ -23,6 +23,8 @@ using FluentValidation;
 using LightResults;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
+using CondominiumAlerts.Features.Features.Notifications;
+using CondominiumAlerts.Domain.Interfaces;
 using CondominiumAlerts.Features.Features.Comment.Add;
 
 namespace CondominiumAlerts.Features.Extensions;
@@ -37,7 +39,7 @@ public static class DependencyInjection
             config.AddOpenBehavior(typeof(LoggingBehavior<,>));
             //config.AddOpenBehavior(typeof(ValidationBehavior<,>));
         });
-        
+        services.AddScoped<INotificationService, NotificationService>();
         services.AddScoped<IRequestHandler<GetPostsCommand, Result<List<GetPostsResponse>>>, GetPostsHandler>();
 
         AddValidators(services);
@@ -77,7 +79,7 @@ services.AddScoped<IValidator<GetCondominiumsUsersCommand>, GetCondominiumsUsers
 services.AddScoped<IValidator<CreatePostCommand>, CreatePostValidator>();
 services.AddScoped<IValidator<AddCommentCommand>, AddCommentValidator>();*/
 
-        #endregion
+        #endregion Backup old commented validation injection
 
         IEnumerable<Type> validationsTypes = Assembly.GetExecutingAssembly().GetTypes()
             .Where(t => (!t.IsAbstract || !t.IsInterface) && t.Name.EndsWith("Validator"));
@@ -86,7 +88,7 @@ services.AddScoped<IValidator<AddCommentCommand>, AddCommentValidator>();*/
         {
             IEnumerable<Type> interfaces = validationType.GetInterfaces()
                 .Where(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IValidator<>));
-            
+
             foreach (Type interfaceType in interfaces)
             {
                 services.AddScoped(interfaceType, validationType);

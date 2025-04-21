@@ -45,7 +45,6 @@ export class ChatsDrawerComponent implements OnInit, OnDestroy{
   }
 
   getUserCondominiums(): void {
-    console.log("USERID", this.currentUser?.id)
     this.condominiumService.getCondominiumsJoinedByUser({userId: this.currentUser?.id!}).pipe(takeUntil(this.destroy$)).subscribe((response) => {
       this.condominiumsSubject.next(response.data);
       console.log("CONDOMINIUMS OBTENIDOS", response.data)

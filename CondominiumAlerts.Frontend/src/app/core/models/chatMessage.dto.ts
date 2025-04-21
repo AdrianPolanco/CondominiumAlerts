@@ -5,6 +5,7 @@ export type ChatMessageDto = {
     text: string;
     mediaUrl?: string;
     creatorUser: ChatCreatorUserDto;
+    creatorUserId?: string;
     receiverUserId?: string;
     condominiumId?: string;
     messageBeingRepliedToId?: string;

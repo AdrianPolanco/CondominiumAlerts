@@ -99,7 +99,7 @@ namespace CondominiumAlerts.Tests.Unit.Features.Condominiums.Join
             Assert.False(result.IsSuccess);
             Assert.True(!string.IsNullOrEmpty(result.Error.Message));
             Assert.True(result.IsFailed);
-            Assert.Contains("The code is to short, it must be 11 characters long", result.Error.Message);
+            Assert.Contains("The code is too short, it must be 11 characters long", result.Error.Message);
         }
 
 
@@ -115,7 +115,7 @@ namespace CondominiumAlerts.Tests.Unit.Features.Condominiums.Join
             Assert.False(result.IsSuccess);
             Assert.True(!string.IsNullOrEmpty(result.Error.Message));
             Assert.True(result.IsFailed);
-            Assert.Contains("The code is to long, it must be 11 characters long", result.Error.Message);
+            Assert.Contains("The code is too long, it must be 11 characters long", result.Error.Message);
         }
 
 

@@ -12,12 +12,12 @@
         </ng-template>
         <ng-template #end>
             <nav class="flex gap-4 items-center">
-              @if(unreadNotificationsCount > 0){
-                <i class="pi pi-bell" pBadge [value]="unreadNotificationsCount" style="font-size: 1.2rem" (click)="showNotificationsDialog()"></i>
+              @if(unreadCount() > 0){
+                <i class="pi pi-bell" pBadge [value]="unreadCount()" style="font-size: 1.2rem" (click)="showNotificationsDialog()"></i>
               }@else{
                 <i class="pi pi-bell" style="font-size: 1.2rem" (click)="showNotificationsDialog()"></i>
               }
-            <p-menu #menu [model]="menuItems" [popup]="true" />
+            <p-menu #menu [model]="menuItems()" [popup]="true" />
             <button (click)="menu.toggle($event)" class="flex justify-center items-center">
                 @if(userData?.profilePictureUrl){
                   <p-avatar [image]="userData?.profilePictureUrl" class="mr-2" size="large" shape="circle" />
@@ -44,32 +44,44 @@
             (onFormSubmitted)="onSubmit($event)">
         </shared-form>
     </p-dialog>
-    <p-dialog
-      header="Notificaciones"
-      [modal]="true"
-      [(visible)]="showNotifications"
-      [style]="{ width: '50rem' }"
-      [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }"
-      [maximizable]="true"
-      (onHide)="onNotificationsClosed()"
-    >
-        <div class="w-50 p-5">
-          @if(notifications.length){
-            <div *ngFor="let notification of notifications" class="mb-3 p-3 rounded"
-                 [ngClass]="{ 'bg-white': notification.read, 'bg-gray-100': !notification.read }">
-              <div class="flex justify-end">
-                <span class="text-xs text-gray-400 justify-end">
-                  {{ notification.createdAt | timeAgo }}
-                </span>
-              </div>
-              <div class="flex items-center space-x-2">
-                <i class="pi pi-bell text-primary"></i>
-                <p class="text-sm">{{ notification.title }}</p>
-              </div>
-              <span class="text-xs text-gray-400">{{ notification.description }}</span>
-            </div>
-          }@else{
-            <h1 class="text-center text-xl mb-5">No tienes notificaciones</h1>
-          }
-        </div>
-    </p-dialog>
+<p-dialog 
+  header="Notificaciones" 
+  [(visible)]="showNotificationsDialog" 
+  [style]="{ width: '90vw', maxWidth: '500px' }"
+  [modal]="true"
+  [dismissableMask]="true">
+  
+  <div class="notifications-container">
+    <div *ngFor="let notification of notifications()" class="notification-item">
+      <div class="notification-header">
+        <span class="notification-title">{{ notification.title }}</span>
+        <span class="notification-time">{{ notification.createdAt | date:'short' }}</span>
+      </div>
+      <div *ngIf="notification.description" class="notification-description">
+        {{ notification.description }}
+      </div>
+      @if(notification.levelOfPriority != null) {
+      <div class="notification-priority" [ngClass]="{
+        'priority-high': notification.levelOfPriority.priority >= 7,
+        'priority-medium': notification.levelOfPriority.priority >= 4 && notification.levelOfPriority.priority < 7,
+        'priority-low': notification.levelOfPriority.priority < 4
+      }">
+        {{ notification.levelOfPriority.title }}
+      </div>
+      }
+    </div>
+    
+    <div *ngIf="notifications().length === 0" class="no-notifications">
+      No hay notificaciones
+    </div>
+  </div>
+  
+  <ng-template pTemplate="footer">
+    <button 
+      pButton 
+      label="Cerrar" 
+      class="p-button-text"
+      (click)="showNotificationsDialog.set(false)">
+    </button>
+  </ng-template>
+</p-dialog>

@@ -6,9 +6,6 @@ import { GetCondominiumsUsersResponse } from '../../../users/models/user.model';
 import { UserService } from '../../../users/services/user.service';
 import { CondominiumService } from '../../services/condominium.service';
 import { GetCondominiumResponse } from "../../models/getCondominium.response";
-import { CondominiumsLayoutComponent } from '../../../../shared/components/condominiums-layout/condominiums-layout.component';
-import { ChatsDrawerComponent } from "../../../../shared/components/chats-drawer/chats-drawer.component";
-import { BackArrowComponent } from "../../../../shared/components/back-arrow/back-arrow.component";
 import { ButtonModule } from 'primeng/button';
 import { AuthService } from '../../../../core/auth/services/auth.service';
 import { FormsModule } from '@angular/forms';
@@ -24,7 +21,9 @@ import { getCondominiumTokenResponse } from '../../models/getCondominiumToken.re
 import { AuthenticationService } from '../../../../core/services/authentication.service';
 import { User } from '../../../../core/auth/layout/auth-layout/user.type';
 import { Subject, takeUntil } from 'rxjs';
-
+import { ChatsDrawerComponent } from '../../../../shared/components/chats-drawer/chats-drawer.component';
+import { BackArrowComponent } from '../../../../shared/components/back-arrow/back-arrow.component';
+import { CondominiumsLayoutComponent } from '../../../../shared/components/condominiums-layout/condominiums-layout.component';
 @Component({
   selector: 'app-condominium-index',
   standalone: true,
@@ -33,10 +32,10 @@ import { Subject, takeUntil } from 'rxjs';
     TimeAgoPipe,
     CommonModule,
     FormsModule,
-    CondominiumsLayoutComponent,
-    ChatsDrawerComponent,
-    BackArrowComponent,
-    ButtonModule
+      ButtonModule,
+      ChatsDrawerComponent,
+      BackArrowComponent,
+      CondominiumsLayoutComponent
   ],
   templateUrl: './condominum-index.component.html',
   styleUrls: ['./condominum-index.component.css'],
