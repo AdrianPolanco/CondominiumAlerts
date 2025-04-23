@@ -3,22 +3,30 @@
     <div class="flex justify-between mb-6">
       <shared-back-arrow url="/condominiums" />
 
-      <div class="flex space-x-2">
-        <button class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md flex items-center"
-                (click)="openPostModal()">
-          <i class="pi pi-plus mr-2"></i>
-          Nuevo post
-        </button>
+     <div class="flex space-x-2">
+          <button class="bg-primary hover:bg-primary-emphasis text-white px-4 py-2 rounded-md flex items-center"
+                  (click)="openPostModal()">
+            <i class="pi pi-plus mr-2"></i>
+            Nuevo post
+          </button>
 
-        <p-button label="Mantenimiento Niveles"
-                  styleClass="bg-primary-contrast text-primary-700 px-4 py-2 rounded-md flex items-center hover:bg-primary-emphasis-alt hover:text-primary-contrast"
-                  (onClick)="goToLevels()" />
-
-        <p-button label="Consegir link"
-                  styleClass="bg-primary-contrast text-primary-700 px-4 py-2 rounded-md flex items-center hover:bg-primary-emphasis-alt hover:text-primary-contrast"
-                  (onClick)="getLink()" />
-      </div>
+          <p-button
+            label="Nuevo nivel de prioridad"
+            icon="pi pi-plus"
+            iconPos="left"
+            styleClass="bg-primary-contrast text-primary-700 px-4 py-2 rounded-md flex items-center hover:bg-primary-emphasis-alt hover:text-primary-contrast"
+            (onClick)="goToLevels()"
+          />
+        </div>
+        <p-button
+          label="Obtener enlace"
+          icon="pi pi-link"
+          iconPos="left"
+          styleClass="bg-primary-contrast text-primary-700 px-4 py-2 rounded-md flex items-center hover:bg-primary-emphasis-alt hover:text-primary-contrast"
+          (onClick)="getLink()"
+        />
     </div>
+  </div>
 
     <h2 class="text-xl md:text-4xl font-semibold mb-4 text-white">
       <i class="pi pi-pen-to-square mr-2 text-lg md:text-3xl"></i>
