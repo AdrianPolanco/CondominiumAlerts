@@ -9,6 +9,9 @@ import { AddCondominiumCommand } from "../../models/addCondominium.command";
 import { Router } from '@angular/router';
 import {ButtonDirective} from 'primeng/button';
 import { ChatsDrawerComponent } from "../../../../shared/components/chats-drawer/chats-drawer.component";
+import { AuthenticationService } from '../../../../core/services/authentication.service';
+import { User } from '../../../../core/auth/layout/auth-layout/user.type';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
     selector: 'app-condominium-page',
@@ -18,7 +21,17 @@ import { ChatsDrawerComponent } from "../../../../shared/components/chats-drawer
 })
 export class CondominiumPageComponent {
 
-  constructor(private condominiumService: CondominiumService, private router: Router) { }
+    user: User|null = null
+    destroy$ = new Subject<void>();
+   constructor(private condominiumService: CondominiumService,
+     private router: Router,      
+      private authenticationService: AuthenticationService, 
+    ) { 
+      this.authenticationService.userData$.pipe(takeUntil(this.destroy$)).subscribe((userData) => {
+        if(userData?.data) {
+           this.user = userData?.data
+        }});
+      }
 
   private readonly formGroup = signal<FormGroup>(new FormGroup({}));
 
@@ -77,12 +90,18 @@ export class CondominiumPageComponent {
 
   onSubmit(value: AddCondominiumCommand) {
     const formComponent = this.formComponent();
+    console.log(this.user)
+    value.userId = !this.user?.id ? "" : this.user.id
+    console.log(value)
     this.condominiumService.create(value).subscribe({
       next: (response) => {
-        formComponent?.resetForm({
+        setTimeout( () =>{
+              formComponent?.resetForm({
           status: 'success',
           message: '¡Condominio creado satisfactoriamente!',
         });
+        },1000)
+        this.router.navigate(['/condominium/index', response.data?.id]);
       },
       error: (err) => {
         console.log(err)

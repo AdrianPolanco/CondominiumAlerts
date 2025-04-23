@@ -6,7 +6,8 @@ using CondominiumAlerts.Features.Helpers;
 using FluentValidation;
 using LightResults;
 using Microsoft.Extensions.Logging;
-using CondominiumEntity = CondominiumAlerts.Domain.Aggregates.Entities;
+using CondominiumAlerts.Domain.Aggregates.Entities;
+using CondominiumAlerts.Features.Extensions;
 
 namespace CondominiumAlerts.Features.Features.Condominiums.Add
 {
@@ -17,28 +18,33 @@ namespace CondominiumAlerts.Features.Features.Condominiums.Add
         private readonly ICondominiumRepository _condominiumRepository;
         private readonly ILogger<AddCondominiumHandler> _logger;
         private readonly IValidator<AddCondominiumCommand> _validator;
+        private readonly IRepository<CondominiumUser, Guid> _condominiumUserRepository;
 
         public AddCondominiumHandler(Cloudinary cloudinary,
                                      ICondominiumRepository condominiumRepository,
                                      ILogger<AddCondominiumHandler> logger,
-                                     IValidator<AddCondominiumCommand> validator)
+                                     IValidator<AddCondominiumCommand> validator,
+                                     IRepository<CondominiumUser, Guid>
+                                         condominiumUserRepository)
         {
             _cloudinary = cloudinary;
             _condominiumRepository = condominiumRepository;
             _logger = logger;
             _validator = validator;
+            _condominiumUserRepository = condominiumUserRepository;
         }
 
         public async Task<Result<AddCondominiumResponse>>
         Handle(AddCondominiumCommand request, CancellationToken cancellationToken)
         {
-            FluentValidation.Results.ValidationResult validation = _validator.Validate(request);
+            FluentValidation.Results.ValidationResult validation = await 
+                _validator.ValidateAsync(request,cancellationToken);
 
             if (!validation.IsValid)
             {
-                IEnumerable< string> errors = validation.Errors.Select(e => e.ErrorMessage);
-                _logger.LogTrace($"Validation failed {errors}");
-                return Result.Fail<AddCondominiumResponse>(string.Join(", ", errors));
+                /*IEnumerable< string> errors = validation.Errors.Select(e => e.ErrorMessage);
+                _logger.LogTrace($"Validation failed {errors}");*/
+                return validation.ToLightResult<AddCondominiumResponse>(_logger);
             }
 
             ImageUploadResult imageUploadResult = await _cloudinary.UploadAsync(new ImageUploadParams()
@@ -56,7 +62,7 @@ namespace CondominiumAlerts.Features.Features.Condominiums.Add
                 _logger.LogTrace("Failed to create invite code {InviteCode}, already exists.", inviteCode);
                 inviteCode = ByteHelpers.GenerateBase64String(11);
             }
-            CondominiumEntity.Condominium condominium = await _condominiumRepository.CreateAsync(new CondominiumEntity.Condominium()
+            Condominium? createdCondominium = await _condominiumRepository.CreateAsync(new Condominium()
             {
                 Id = Guid.NewGuid(),
                 Name = request.Name,
@@ -66,12 +72,26 @@ namespace CondominiumAlerts.Features.Features.Condominiums.Add
                 LinkToken = "",
                 TokenExpirationDate = DateTime.UtcNow.AddDays(90),
             }, cancellationToken);
+
+            if (createdCondominium is null)
+            {
+                _logger.LogWarning("Failed to create condominium, with request {@request}.}", request);
+                return Result<AddCondominiumResponse>.Fail("Failed to create condominium");
+            }
+
+            await _condominiumUserRepository.CreateAsync(new()
+            {
+                UserId = request.userId,
+                CondominiumId = createdCondominium.Id,
+
+            }, cancellationToken);
+            
             return new AddCondominiumResponse()
             {
-                Id = condominium.Id,
-                Address = condominium.Address,
-                Name = condominium.Name,
-                ImageUrl = condominium.ImageUrl
+                Id = createdCondominium.Id,
+                Address = createdCondominium.Address,
+                Name = createdCondominium.Name,
+                ImageUrl = createdCondominium.ImageUrl
             };
         }
     }
