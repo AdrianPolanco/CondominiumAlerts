@@ -1,5 +1,6 @@
 ﻿using Carter;
 using CondominiumAlerts.Features.Features.Posts.Create;
+using CondominiumAlerts.Features.Features.Posts.Delete;
 using CondominiumAlerts.Features.Features.Posts.Get;
 using CondominiumAlerts.Features.Features.Posts.Update;
 using LightResults;
@@ -77,6 +78,26 @@ namespace CondominiumAlerts.Api.Endpoints
                        result.IsSuccess,
                        Data = result.Value
                    };
+                   return Results.Ok(response);
+               }
+            ).DisableAntiforgery();
+
+            // eliminar un post
+            app.MapDelete("/posts/{id}",
+               async (ISender sender, Guid id, CancellationToken cancellationToken) =>
+               {
+                   var command = new DeletePostCommand { Id = id };
+                   Result<DeletePostResponse> result = await sender.Send(command, cancellationToken);
+
+                   if (!result.IsSuccess)
+                       return Results.BadRequest(result);
+
+                   var response = new
+                   {
+                       result.IsSuccess,
+                       Data = result.Value
+                   };
+
                    return Results.Ok(response);
                }
             ).DisableAntiforgery();
