@@ -9,7 +9,6 @@ import { routes } from './app.routes';
 import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
 import { getAuth, provideAuth } from '@angular/fire/auth';
 import { environment } from '../enviroments/environment';
-import { customPreset } from './theme';
 import {provideHttpClient, withFetch} from '@angular/common/http';
 import { MessageService } from 'primeng/api';
 
@@ -21,6 +20,14 @@ export const appConfig: ApplicationConfig = {
     provideAuth(() => getAuth()),
     provideAnimationsAsync(),
     provideHttpClient(withFetch()),
+    providePrimeNG({
+      translation: {
+         weak: 'Débil',
+         medium: "Promedio",
+         strong: "Fuerte",
+         passwordPrompt: "Ingresa una contraseña"
+      }
+  }),
     MessageService
   ],
 };

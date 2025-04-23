@@ -134,6 +134,8 @@ export class AuthenticationService implements OnDestroy {
         })
       );
 
+      console.log("User data:", userData);
+
       this.userDataSubject.next(userData);
     } catch (error) {
       console.error("Error en getUserData:", error);

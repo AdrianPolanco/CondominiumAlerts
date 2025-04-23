@@ -17,7 +17,7 @@
     </ng-template>
   </p-toolbar>
   <section class="grid md:grid-cols-6 grid-cols-1 justify-around">
-    <aside class="col-span-4 md:flex justify-center gap-y-24 bg-red-50 hidden">
+    <aside class="col-span-4 md:flex justify-center gap-y-24 bg-primary-50 hidden">
       <div class="flex flex-col pt-32 gap-y-10">
         @for(feature of features; track feature.title+feature.details){
         <article class="flex justify-start items-center gap-x-2">
@@ -34,7 +34,7 @@
     </aside>
     <article class="col-span-2 p-3">
       <div class="flex flex-col items-center justify-center">
-        <h1 class="text-4xl font-bold text-red-500">Crear nuevo usuario</h1>
+        <h1 class="text-4xl font-bold text-primary-500">Crear nuevo usuario</h1>
         <shared-form
           [formSettingsInput]="registerFormSettings()"
           (onFormCreated)="onFormCreated($event)"
@@ -58,12 +58,11 @@
             width="40"
           />
         </p-button>
-        <p-button label="Cerrar sesión" (onClick)="logOut()" />
         <p-button
           label="Si ya tienes una cuenta, inicia sesión aquí"
           [link]="true"
           routerLink="/login"
-          styleClass="text-red-400"
+          styleClass="text-primary-400"
         />
       </div>
     </article>
