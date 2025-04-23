@@ -48,7 +48,7 @@ namespace CondominiumAlerts.Api.Endpoints
             app.MapPost("/condominium",
                 async (ISender sender, [FromForm] AddCondominiumCommand command,CancellationToken cancellationToken) =>
                 {
-              
+          
                     Result<AddCondominiumResponse> result = await sender.Send(command, cancellationToken);
                     if (!result.IsSuccess) return Results.BadRequest(result);
 

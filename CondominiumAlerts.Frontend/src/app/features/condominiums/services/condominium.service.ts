@@ -41,10 +41,12 @@ export class CondominiumService implements OnDestroy{
         fb.append('name', cmd.name);
         fb.append('address', cmd.address);
         fb.append('imageFile',cmd.imageFile);
+        fb.append('userId',cmd.userId);
         console.log("data", {
             name: fb.get('name'),
             address: fb.get('address'),
-            imageFile: fb.get('imageFile')
+            imageFile: fb.get('imageFile'),
+            userId: fb.get('userId'),
         })
         return this.httpClient.post<AddCondominiumResponse>(
             "/api/condominium",
