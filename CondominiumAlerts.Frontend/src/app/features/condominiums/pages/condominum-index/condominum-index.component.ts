@@ -46,7 +46,7 @@ export class CondominumIndexComponent implements OnInit {
 
   comments: { [postId: string]: getCommentByPostResponse[] } = {};
   showComments: { [postId: string]: boolean } = {};
-  newComments: { [postId: string]: { text: string; imageFile?: File } } = {};
+  newComments: { [postId: string]: { text: string; imageFile?: File; currentImageUrl: string; } } = {};
   users: GetCondominiumsUsersResponse[] = [
     {
       id: 'dddddfsdfdfs',
@@ -177,7 +177,7 @@ destroy$ = new Subject<void>;
       this.loadComments(postId);
     }
     if (!this.newComments[postId]) {
-      this.newComments[postId] = { text: '', imageFile: undefined };
+      this.newComments[postId] = { text: '', imageFile: undefined, currentImageUrl: ''};
     }
   }
 
@@ -201,28 +201,62 @@ destroy$ = new Subject<void>;
 
   initializeNewComments(postId: string): void {
     if (!this.newComments[postId]) {
-      this.newComments[postId] = { text: '', imageFile: undefined };
+      this.newComments[postId] = { text: '', imageFile: undefined, currentImageUrl: '' };
     }
   }
 
+
   onCommentFileSelected(event: Event, postId: string): void {
     const input = event.target as HTMLInputElement;
+
+    if (!this.newComments[postId]) {
+      this.newComments[postId] = { text: '', imageFile: undefined, currentImageUrl: '' };
+    }
+
+    // Limpiar la vista previa anterior si existe
+    if (this.newComments[postId].currentImageUrl) {
+      URL.revokeObjectURL(this.newComments[postId].currentImageUrl);
+    }
+
     if (input.files && input.files.length > 0) {
-      this.newComments[postId].imageFile = input.files[0];
+      const file = input.files[0];
+      this.newComments[postId].imageFile = file;
+
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.newComments[postId].currentImageUrl = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    } else {
+      this.newComments[postId].imageFile = undefined;
+      this.newComments[postId].currentImageUrl = '';
     }
   }
 
 
   submitComment(postId: string): void {
     const commentData = this.newComments[postId];
+
+    // Validar que haya texto en el comentario
+    if (!commentData.text || !commentData.text.trim()) {
+      return;
+    }
+
     const command: AddCommentCommand = {
       text: commentData.text,
       ImageFile: commentData.imageFile
     };
 
-    this.commentService.createComment(command, postId).subscribe(() => {
-      this.newComments[postId] = { text: '', imageFile: undefined };
-      this.loadComments(postId);
+    this.commentService.createComment(command, postId).subscribe({
+      next: () => {
+        // Resetear completamente el formulario de comentario
+        this.resetCommentForm(postId);
+        // Recargar los comentarios
+        this.loadComments(postId);
+      },
+      error: (err) => {
+        console.error('Error al enviar comentario:', err);
+      }
     });
   }
 
@@ -281,7 +315,7 @@ destroy$ = new Subject<void>;
 
         this.publications.forEach(publication => {
           this.showComments[publication.id] = false; // Inicialmente ocultos
-          this.newComments[publication.id] = { text: '', imageFile: undefined };
+          this.newComments[publication.id] = { text: '', imageFile: undefined, currentImageUrl: '' };
           this.loadComments(publication.id); // Cargar comentarios en segundo plano
         });
       },
@@ -356,6 +390,7 @@ destroy$ = new Subject<void>;
       this.resetPostForm();
     }
   }
+    
 
   resetPostForm() {
     this.postForm = {
@@ -435,8 +470,6 @@ destroy$ = new Subject<void>;
     }
   }
 
-
-
   closePostModal() {
     this.showPostModal = false;
     this.editingPost = null;
@@ -445,6 +478,23 @@ destroy$ = new Subject<void>;
 
   editPost(postId: string): void {
     this.openPostModal(postId);
+  }
+
+  resetCommentForm(postId: string): void {
+    if (this.newComments[postId]?.currentImageUrl) {
+      URL.revokeObjectURL(this.newComments[postId].currentImageUrl);
+    }
+
+    this.newComments[postId] = {
+      text: '',
+      imageFile: undefined,
+      currentImageUrl: ''
+    };
+
+    const fileInput = document.querySelector(`input[type="file"][data-post-id="${postId}"]`) as HTMLInputElement;
+    if (fileInput) {
+      fileInput.value = '';
+    }
   }
 
 }
