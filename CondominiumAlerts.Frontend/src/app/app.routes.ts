@@ -1,6 +1,12 @@
 import { Routes } from '@angular/router';
+import { authGuard } from './core/auth/guards/auth.guard';
 
 export const routes: Routes = [
+  {
+    path: '',
+    redirectTo: 'home',
+    pathMatch: 'full',
+  },
   {
     path: 'register',
     title: 'Registrar usuario',
@@ -47,6 +53,7 @@ export const routes: Routes = [
   },
   {
     path: 'condominium/create',
+    canActivate: [authGuard], // Add the authGuard here
     loadComponent: () =>
       import(
         './features/condominiums/pages/condominium-page/condominium-page.component'
@@ -83,9 +90,4 @@ export const routes: Routes = [
       import('./features/condominiums/pages/joinwith-token/joinwith-token.component')
     .then(c => c.JoinwithTokenComponent)
   },
-  {
-    path: '',
-    redirectTo: 'home',
-    pathMatch: 'full',
-  }
 ];
