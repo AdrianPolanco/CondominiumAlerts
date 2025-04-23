@@ -75,7 +75,16 @@ export class SingInComponent {
         email,
         password
       );
+  
       if (result.user) {
+        // Confirmar que el usuario está verificado
+        const user = result.user;
+
+        if (!user.emailVerified) {
+          this.presentToast('Por favor, verifica tu correo electrónico antes de iniciar sesión.');
+          await this.authService.logout(); // opcional: cerrar sesión si no está verificado
+          return;
+        }
         //Link de la pagina principal de la app
         this.router.navigateByUrl('/condominiums');
         return;
