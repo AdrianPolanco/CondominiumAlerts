@@ -51,6 +51,7 @@ export class UserOptionsComponent implements OnInit, OnDestroy {
     private router = inject(Router);
 
     // State signals
+    isGoogleUser = signal(false);
     visible = signal(false);
     showNotificationsDialog = model(false);
     showDrawer = signal(false);
@@ -135,6 +136,8 @@ export class UserOptionsComponent implements OnInit, OnDestroy {
             .subscribe((userData) => {
                 if (userData) {
                     this.userData = userData.data;
+                    const isProfilePicFromGoogle = userData.data.profilePictureUrl?.includes('googleusercontent.com');
+                    this.isGoogleUser.set(isProfilePicFromGoogle);
                     this.updateFormFields();
                     this.formGroup().patchValue(this.mapUserDataToForm(userData.data));
                 }
@@ -237,6 +240,7 @@ export class UserOptionsComponent implements OnInit, OnDestroy {
     }
 
     onFormCreated(form: FormGroup) {
+      console.log("ON FORM CREATED", form);
         this.formGroup.set(form);
     }
 
@@ -346,24 +350,30 @@ export class UserOptionsComponent implements OnInit, OnDestroy {
                     maxLength: 'El código postal no puede tener más de 6 caracteres.',
                     pattern: 'El código postal debe ser un número.',
                 },
-            },
-            {
-                name: 'profilePic',
-                label: 'Subir imagen',
-                type: 'file',
-                validators: [],
-                filetype: 'image/*',
-                onFileSelect: (event: any) => {
-                    if (event.files.length > 0) {
-                        const file = event.files[0];
-                        this.formGroup().patchValue({
-                            profilePic: file,
-                        });
-                        if (file) this.imageUrl.set(URL.createObjectURL(file));
-                    }
-                },
-            },
+            }
         ]);
+
+        if(!this.isGoogleUser()){
+          this.userProfileFormFields.set([
+            ...this.userProfileFormFields(),
+            {
+              name: 'profilePic',
+              label: 'Subir imagen',
+              type: 'file',
+              validators: [],
+              filetype: 'image/*',
+              onFileSelect: (event: any) => {
+                  if (event.files.length > 0) {
+                      const file = event.files[0];
+                      this.formGroup().patchValue({
+                          profilePic: file,
+                      });
+                      if (file) this.imageUrl.set(URL.createObjectURL(file));
+                  }
+              },
+          },
+          ])
+        }
 
         this.profileFormSettings.set({
             ...this.profileFormSettings(),

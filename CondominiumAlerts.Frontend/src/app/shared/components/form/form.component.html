@@ -85,9 +85,9 @@
 
       @if ((form().get(field.name)?.invalid && form().get(field.name)?.touched) ||
      (field.showFormErrors && form().errors && form().get(field.name)?.touched)) {
-        <small class="text-red-500">
-          {{ getErrorMessage(field) }}
-        </small>
+        <div *ngFor="let msg of feedback()?.message?.split(', ')">
+          <span>{{ msg }}</span>
+        </div>
     }
     </div>
   }
@@ -119,12 +119,17 @@
 
   @if(feedback() && feedback()?.status !== 'none'){
     <div class="flex justify-center items-center gap-2">
-      @if(feedback()?.status === 'success'){
-        <i class="pi pi-check-circle text-green-500"></i>
-      }@else if(feedback()?.status === 'error'){
-        <i class="pi pi-times-circle text-red-500"></i>
-      }
-      <span>{{ feedback()?.message }}</span>
+      <div>
+        @if(feedback()?.status === 'success'){
+          <i class="pi pi-check-circle text-green-500"></i>
+          <span class="inline-block">{{ feedback()?.message}}</span>
+        }@else if(feedback()?.status === 'error'){
+          <div *ngFor="let msg of feedback()?.message?.split(', ')" class="flex items-center gap-2">
+            <i class="pi pi-times-circle text-red-500"></i>
+            <span class="inline-block">{{ msg }}</span>
+          </div>
+        }
+      </div>
     </div>
   }
 </form>

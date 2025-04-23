@@ -17,7 +17,7 @@
           <p-button label="Iniciar Sesión" icon="pi pi-sign-in" class="mr-2" severity="secondary" />
         </a>
         <a routerLink="/register">
-          <p-button label="Registrarse" icon="pi pi-user-plus" severity="danger" />
+          <p-button label="Registrarse" icon="pi pi-user-plus" styleClass="bg-primary hover:bg-primary-emphasis" />
         </a>
       </div>
     </ng-template>
@@ -37,7 +37,7 @@
             Condominium Alerts es la plataforma ideal para gestionar y mejorar la comunicación en tu condominio.
           </p>
           <div>
-            <button class="bg-red-500 text-white px-8 py-4 rounded-lg font-semibold hover:bg-red-600" pButton [routerLink]="'/register'">
+            <button class="bg-primary text-white px-8 py-4 rounded-lg font-semibold hover:bg-primary-emphasis" pButton [routerLink]="'/register'">
               Comenzar ahora
             </button>
           </div>
@@ -72,7 +72,7 @@
         <!-- Feature 1 -->
         <div class="bg-white p-8 rounded-lg shadow-md flex items-center">
           <div class="w-1/4 flex justify-center">
-            <i class="fas fa-desktop text-5xl md:text-6xl text-red-500"></i>
+            <i class="fas fa-desktop text-5xl md:text-6xl text-primary"></i>
           </div>
           <div class="w-3/4 pl-4">
             <h3 class="text-xl font-semibold text-gray-800 mb-2">Gestión centralizada</h3>
@@ -85,7 +85,7 @@
         <!-- Feature 2 -->
         <div class="bg-white p-8 rounded-lg shadow-md flex items-center">
           <div class="w-1/4 flex justify-center">
-            <i class="fa-solid fa-lock text-5xl md:text-6xl text-red-500"></i>
+            <i class="fa-solid fa-lock text-5xl md:text-6xl text-primary"></i>
           </div>
           <div class="w-3/4 pl-4">
             <h3 class="text-xl font-semibold text-gray-800 mb-2">Seguridad garantizada</h3>
@@ -98,7 +98,7 @@
         <!-- Feature 3 -->
         <div class="bg-white p-8 rounded-lg shadow-md flex items-center">
           <div class="w-1/4 flex justify-center">
-            <i class="fa-solid fa-robot text-5xl md:text-6xl text-red-500"></i>
+            <i class="fa-solid fa-robot text-5xl md:text-6xl text-primary"></i>
           </div>
           <div class="w-3/4 pl-4">
             <h3 class="text-xl font-semibold text-gray-800 mb-2">IA integrada</h3>
@@ -111,7 +111,7 @@
         <!-- Feature 4 -->
         <div class="bg-white p-8 rounded-lg shadow-md flex items-center">
           <div class="w-1/4 flex justify-center">
-            <i class="fa-solid fa-message text-5xl md:text-6xl text-red-500"></i>
+            <i class="fa-solid fa-message text-5xl md:text-6xl text-primary"></i>
           </div>
           <div class="w-3/4 pl-4">
             <h3 class="text-xl font-semibold text-gray-800 mb-2">Comunicación eficiente</h3>
@@ -125,7 +125,7 @@
   </section>
 
   <!-- CTA -->
-  <section class="py-20 bg-red-500">
+  <section class="py-20 bg-primary">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
       <h2 class="text-3xl font-bold text-white mb-4">
         ¿Listo para llevar tu condominio al siguiente nivel?
@@ -133,7 +133,7 @@
       <p class="text-lg md:text-xl text-red-100 mb-8">
         Regístrate hoy y comienza a disfrutar de todas las ventajas.
       </p>
-      <button class="bg-white text-red-500 px-8 py-4 rounded-lg font-semibold hover:bg-red-50" pButton [routerLink]="'/register'">
+      <button class="bg-white text-primary-500 px-8 py-4 rounded-lg font-semibold hover:bg-red-50" pButton [routerLink]="'/register'">
         Comenzar ahora
       </button>
     </div>
