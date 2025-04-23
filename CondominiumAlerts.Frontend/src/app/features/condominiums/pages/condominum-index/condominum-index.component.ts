@@ -24,6 +24,8 @@ import { Subject, takeUntil } from 'rxjs';
 import { ChatsDrawerComponent } from '../../../../shared/components/chats-drawer/chats-drawer.component';
 import { BackArrowComponent } from '../../../../shared/components/back-arrow/back-arrow.component';
 import { CondominiumsLayoutComponent } from '../../../../shared/components/condominiums-layout/condominiums-layout.component';
+import { MessageService } from 'primeng/api';
+import { Toast } from 'primeng/toast';
 @Component({
   selector: 'app-condominium-index',
   standalone: true,
@@ -35,7 +37,8 @@ import { CondominiumsLayoutComponent } from '../../../../shared/components/condo
       ButtonModule,
       ChatsDrawerComponent,
       BackArrowComponent,
-      CondominiumsLayoutComponent
+      CondominiumsLayoutComponent, 
+      Toast
   ],
   templateUrl: './condominum-index.component.html',
   styleUrls: ['./condominum-index.component.css'],
@@ -90,7 +93,7 @@ export class CondominumIndexComponent implements OnInit {
     private priorityService: PriorityLevelService,
     private commentService: CommetService,
     private authenticationService: AuthenticationService,
-    private location: Location
+    private messageService: MessageService
   )
   {
     this.postForm = {
@@ -136,7 +139,6 @@ destroy$ = new Subject<void>;
    //   console.log(url)
       this.copyToClipBoard(url)
 
-      alert("Link copiado en el portapapeles")
       return;
     }
 
@@ -151,7 +153,6 @@ destroy$ = new Subject<void>;
       //  console.log(this.currentToken)     
     //    console.log(url)
         this.copyToClipBoard(url)
-        alert("Link copiado en el portapapeles")
       },
       error: (err)=>{
       //  console.error(err)
@@ -168,6 +169,12 @@ destroy$ = new Subject<void>;
     textArea.select();
     document.execCommand('copy');
     document.body.removeChild(textArea)
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Enlace copiado',
+      detail: 'El enlace para unirse al condominio ha sido copiado al portapapeles',
+      life: 3000
+    });
   }
   
   toggleComments(postId: string): void {
