@@ -38,11 +38,13 @@
             <p-image styleClass="rounded-full" src="images/default-profile-pic.png" alt="Image" width="200" [preview]="true" />
         }
         </div>
-        <shared-form
+        @if(visible()){
+          <shared-form
             [formSettingsInput]="profileFormSettings()"
             (onFormCreated)="onFormCreated($event)"
             (onFormSubmitted)="onSubmit($event)">
-        </shared-form>
+          </shared-form>
+        }
     </p-dialog>
 <p-dialog 
   header="Notificaciones" 

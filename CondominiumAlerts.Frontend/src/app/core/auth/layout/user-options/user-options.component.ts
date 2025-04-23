@@ -237,6 +237,7 @@ export class UserOptionsComponent implements OnInit, OnDestroy {
     }
 
     onFormCreated(form: FormGroup) {
+      console.log("ON FORM CREATED", form);
         this.formGroup.set(form);
     }
 

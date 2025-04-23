@@ -5,7 +5,7 @@ import {Checkbox} from 'primeng/checkbox';
 import {Textarea} from 'primeng/textarea';
 import {InputGroupAddon} from 'primeng/inputgroupaddon';
 import {InputGroup} from 'primeng/inputgroup';
-import {NgClass} from '@angular/common';
+import {CommonModule, NgClass} from '@angular/common';
 import {DropdownModule} from 'primeng/dropdown';
 import {InputText} from 'primeng/inputtext';
 import {ButtonDirective} from 'primeng/button';
@@ -30,6 +30,7 @@ import { FileUpload } from 'primeng/fileupload';
     Password,
     ProgressSpinner,
     FileUpload,
+    CommonModule
   ],
   templateUrl: './form.component.html'
 })
@@ -67,6 +68,8 @@ export class FormComponent implements OnInit{
         });
       }
     });
+
+    console.log("FIELDS CREATED", this.fields());
   }
 
   isFileField(field: SharedFormField): field is SharedFormFieldFile {
@@ -117,29 +120,36 @@ export class FormComponent implements OnInit{
   }
 
 
-  getErrorMessage(field: SharedFormField): string {
+  getErrorMessages(field: SharedFormField): string[] {
     const control = this.form().get(field.name);
-    if (!control) return '';
-
-    // Verificar errores del control
+    const messages: string[] = [];
+  
+    if (!control) return messages;
+  
+    // Errores del control individual
     if (control.errors) {
       for (const error in control.errors) {
         if (field.errorMessages?.[error]) {
-          return field.errorMessages[error];
+          messages.push(field.errorMessages[error]);
         }
       }
     }
-
-    // Verificar errores a nivel de formulario
+  
+    // Errores a nivel de formulario
     const formErrors = this.form().errors;
     if (formErrors) {
       for (const error in formErrors) {
         if (field.errorMessages?.[error]) {
-          return field.errorMessages[error];
+          messages.push(field.errorMessages[error]);
         }
       }
     }
-
-    return 'Error desconocido';
+  
+    if (messages.length === 0) {
+      messages.push('Error desconocido');
+    }
+  
+    return messages;
   }
+  
 }
