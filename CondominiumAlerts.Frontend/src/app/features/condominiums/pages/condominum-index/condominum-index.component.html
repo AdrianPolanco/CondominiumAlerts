@@ -84,38 +84,32 @@
               *ngIf="comments[publication.id]?.length; else noComments"
               class="space-y-8"
             >
-              <div
-                *ngFor="let comment of comments[publication.id]"
-                class="flex items-start gap-2"
-              >
-                <img
-                  [src]="comment.userProfilePicture"
-                  alt="Foto de perfil"
-                  class="w-6 h-6 rounded-full object-cover mt-1"
-                />
+              <div *ngFor="let comment of comments[publication.id]"
+                   class="flex items-start gap-2">
+                <img [src]="comment.userProfilePicture"
+                     alt="Foto de perfil"
+                     class="w-6 h-6 rounded-full object-cover mt-1" />
 
                 <!-- Contenido del comentario -->
                 <div class="flex-1">
                   <div class="flex items-baseline gap-2">
-                    <span
-                      class="text-sm font-medium text-gray-800 dark:text-white"
-                      >{{ comment.username }}</span
-                    >
-                    <span class="text-xs text-gray-500 dark:text-gray-400">{{
-                      comment.createdAt | timeAgo
-                    }}</span>
+                    <span class="text-sm font-medium text-gray-100  dark:text-white">{{ comment.username }}</span>
+                    <span class="text-xs text-gray-200 dark:text-gray-400">
+                      {{
+                         comment.createdAt | timeAgo
+                      }}
+                    </span>
                   </div>
 
-                  <p class="text-sm text-gray-800 dark:text-gray-200 mt-0">
+                  <p class="text-sm text-gray-100 mt-0">
                     {{ comment.text }}
                   </p>
 
+
                   <div *ngIf="comment.imageUrl" class="mt-1">
-                    <img
-                      [src]="comment.imageUrl"
-                      alt="Imagen del comentario"
-                      class="max-w-[200px] rounded border border-gray-200 dark:border-gray-600"
-                    />
+                    <img [src]="comment.imageUrl"
+                         alt="Imagen del comentario"
+                         class="max-w-[200px] rounded border border-gray-200 dark:border-gray-600" />
                   </div>
                 </div>
               </div>
@@ -132,11 +126,11 @@
             <textarea [(ngModel)]="newComments[publication.id].text"
                       name="text"
                       placeholder="Escribe un comentario..."
-                      class="w-full p-2 rounded bg-gray-800 text-white"
+                      class="w-full p-2 rounded bg-gray-800 text-white border border-gray-500 focus:outline-none focus:border-gray-100"
                       required></textarea>
 
             <div class="form-group">
-                <label class="block mb-1 text-sm font-semibold">Imagen</label>
+                <label class="block mb-1 text-gray-100 font-semibold">Imagen</label>
                 <div *ngIf="newComments[publication.id].currentImageUrl" class="mb-2">
                   <img [src]="newComments[publication.id].currentImageUrl"
                        alt="Vista previa"
