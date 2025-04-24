@@ -1,4 +1,4 @@
-import { Injectable, OnDestroy } from '@angular/core';
+import { Injectable, OnDestroy, OnInit } from '@angular/core';
 import { AuthenticationService } from '../../core/services/authentication.service';
 import { HttpClient } from '@angular/common/http';
 import { User } from '../../core/auth/layout/auth-layout/user.type';
@@ -27,40 +27,25 @@ export class NotificationService implements OnDestroy {
         private readonly httpClient: HttpClient,
         private readonly condominiumService: CondominiumService
     ) {
+        this.authenticationService.userData$
+            .pipe(takeUntil(this.destroy$))
+            .subscribe(user => {
+                if (user?.data) {
+                    this.user = user.data;
+                    this.get().subscribe();
+                }
+            });
+
         this.authenticationService.userToken$
             .pipe(takeUntil(this.destroy$))
             .subscribe(token => {
                 this.token = token;
                 if (token) this.initSignalRConnection();
             });
-
-        this.authenticationService.userData$
-            .pipe(takeUntil(this.destroy$))
-            .subscribe(user => {
-                if (user?.data) {
-                    this.user = user.data;
-                    if (this.hubConnection && this.user) {
-                        this.condominiumService.getCondominiumsJoinedByUser({
-                            userId: this.user.id
-                        }).pipe(
-                            takeUntil(this.destroy$)
-                        ).subscribe({
-                            next: value => {
-                                value.data.forEach(value => {
-                                    this.joinNotificationGroup(
-                                        value.id
-                                    );
-                                });
-                            }
-                        });
-
-                    }
-                }
-            });
     }
 
 
-    private initSignalRConnection() {
+    private async initSignalRConnection() {
         this.hubConnection = new HubConnectionBuilder()
             .withUrl('/api/hubs/notification', {
                 accessTokenFactory: () => this.token || ''
@@ -68,13 +53,36 @@ export class NotificationService implements OnDestroy {
             .configureLogging(LogLevel.Information)
             .build();
 
-        this.hubConnection.on("ReciveNotification", (notification: CondominiumNotification) => {
+        this.hubConnection.on("ReceiveNotification", (notification: CondominiumNotification) => {
             // Update local notifications
             this.get().subscribe(); // Refresh notifications
         });
 
-        this.hubConnection.start()
+        await this.hubConnection.start()
             .catch(err => console.error('Error establishing SignalR connection:', err));
+
+        console.log("HELLO");
+        this.authenticationService.userData$
+            .pipe(takeUntil(this.destroy$))
+            .subscribe(_ => {
+                if (this.hubConnection && this.user) {
+                    this.condominiumService.getCondominiumsJoinedByUser({
+                        userId: this.user.id
+                    }).pipe(
+                        takeUntil(this.destroy$)
+                    ).subscribe({
+                        next: value => {
+                            value.data.forEach(value => {
+                                this.joinNotificationGroup(
+                                    value.id
+                                );
+                            });
+                        }
+                    });
+
+                }
+            });
+
     }
 
     private joinNotificationGroup(condominiumId: string) {

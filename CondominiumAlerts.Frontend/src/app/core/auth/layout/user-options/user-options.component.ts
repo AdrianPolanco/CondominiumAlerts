@@ -99,7 +99,8 @@ export class UserOptionsComponent {
             takeUntil(this.destroy$)
         ).subscribe(notifications => {
             this.notifications = [...notifications];
-        })
+        });
+
     }
 
     ngOnInit() {
@@ -116,7 +117,6 @@ export class UserOptionsComponent {
             .pipe(takeUntil(this.destroy$)) // Se detiene cuando `destroy$` emite un valor en el @AutoUnsubscribe()
             .subscribe(userData => {
                 if (userData) this.userData = userData?.data;
-                console.log(this.userData)
                 console.log("TOKEN", this.token)
                 this.updateFormFields(); // <== Actualiza los valores del formulario
                 if (userData) this.formGroup().patchValue(this.mapUserDataToForm(userData.data));
