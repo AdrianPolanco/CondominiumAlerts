@@ -108,7 +108,7 @@
   </header>
   @if(show === "chat"){
     <section class="chat-content bg-white scroll-invisible w-full flex flex-col gap-4">
-      <div class="chat-content bg-white scroll-invisible w-full flex flex-col gap-4">
+      <div  #chatContent class="chat-content bg-white scroll-invisible w-full flex flex-col gap-4">
         <app-chat-buble
           *ngFor="let message of messages()"
           [message]="message"
@@ -121,7 +121,7 @@
       </div>
     </section>
 
-    <app-chat-box></app-chat-box>
+    <app-chat-box [options]="options()"></app-chat-box>
 
     @if(isThereSummaryResult() && showSummary && summaryResult()?.content){
       <p-dialog header="Resumen" [modal]="true" [(visible)]="showSummary" [style]="{ width: '50rem' }" [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }" [maximizable]="true">
