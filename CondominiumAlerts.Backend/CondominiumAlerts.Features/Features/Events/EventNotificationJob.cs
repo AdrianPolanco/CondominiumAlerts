@@ -88,7 +88,6 @@ public class EventNotificationJob: IInvocable
                     Title = $"El evento '{eventItem.Title}' ha finalizado en el condominio {eventItem.Condominium.Name}.",
                     Description = eventItem.Description,
                     CondominiumId = eventItem.CondominiumId,
-                    Read = false,
                     EventId = eventItem.Id
                 };
                 
