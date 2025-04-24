@@ -8,7 +8,6 @@ import {User} from '../../../core/auth/layout/auth-layout/user.type';
 import { HttpTransportType, HubConnection, HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
 import {CondominiumNotification} from '../types/condominiumNotification.type';
 import {NotificationService} from '../../notifications/notification.service';
-import { NotificationDto } from '../../notifications/models/notification.model';
 
 @AutoUnsubscribe()
 @Injectable({
@@ -18,7 +17,7 @@ export class EventService implements OnDestroy {
 
   private hubConnection: HubConnection | null = null;
   private eventsBehaviorSubject = new BehaviorSubject<CondominiumEvent[]>([]);
-  private notificationBehaviorSubject = new BehaviorSubject<NotificationDto[]>([]);
+  private notificationBehaviorSubject = new BehaviorSubject<CondominiumNotification[]>([]);
   notification$ = this.notificationBehaviorSubject.asObservable();
   private readonly destroy$ = new Subject<void>();
   private token: string|null = null;
@@ -40,7 +39,7 @@ export class EventService implements OnDestroy {
     });
   }
 
-     // 🔌 Inicia la conexión al Hub si no existe
+  // 🔌 Inicia la conexión al Hub si no existe
   private async initHubConnection(): Promise<void> {
     if (this.hubConnection || this.isConnecting) return;
     this.isConnecting = true;
@@ -93,7 +92,7 @@ export class EventService implements OnDestroy {
   }
 
   private registerHandlers(){
-    this.hubConnection?.on("EventStarted", (notification: NotificationDto) => {
+    this.hubConnection?.on("EventStarted", (notification: CondominiumNotification) => {
       console.log("Notificación: ", notification);
       const current = this.notificationBehaviorSubject.getValue();
       console.log("Valor actual en notificationBehaviorSubject:", current, "tipo:", typeof current);
@@ -107,7 +106,7 @@ export class EventService implements OnDestroy {
       }
     });
 
-    this.hubConnection?.on("EventFinished", (notification: NotificationDto) => {
+    this.hubConnection?.on("EventFinished", (notification: CondominiumNotification) => {
       console.log("Notificación: ", notification);
       const current = this.notificationBehaviorSubject.getValue();
       console.log("Valor actual en notificationBehaviorSubject:", current, "tipo:", typeof current);
@@ -147,7 +146,7 @@ export class EventService implements OnDestroy {
   private loadInitialNotifications(): void {
     this.notificationService.get().pipe(takeUntil(this.destroy$)).subscribe(response => {
       if (response.isSuccess) {
-        this.notificationBehaviorSubject.next(response.data);
+        this.notificationBehaviorSubject.next(response.data.notifications);
       }
     });
   }
@@ -198,20 +197,20 @@ export class EventService implements OnDestroy {
           Authorization: `Bearer ${this.token}`
         }
       }).pipe(
-        switchMap(res => {
-          if (res.isSuccess) {
-            // Vuelve a obtener la lista de eventos actualizada desde el backend
-            return this.get(condominiumId).pipe(
-              tap(() => console.log('Eventos actualizados tras creación')),
-            );
-          } else {
-            return of({ isSuccess: false, data: [...this.eventsBehaviorSubject.getValue()] });
-          }
-        }),
-        catchError(err => {
-          console.error('Error al guardar evento:', err);
+      switchMap(res => {
+        if (res.isSuccess) {
+          // Vuelve a obtener la lista de eventos actualizada desde el backend
+          return this.get(condominiumId).pipe(
+            tap(() => console.log('Eventos actualizados tras creación')),
+          );
+        } else {
           return of({ isSuccess: false, data: [...this.eventsBehaviorSubject.getValue()] });
-        })
+        }
+      }),
+      catchError(err => {
+        console.error('Error al guardar evento:', err);
+        return of({ isSuccess: false, data: [...this.eventsBehaviorSubject.getValue()] });
+      })
     );
   }
 
