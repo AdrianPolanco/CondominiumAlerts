@@ -51,17 +51,16 @@ public class EventNotificationJob: IInvocable
             {
                 _logger.LogInformation($"Event {eventItem.Id} started at {eventItem.Start}");
                 eventItem.IsStarted = true;
-                var notification = new Notification(){
+                var notification = new Notification() {
                     Id = Guid.NewGuid(),
                     Title = $"El evento '{eventItem.Title}' ha comenzado en el condominio {eventItem.Condominium.Name}.",
                     Description = eventItem.Description,
                     CondominiumId = eventItem.CondominiumId,
-                    Read = false,
                     EventId = eventItem.Id,
                 };
-                
+
                 startedEventsNotifications.Add(notification);
-                
+
                 await _hubContext.Clients.Group(eventItem.Id.ToString()).SendAsync("EventStarted", notification);                
             }catch (Exception ex)
             {

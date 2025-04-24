@@ -35,13 +35,33 @@ public class GetEventRelatedNotificationsQueryHandler: IQueryHandler<GetEventRel
             cancellationToken,
             filter: n => n.EventId.HasValue &&
                          eventIds.Contains(n.EventId.Value) ||
-                         n.ReceiverUserId == request.UserId
+                         n.ReceiverUserId == request.UserId,
+            includes: [n => n.LevelOfPriority!, n => n.NotificationUsers!]
         );
 
         notifications = notifications.OrderByDescending(n => n.CreatedAt).ToList();
-        
-        var response = new GetEventRelatedNotificationsQueryResponse(notifications);
-        
+
+        var response = new GetEventRelatedNotificationsQueryResponse(
+            notifications.ConvertAll(x => new NotificationDto()
+            {
+                Id = x.Id,
+                Title = x.Title,
+                CondominiumId = x.CondominiumId,
+                CreatedAt = x.CreatedAt,
+                Description = x.Description,
+                Read = x.NotificationUsers
+                        ?.FirstOrDefault(x => x.UserId == request.UserId)
+                        ?.Read ?? false,
+                LevelOfPriority = x.LevelOfPriority is null ? null
+                    : new LevelOfPriorityDto()
+                    {
+                        Id = x.LevelOfPriority.Id,
+                        Priority = x.LevelOfPriority.Priority,
+                        Title = x.Title
+                    }
+            })
+        );
+
         return Result.Ok<GetEventRelatedNotificationsQueryResponse>(response);
     }
 }

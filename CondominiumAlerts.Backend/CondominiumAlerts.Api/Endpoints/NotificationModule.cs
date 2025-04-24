@@ -18,7 +18,6 @@ namespace CondominiumAlerts.Api.Endpoints
                 async (string userId, ISender sender, CancellationToken cancellationToken,
                     ClaimsPrincipal claims) =>
                 {
-                    
                     var requesterId = claims.FindFirst("user_id")?.Value;
 
                     if (requesterId is null)
@@ -84,7 +83,7 @@ namespace CondominiumAlerts.Api.Endpoints
                         return Results.BadRequest(response);
                     }
 
-                    var query = new MarkAsReadNotificationsCommand(NotificationsIds);
+                    var query = new MarkAsReadNotificationsCommand(requesterId, NotificationsIds);
 
                     var result = await sender.Send(query, cancellationToken);
 
