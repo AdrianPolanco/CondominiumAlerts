@@ -40,7 +40,7 @@ export class NotificationService implements OnDestroy {
                 if (user?.data) {
                     this.user = user.data;
                     if (this.hubConnection && this.user) {
-                        condominiumService.getCondominiumsJoinedByUser({
+                        this.condominiumService.getCondominiumsJoinedByUser({
                             userId: this.user.id
                         }).pipe(
                             takeUntil(this.destroy$)
@@ -62,7 +62,7 @@ export class NotificationService implements OnDestroy {
 
     private initSignalRConnection() {
         this.hubConnection = new HubConnectionBuilder()
-            .withUrl('/hubs/notification', {
+            .withUrl('/api/hubs/notification', {
                 accessTokenFactory: () => this.token || ''
             })
             .configureLogging(LogLevel.Information)
