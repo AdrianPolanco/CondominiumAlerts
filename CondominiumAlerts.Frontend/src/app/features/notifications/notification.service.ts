@@ -29,7 +29,7 @@ export class NotificationService {
   private destroy$ = new Subject<void>();
 
   get(){
-    return this.httpClient.get<{ isSuccess: boolean, data: { notifications: CondominiumNotification[] }}>(`/api/notifications/user/${this.user?.id}`, {
+    return this.httpClient.get<{ isSuccess: boolean, data: CondominiumNotification[]}>(`/api/notifications/user/${this.user?.id}`, {
       headers: {
         Authorization: `Bearer ${this.token}`
       }
@@ -39,7 +39,7 @@ export class NotificationService {
       }),
       catchError((error) => {
         console.error('Error fetching notifications:', error);
-        return of<{ isSuccess: boolean, data: { notifications: CondominiumNotification[] }}>({ isSuccess: false, data: {notifications: []} });
+        return of<{ isSuccess: boolean, data: CondominiumNotification[]}>({ isSuccess: false, data: [] });
       })
     )
   }

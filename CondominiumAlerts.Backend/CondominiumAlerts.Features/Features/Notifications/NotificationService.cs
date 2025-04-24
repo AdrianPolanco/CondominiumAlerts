@@ -32,6 +32,7 @@ namespace CondominiumAlerts.Features.Features.Notifications
                 true,
                 includes: [x => x.LevelOfPriority]
             )!;
+
             await _notificationHubContext.Clients.Group(condominiumId)
                 .SendAsync(
                     NotificationHub.ReciveNotification,
@@ -41,6 +42,7 @@ namespace CondominiumAlerts.Features.Features.Notifications
                         Description: notifcationWithLvl.Description,
                         CreatedAt: notifcationWithLvl.CreatedAt,
                         CondominiumId: notifcationWithLvl.CondominiumId,
+                        Read: notifcationWithLvl.Read,
                         LevelOfPriority: new LevelOfPriorityDto(
                             Id: notifcationWithLvl.LevelOfPriority.Id,
                             Title: notifcationWithLvl.LevelOfPriority.Title,

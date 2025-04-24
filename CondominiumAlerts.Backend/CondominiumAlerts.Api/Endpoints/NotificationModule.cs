@@ -6,6 +6,7 @@ using MediatR;
 using CondominiumAlerts.Features.Features.Notifications.Get;
 using System.Security.Claims;
 using CondominiumAlerts.Features.Features.Notifications.MarkAsRead;
+using LightResults;
 
 namespace CondominiumAlerts.Api.Endpoints
 {
@@ -15,7 +16,7 @@ namespace CondominiumAlerts.Api.Endpoints
         {
             app.MapHub<NotificationHub>("/hubs/notifications");
 
-            app.MapGet("/user/notifications/{userId}",
+            app.MapGet("/notifications/user/{userId}",
                 async (ISender sender,
                        string userId,
                        ClaimsPrincipal claims
@@ -34,7 +35,7 @@ namespace CondominiumAlerts.Api.Endpoints
                        }
                    });
                }
-               LightResults.Result<List<NotificationDto>> result
+               Result<List<NotificationDto>> result
                    = await sender.Send(
                        new GetNotificationsOfUserQuery(userId, requesterId)
                    );
