@@ -86,13 +86,11 @@
                      class="w-6 h-6 rounded-full object-cover mt-1" />
 
                 <!-- Contenido del comentario -->
-                <div class="flex-1">
+                <div class="flex-1 relative">
                   <div class="flex items-baseline gap-2">
-                    <span class="text-sm font-medium text-gray-100  dark:text-white">{{ comment.username }}</span>
+                    <span class="text-sm font-medium text-gray-100 dark:text-white">{{ comment.username }}</span>
                     <span class="text-xs text-gray-200 dark:text-gray-400">
-                      {{
-                         comment.createdAt | timeAgo
-                      }}
+                      {{ comment.createdAt | timeAgo }}
                     </span>
                     <button *ngIf="isCurrentUserComment(comment.userId)"
                             class="text-gray-300 hover:text-white ml-2"
@@ -105,13 +103,19 @@
                     {{ comment.text }}
                   </p>
 
-
                   <div *ngIf="comment.imageUrl" class="mt-1">
                     <img [src]="comment.imageUrl"
                          alt="Imagen del comentario"
                          class="max-w-[200px] rounded border border-gray-200 dark:border-gray-600" />
                   </div>
+
+                  <button *ngIf="isCurrentUserComment(comment.userId)"
+                          class="absolute bottom-0 right-0 text-primary-500 hover:text-white m-2"
+                          (click)="confirmDeleteComment(comment.id, publication.id)">
+                    <i class="pi pi-trash mr-1"></i> Eliminar
+                  </button>
                 </div>
+
               </div>
             </div>
 
