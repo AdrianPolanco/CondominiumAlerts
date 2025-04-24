@@ -2,25 +2,24 @@
   <header class="chat-header bg-gray-50 dark:bg-gray-700 flex justify-between items-center p-4">
     <div class="text-xl">
       @if(this.options()?.type == 'condominium'){
-      <div class="flex items-center gap-2">
-        <shared-back-arrow url="/condominiums" color="transparent" />
-        <img
-          [src]="this.options()?.condominium?.imageUrl"
-          [alt]="this.options()?.condominium?.id"
-          class="w-10 h-11 rounded-full"
-        />
-        <div class="flex flex-col gap-0 items-start">
-          <p>{{ this.options()?.condominium?.name }}</p>
-          <span class="text-xs text-gray-500 dark:text-gray-400 block"
-            >({{ this.options()?.condominium?.address }})</span
-          >
+        <div class="flex items-center gap-2">
+          <shared-back-arrow url="/condominiums" color="transparent" />
+          <img
+            [src]="this.options()?.condominium?.imageUrl"
+            [alt]="this.options()?.condominium?.id"
+            class="w-10 h-11 rounded-full"
+          />
+          <div class="flex flex-col gap-0 items-start">
+            <p>{{ this.options()?.condominium?.name }}</p>
+            <span class="text-xs text-gray-500 dark:text-gray-400 block"
+              >({{ this.options()?.condominium?.address }})</span>
+          </div>
         </div>
-      </div>
       }@else{
-      <i class="fa-solid fa-user"></i> {{ this.options()?.user?.name }}
+        <i class="fa-solid fa-user"></i> {{ this.options()?.user?.name }}
       }
     </div>
-    
+
     @if(wasLastMessageToday() && show === "chat"){
       @if(summaryStatus() !== null && summarizing()){
         @switch (summaryStatus()) {
@@ -70,8 +69,7 @@
             />
           }
         }
-      }
-      @else if(!summaryStatus() || !summarizing()){
+      }@else if(!summaryStatus() || !summarizing()){
         <p-button
           icon="pi pi-book"
           [rounded]="true"
@@ -81,7 +79,7 @@
         />
       }
     }
-    
+
     @if(isThereSummaryResult() && show === "chat"){
       <p-button
         icon="pi pi-eye"
@@ -91,35 +89,49 @@
         size="small"
       />
     }
+
+    @if(show === "chat"){
+      <p-button
+        icon="pi pi-calendar-clock"
+        [rounded]="true"
+        size="small"
+        (onClick)="goTo('calendar')"
+      />
+    }@else if(show === "calendar"){
+      <p-button
+        icon="pi pi-comments"
+        [rounded]="true"
+        size="small"
+        (onClick)="goTo('chat')"
+      />
+    }
   </header>
-  
-  <section class="chat-content bg-white scroll-invisible w-full flex flex-col gap-4">
-    <div class="chat-content bg-white scroll-invisible w-full flex flex-col gap-4">
-      <app-chat-buble
-        *ngFor="let message of messages()"
-        [message]="message"
-      ></app-chat-buble>
-      @if(messages().length === 0){
-      <div class="flex flex-col justify-center items-center text-gray-400 gap-1">
-        <p>¡Sé el primero en mandar un mensaje!</p>
+  @if(show === "chat"){
+    <section class="chat-content bg-white scroll-invisible w-full flex flex-col gap-4">
+      <div class="chat-content bg-white scroll-invisible w-full flex flex-col gap-4">
+        <app-chat-buble
+          *ngFor="let message of messages()"
+          [message]="message"
+        ></app-chat-buble>
+        @if(messages().length === 0){
+        <div class="flex flex-col justify-center items-center text-gray-400 gap-1">
+          <p>¡Sé el primero en mandar un mensaje!</p>
+        </div>
+        }
       </div>
-      }
-    </div>
-  </section>
-  
-  <app-chat-box></app-chat-box>
-  
-  @if(isThereSummaryResult() && showSummary && summaryResult()?.content){
-    <p-dialog header="Resumen" [modal]="true" [(visible)]="showSummary" [style]="{ width: '50rem' }" [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }" [maximizable]="true">
-      <ul>
-        <li *ngFor="let item of formatSummary()">{{ item }}</li>
-      </ul>
-    </p-dialog>
-  }
-  
-  <p-toast/>
-  
-  @if(show === "calendar"){
+    </section>
+
+    <app-chat-box></app-chat-box>
+
+    @if(isThereSummaryResult() && showSummary && summaryResult()?.content){
+      <p-dialog header="Resumen" [modal]="true" [(visible)]="showSummary" [style]="{ width: '50rem' }" [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }" [maximizable]="true">
+        <ul>
+          <li *ngFor="let item of formatSummary()">{{ item }}</li>
+        </ul>
+      </p-dialog>
+    }
+    <p-toast/>
+  }@else if(show === "calendar"){
     <feature-calendar/>
   }
 </section>
