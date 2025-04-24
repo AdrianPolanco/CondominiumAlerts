@@ -1,7 +1,7 @@
 export interface AddCommentCommand
 {
   text: string;
-  ImageFile?: File;
+  ImageFile?: File | null;
   imageUrl?: string;    
   previewUrl?: string;
 }

@@ -7,6 +7,8 @@ import { AddCommentCommand } from '../../Comments/models/AddComment.Command'
 import { AddCommentResponse } from '../../Comments/models/AddComment.Response'
 import { getCommentByPostCommand } from '../../Comments/models/getCommentByPost.Command'
 import { getCommentByPostResponse } from '../../Comments/models/getCommentByPost.Reponse'
+import { UpdateCommentResponse } from '../../Comments/models/updateComment.Response'
+import { UpdateCommentCommand } from '../../Comments/models/updateComment.Command'
 import { AuthService } from '../../../core/auth/services/auth.service';
 
 @Injectable({
@@ -43,5 +45,20 @@ export class CommetService
 
     return this.http.post<AddCommentResponse>(this.apiUrl, fb);
   }
+
+  updateComment(commentId: string, cmd: UpdateCommentCommand): Observable<any> {
+    const formData = new FormData();
+    formData.append('text', cmd.text);
+
+    if (cmd.imageFile) {
+      formData.append('imageFile', cmd.imageFile);
+    }
+
+    return this.http.put(
+      `${this.apiUrl}/${commentId}`, 
+      formData
+    );
+  }
+
 
 }
