@@ -512,7 +512,7 @@ destroy$ = new Subject<void>;
     }
   }
 
-
+  //Confirmacion para eliminar
   confirmDelete(postId: string): void {
     this.confirmationService.confirm({
       message: '¿Estás seguro de que deseas eliminar esta publicación?',
