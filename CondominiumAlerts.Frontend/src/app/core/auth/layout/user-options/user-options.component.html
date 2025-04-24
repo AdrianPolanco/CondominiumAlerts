@@ -13,6 +13,7 @@
     <ng-template #end>
       <nav class="flex gap-4 items-center">
         @if(unreadNotificationsCount > 0){
+
           <i class="pi pi-bell" pBadge [value]="unreadNotificationsCount" style="font-size: 1.2rem" (click)="showNotificationsDialog()"></i>
         }@else{
           <i class="pi pi-bell" style="font-size: 1.2rem" (click)="showNotificationsDialog()"></i>
