@@ -146,7 +146,8 @@ export class EventService implements OnDestroy {
   private loadInitialNotifications(): void {
     this.notificationService.get().pipe(takeUntil(this.destroy$)).subscribe(response => {
       if (response.isSuccess) {
-        this.notificationBehaviorSubject.next(response.data);
+        console.log("PUTA DATA", response.data)
+        this.notificationBehaviorSubject.next(response.data.notifications);
       }
     });
   }

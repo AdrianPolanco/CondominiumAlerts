@@ -7,9 +7,9 @@ using LightResults;
 
 namespace CondominiumAlerts.Features.Features.Messages.Create
 {
-    public class AddMessageCommandHandler(IRepository<Message, Guid> messageRepository, Cloudinary cloudinary, INotificationService notificationService) : ICommandHandler<AddMessageCommand, Result<MessageDto>>
+    public class AddMessageCommandHandler(IRepository<Message, Guid> messageRepository, Cloudinary cloudinary/*, INotificationService notificationService*/) : ICommandHandler<AddMessageCommand, Result<MessageDto>>
     {
-        private readonly INotificationService _notificationService = notificationService;
+       // private readonly INotificationService _notificationService = notificationService;
 
         public async Task<Result<MessageDto>> Handle(AddMessageCommand request, CancellationToken cancellationToken)
         {
