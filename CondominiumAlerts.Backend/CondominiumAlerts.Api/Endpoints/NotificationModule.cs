@@ -50,7 +50,7 @@ namespace CondominiumAlerts.Api.Endpoints
                             }
                         };
 
-                        return Results.Unauthorized();
+                        return Results.BadRequest(response);
                     }
 
                     var successResponse = new
