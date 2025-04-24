@@ -68,6 +68,8 @@ namespace CondominiumAlerts.Features.Features.Notifications.Get
                     return Result.Ok(new List<NotificationDto>());
                 }
 
+                notifications = notifications.OrderByDescending(n => n.CreatedAt).ToList();
+
                 var result = notifications.Adapt<List<NotificationDto>>();
                 return Result.Ok(result);
             }

@@ -6,6 +6,7 @@ namespace CondominiumAlerts.Features.Features.Notifications.Get
         string? Description,
         DateTime CreatedAt,
         LevelOfPriorityDto LevelOfPriority,
+        bool Read,
         Guid? CondominiumId
     );
 }

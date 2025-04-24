@@ -32,17 +32,19 @@
 <p-dialog [(visible)]="visible" [modal]="true" [style]="{ width: '25rem' }">
   <h1 class="text-center text-3xl mb-5">Mi perfil</h1>
   <div class="flex justify-center items-center w-full rounded-full">
-    @if(imageUrl()){
-      <p-image styleClass="rounded-full" src="{{imageUrl()}}" alt="Image" width="200" [preview]="true" />
-    }@else{
-      <p-image styleClass="rounded-full" src="images/default-profile-pic.png" alt="Image" width="200" [preview]="true" />
-    }
+    <p-image [preview]="true">
+      <ng-template pTemplate="image">
+        <img [src]="imageUrl() || 'images/default-profile-pic.png'" alt="Profile" class="rounded-full w-[100px] h-[100px] object-cover" />
+      </ng-template>
+    </p-image>
   </div>
-  <shared-form
-    [formSettingsInput]="profileFormSettings()"
-    (onFormCreated)="onFormCreated($event)"
-    (onFormSubmitted)="onSubmit($event)">
-  </shared-form>
+  @if(visible()){
+    <shared-form
+      [formSettingsInput]="profileFormSettings()"
+      (onFormCreated)="onFormCreated($event)"
+      (onFormSubmitted)="onSubmit($event)">
+    </shared-form>
+  }
 </p-dialog>
 <p-dialog
   header="Notificaciones"
