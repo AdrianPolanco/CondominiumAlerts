@@ -233,8 +233,9 @@
             Cancelar
           </button>
           <button type="submit"
-                  [disabled]="!postForm.title || !postForm.description"
-                  class="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-md font-semibold">
+                  [disabled]="!postForm.title || !postForm.description || !postForm.levelOfPriorityId"
+                  class="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-md font-semibold disabled:opacity-50"
+                  [ngClass]="{ 'opacity-50 cursor-not-allowed': postFormRef.invalid }">
             {{ editingPost ? "Actualizar" : "Publicar" }}
           </button>
         </div>
