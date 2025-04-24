@@ -1,24 +1,40 @@
-import {Component, computed, inject, OnDestroy, OnInit, signal} from '@angular/core';
-import {ChatBoxComponent} from '../chat-box/chat-box.component';
-import {ChatBubleComponent} from '../chat-buble/chat-buble.component';
-import {NgClass, NgFor, NgIf} from '@angular/common';
-import {ChatService} from '../../services/chat.service';
-import {AutoUnsubscribe} from '../../decorators/autounsuscribe.decorator';
-import {combineLatest, firstValueFrom, map, shareReplay, Subject, takeUntil} from 'rxjs';
-import {ChatOptions} from './chat.type';
-import {ChatMessageDto} from '../../../core/models/chatMessage.dto';
-import {FormsModule} from '@angular/forms';
-import {Button} from 'primeng/button';
-import {AuthenticationService} from '../../../core/services/authentication.service';
-import {User} from '../../../core/auth/layout/auth-layout/user.type';
-import {SummaryResult} from '../../../features/condominiums/models/summaryResult';
-import {Dialog} from 'primeng/dialog';
-import {MessageService} from 'primeng/api';
-import {Toast} from 'primeng/toast';
-import {SummaryStatus} from '../../../features/condominiums/models/summaryStatus.enum';
-import {BackArrowComponent} from "../back-arrow/back-arrow.component";
-import {CalendarComponent} from "../../../features/events/components/calendar/calendar.component";
-import {ChatSignalRService} from '../../../core/services/chat-signal-r.service';
+import {
+  Component,
+  computed,
+  ElementRef,
+  inject,
+  OnDestroy,
+  OnInit,
+  signal,
+  viewChild,
+} from '@angular/core';
+import { ChatBoxComponent } from '../chat-box/chat-box.component';
+import { ChatBubleComponent } from '../chat-buble/chat-buble.component';
+import { NgFor } from '@angular/common';
+import { ChatService } from '../../services/chat.service';
+import { AutoUnsubscribe } from '../../decorators/autounsuscribe.decorator';
+import {
+  combineLatest,
+  firstValueFrom,
+  map,
+  shareReplay,
+  Subject,
+  takeUntil,
+} from 'rxjs';
+import { ChatOptions } from './chat.type';
+import { ChatMessageDto } from '../../../core/models/chatMessage.dto';
+import { FormsModule } from '@angular/forms';
+import { Button } from 'primeng/button';
+import { AuthenticationService } from '../../../core/services/authentication.service';
+import { User } from '../../../core/auth/layout/auth-layout/user.type';
+import { SummaryResult } from '../../../features/condominiums/models/summaryResult';
+import { Dialog } from 'primeng/dialog';
+import { MessageService } from 'primeng/api';
+import { Toast } from 'primeng/toast';
+import { SummaryStatus } from '../../../features/condominiums/models/summaryStatus.enum';
+import { BackArrowComponent } from '../back-arrow/back-arrow.component';
+import { CalendarComponent } from '../../../features/events/components/calendar/calendar.component';
+import { ChatSignalRService } from '../../../core/services/chat-signal-r.service';
 
 @AutoUnsubscribe()
 @Component({
@@ -34,8 +50,6 @@ import {ChatSignalRService} from '../../../core/services/chat-signal-r.service';
     Dialog,
     BackArrowComponent,
     CalendarComponent,
-    NgClass,
-    NgIf
   ],
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.css',
@@ -46,8 +60,8 @@ export class ChatComponent implements OnInit, OnDestroy {
   private authenticationService = inject(AuthenticationService);
   private chatSignalRService = inject(ChatSignalRService);
   private destroy$ = new Subject<void>();
-  
-  show: "chat" | "calendar" = "chat";
+  private chatContent = viewChild<ElementRef<HTMLDivElement>>('chatContent');
+  show: 'chat' | 'calendar' = 'chat';
   options = signal<ChatOptions | null>(null);
   currentUser: User | null = null;
   messages = signal<ChatMessageDto[]>([]);
@@ -59,7 +73,7 @@ export class ChatComponent implements OnInit, OnDestroy {
   summaryStatus = signal<SummaryStatus | null>(null);
   SummaryStatusEnum = SummaryStatus;
   lastMessage = signal<ChatMessageDto | null>(null);
-  
+
   wasLastMessageToday = computed(() => {
     const message = this.lastMessage();
     if (!message || !message.createdAt) {
@@ -68,7 +82,8 @@ export class ChatComponent implements OnInit, OnDestroy {
 
     const messageDate = new Date(message.createdAt);
     const now = new Date();
-    const diffInHours = (now.getTime() - messageDate.getTime()) / (1000 * 60 * 60);
+    const diffInHours =
+      (now.getTime() - messageDate.getTime()) / (1000 * 60 * 60);
 
     return diffInHours <= 24;
   });
@@ -86,7 +101,8 @@ export class ChatComponent implements OnInit, OnDestroy {
     shareReplay(1)
   );
 
-  ngOnInit(): void {
+  async ngOnInit() {
+    await this.chatSignalRService.start();
     this.authenticationService.userData$
       .pipe(takeUntil(this.destroy$))
       .subscribe((userData) => {
@@ -96,7 +112,9 @@ export class ChatComponent implements OnInit, OnDestroy {
     this.chatService.chatOptions$
       .pipe(takeUntil(this.destroy$))
       .subscribe((options) => {
+        this.leaveOldGroup();
         this.options.set(options);
+        this.joinToGroup();
 
         if (options && options.type === 'condominium' && options.condominium) {
           // Cargar mensajes
@@ -106,6 +124,9 @@ export class ChatComponent implements OnInit, OnDestroy {
             .subscribe((response) => {
               this.messages.set(response.data);
               this.lastMessage.set(response.data[response.data.length - 1]);
+              setTimeout(() => {
+                this.scrollToBottom();
+              }, 200);
             });
 
           // Cargar el estado del resumen y el resultado al inicializar
@@ -114,11 +135,11 @@ export class ChatComponent implements OnInit, OnDestroy {
           // Suscripción para manejar el estado del resumen
           this.summaryState$
             .pipe(takeUntil(this.destroy$))
-            .subscribe(({status, result, canShowSummary}) => {
+            .subscribe(({ status, result, canShowSummary }) => {
               this.summaryStatus.set(status);
               this.summaryResult.set(result);
               this.isThereSummaryResult.set(canShowSummary);
-              
+
               switch (status) {
                 case SummaryStatus.Cancelled:
                   this.summarizing.set(false);
@@ -140,18 +161,40 @@ export class ChatComponent implements OnInit, OnDestroy {
 
           // Conectar al SignalR hub si hay usuario
           if (this.currentUser?.id) {
-            this.chatService.connectToCondominiumHub(
-              options.condominium.id,
-              options.condominium.name,
-              this.currentUser.id
-            ).catch(error => {
-              console.error("Error connecting to hub", error);
-            });
+            this.chatService
+              .connectToCondominiumHub(
+                options.condominium.id,
+                options.condominium.name,
+                this.currentUser.id
+              )
+              .catch((error) => {
+                console.error('Error connecting to hub', error);
+              });
           }
         }
       });
 
-    this.joinToGroup();
+    this.chatSignalRService.onNewMessage
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((message) => {
+        if (message) {
+          this.messages.update((prevMessages) => [...prevMessages, message]);
+          this.lastMessage.set(message);
+          setTimeout(() => {
+            this.scrollToBottom();
+          }, 200);
+        }
+      });
+  }
+
+  private scrollToBottom() {
+    const element = this.chatContent()?.nativeElement;
+    if (!element) return;
+
+    element.scrollTo({
+      top: element.scrollHeight,
+      behavior: 'smooth'
+    });
   }
 
   private joinToGroup() {
@@ -170,9 +213,16 @@ export class ChatComponent implements OnInit, OnDestroy {
       });
   }
 
-  goTo(page: "chat" | "calendar") {
+  private leaveOldGroup() {
+    const options = this.options();
+    if (this.chatSignalRService.isHubConnected && options?.condominium) {
+      this.chatSignalRService.leftToGroup(options.condominium.id);
+    }
+  }
+
+  goTo(page: 'chat' | 'calendar') {
     this.show = page;
-    if (page === "calendar") {
+    if (page === 'calendar') {
       this.chatService.disconnectFromHub();
       this.showSummary = false;
     }
@@ -181,7 +231,8 @@ export class ChatComponent implements OnInit, OnDestroy {
   private loadSummaryState() {
     this.chatService.loadCurrentSummaryStatus();
 
-    this.chatService.getCurrentSummaryResult()
+    this.chatService
+      .getCurrentSummaryResult()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (summary) => {
@@ -220,7 +271,8 @@ export class ChatComponent implements OnInit, OnDestroy {
           this.currentUser.id
         );
 
-        this.chatService.requestCondominiumSummary()
+        this.chatService
+          .requestCondominiumSummary()
           .pipe(takeUntil(this.destroy$))
           .subscribe({
             next: (response) => {
@@ -241,7 +293,8 @@ export class ChatComponent implements OnInit, OnDestroy {
 
   cancelSummary() {
     if (this.summaryJobId) {
-      this.chatService.cancelSummaryRequest(this.summaryJobId)
+      this.chatService
+        .cancelSummaryRequest(this.summaryJobId)
         .pipe(takeUntil(this.destroy$))
         .subscribe({
           error: (err) => {
