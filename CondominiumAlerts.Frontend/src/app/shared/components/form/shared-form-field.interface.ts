@@ -11,7 +11,7 @@ export interface SharedFormFieldFile extends SharedFormFieldBase {
 export type  ImagesTypes = 'image/png' | 'image/jpeg' | 'image/webp' | 'image/*';
 
 export interface SharedFormFieldCommon extends SharedFormFieldBase {
-    type: 'text' | 'number' | 'textarea' | 'select' | 'checkbox' | 'password' | 'phone';
+    type: 'text' | 'number' | 'textarea' | 'select' | 'checkbox' | 'password' | 'phone' | 'passwordLogin';
 }
 
 export interface SharedFormFieldBase {

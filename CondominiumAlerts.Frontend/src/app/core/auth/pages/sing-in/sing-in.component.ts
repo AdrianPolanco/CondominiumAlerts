@@ -130,7 +130,7 @@ export class SingInComponent {
     {
       name: 'password',
       label: 'Contraseña',
-      type: 'password',
+      type: 'passwordLogin',
       validators: [
         Validators.required,
         Validators.minLength(8),

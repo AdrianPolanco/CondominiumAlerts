@@ -1,5 +1,6 @@
 ﻿using Carter;
 using CondominiumAlerts.Features.Features.Posts.Create;
+using CondominiumAlerts.Features.Features.Posts.Delete;
 using CondominiumAlerts.Features.Features.Posts.Get;
 using CondominiumAlerts.Features.Features.Posts.Update;
 using LightResults;
@@ -10,6 +11,8 @@ namespace CondominiumAlerts.Api.Endpoints
 {
     public class PostsModule : ICarterModule
     {
+        private const string mainPath = "/posts";
+
         public void AddRoutes(IEndpointRouteBuilder app)
         {
             // Endpoint para obtener todos los posts de un condominio
@@ -80,6 +83,32 @@ namespace CondominiumAlerts.Api.Endpoints
                    return Results.Ok(response);
                }
             ).DisableAntiforgery();
+
+            // Endpoint para eliminar un post
+            app.MapDelete(GetEndpointPattern("/delete"), async (ISender sender, [FromBody] DeletePostCommand request, CancellationToken cancellationToken) =>
+            {
+                Result<DeletePostResponse> result = await sender.Send(request, cancellationToken);
+
+                if (result.IsFailed)
+                {
+                    return Results.BadRequest(result);
+                }
+
+                var response = new
+                {
+                    IsSuccess = result.IsSuccess,
+                    Data = result.Value,
+                };
+
+                return Results.Ok(response);
+            });
         }
+
+        #region private Methods 
+        private string GetEndpointPattern(string name = "")
+        {
+            return mainPath + name;
+        }
+        #endregion
     }
 }

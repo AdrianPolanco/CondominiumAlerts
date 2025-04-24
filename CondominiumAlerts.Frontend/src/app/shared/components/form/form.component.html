@@ -4,29 +4,35 @@
       <label [for]="field.name" class="font-medium">{{ field.label }}</label>
 
       @if (field.icon) {
-        <p-inputgroup>
-          <p-inputgroup-addon>
-            <i class="pi" [ngClass]="field.icon"></i>
-          </p-inputgroup-addon>
-          @if(field.type === 'text' || field.type === 'number'){
-            <input
-              pInputText
-              [type]="field.type"
-              [id]="field.name"
-              [formControlName]="field.name"
-              class="p-inputtext w-full disabled:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50 " />
-          }@else if(field.type === 'password'){
-            <div class="w-full">
-              <p-password
-                [id]="field.name"
-                [formControlName]="field.name"
-                [toggleMask]="true"
-                styleClass="w-full"
-                [inputStyleClass]="'w-full px-4 py-2 border border-gray-300 rounded-l-none rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all disabled:bg-gray-100'"
-              />
-            </div>
-          }
-        </p-inputgroup>
+      <p-inputgroup>
+        <p-inputgroup-addon>
+          <i class="pi" [ngClass]="field.icon"></i>
+        </p-inputgroup-addon>
+        @if(field.type === 'text' || field.type === 'number'){
+        <input pInputText
+               [type]="field.type"
+               [id]="field.name"
+               [formControlName]="field.name"
+               class="p-inputtext w-full disabled:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50 " />
+        }@else if(field.type === 'password'){
+        <div class="w-full">
+          <p-password [id]="field.name"
+                      [formControlName]="field.name"
+                      [toggleMask]="true"
+                      styleClass="w-full"
+                      [inputStyleClass]="'w-full px-4 py-2 border border-gray-300 rounded-l-none rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all disabled:bg-gray-100'" />
+        </div>
+        }@else if(field.type === 'passwordLogin'){
+        <div class="w-full">
+          <p-password [id]="field.name"
+                      [formControlName]="field.name"
+                      [toggleMask]="true"
+                      [feedback]="false"
+                      styleClass="w-full"
+                      [inputStyleClass]="'w-full px-4 py-2 border border-gray-300 rounded-l-none rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all disabled:bg-gray-100'" />
+        </div>
+        }
+      </p-inputgroup>
       } @else {
         @if(field.type === 'text' || field.type === 'number'){
           <input
