@@ -12,10 +12,12 @@ import { ChatMessageDto } from '../../../core/models/chatMessage.dto';
 import { AuthenticationService } from '../../../core/services/authentication.service';
 import { Subject, takeUntil } from 'rxjs';
 import { User } from '../../../core/auth/layout/auth-layout/user.type';
+import { ChatCreatorUserDto } from '../../../core/models/chatCreatorUser.dto';
+import { DateEsPipe } from "../../pipes/date-es.pipe";
 
 @Component({
   selector: 'app-chat-buble',
-  imports: [NgClass],
+  imports: [NgClass, DateEsPipe],
   templateUrl: './chat-buble.component.html',
   styleUrl: './chat-buble.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -45,19 +47,8 @@ export class ChatBubleComponent implements OnInit, OnDestroy {
     return this.currentUser?.id ?? '';
   }
 
-  formatDate(date: Date): string {
-    const options: Intl.DateTimeFormatOptions = {
-      day: 'numeric',
-      month: 'long',
-      hour: '2-digit',
-      minute: '2-digit',
-    };
-    const formattedDate = new Date(date).toLocaleTimeString([], options);
-    return formattedDate;
-  }
-
-  getUserNameById(uid: string | undefined) {
-    return 'Usuario interno';
+  getUserNameById(chatCreatorUserDto: ChatCreatorUserDto) {
+    return chatCreatorUserDto?.username;
   }
 
   isCurrentUser = computed(
