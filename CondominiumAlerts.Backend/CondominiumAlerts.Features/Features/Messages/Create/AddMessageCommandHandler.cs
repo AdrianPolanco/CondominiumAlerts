@@ -7,9 +7,9 @@ using LightResults;
 
 namespace CondominiumAlerts.Features.Features.Messages.Create
 {
-    public class AddMessageCommandHandler(IRepository<Message, Guid> messageRepository, Cloudinary cloudinary/*, INotificationService notificationService*/) : ICommandHandler<AddMessageCommand, Result<MessageDto>>
+    public class AddMessageCommandHandler(IRepository<Message, Guid> messageRepository, Cloudinary cloudinary, INotificationService notificationService) : ICommandHandler<AddMessageCommand, Result<MessageDto>>
     {
-       // private readonly INotificationService _notificationService = notificationService;
+        private readonly INotificationService _notificationService = notificationService;
 
         public async Task<Result<MessageDto>> Handle(AddMessageCommand request, CancellationToken cancellationToken)
         {
@@ -29,18 +29,18 @@ namespace CondominiumAlerts.Features.Features.Messages.Create
                 messageWithCreatorUser.CreatorUser.Lastname,
                 messageWithCreatorUser.CreatorUser.ProfilePictureUrl,
                 messageWithCreatorUser.CreatorUser.Username);
-            // if (message.CondominiumId.HasValue)
-            // {
-            //     await _notificationService.Notify(new Notification
-            //     {
-            //         Id = Guid.NewGuid(),
-            //         Title = "New Message",
-            //         Description = $"New message from {messageWithCreatorUser.CreatorUser?.Name}",
-            //         CondominiumId = message.CondominiumId.Value,
-            //         CreatedAt = DateTime.UtcNow,
-            //         ReceiverUserId = request.ReceiverUserId // Only notify specific user if it's a direct message
-            //     }, message.CondominiumId.Value.ToString(), cancellationToken);
-            // }
+            if (message.CondominiumId.HasValue)
+            {
+                await _notificationService.Notify(new Notification
+                {
+                    Id = Guid.NewGuid(),
+                    Title = "New Message",
+                    Description = $"New message from {messageWithCreatorUser.CreatorUser?.Name}",
+                    CondominiumId = message.CondominiumId.Value,
+                    CreatedAt = DateTime.UtcNow,
+                    ReceiverUserId = request.ReceiverUserId // Only notify specific user if it's a direct message
+                }, message.CondominiumId.Value.ToString(), cancellationToken);
+            }
 
             return Result.Ok(new MessageDto(
                 messageWithCreatorUser!.Id,

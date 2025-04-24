@@ -9,16 +9,18 @@ public class GetEventRelatedNotificationsQueryHandler: IQueryHandler<GetEventRel
 {
     private readonly IRepository<Notification, Guid> _notificationRepository;
     private readonly IRepository<Event, Guid> _eventRepository;
+    private readonly IRepository<Condominium, Guid> _condominiumRepository;
 
-    public GetEventRelatedNotificationsQueryHandler(IRepository<Notification, Guid> notificationRepository, IRepository<Event, Guid> eventRepository)
+    public GetEventRelatedNotificationsQueryHandler(IRepository<Notification, Guid> notificationRepository, IRepository<Event, Guid> eventRepository, IRepository<Condominium, Guid> condominiumRepository)
     {
         _notificationRepository = notificationRepository;
         _eventRepository = eventRepository;
+        _condominiumRepository = condominiumRepository;
     }
-    
+
     public async Task<Result<GetEventRelatedNotificationsQueryResponse>> Handle(GetEventRelatedNotificationsQuery request, CancellationToken cancellationToken)
     {
-        if (request.RequesterId != request.UserId) 
+        if (request.RequesterId != request.UserId)
             return Result.Fail<GetEventRelatedNotificationsQueryResponse>("No tienes permisos para acceder a las notificaciones de este usuario.");
 
         var eventsSubscribedByUser = await _eventRepository.GetAsync(
@@ -31,11 +33,20 @@ public class GetEventRelatedNotificationsQueryHandler: IQueryHandler<GetEventRel
             .Select(e => e.Id)
             .ToHashSet(); // HashSet mejora rendimiento en búsquedas
 
+        var condosId = (await _condominiumRepository.GetAsync(
+            cancellationToken,
+            filter: n => n.Users!.Select(x => x.UserId).Contains(request.UserId)
+        )).Select(x => x.Id);
+
         var notifications = await _notificationRepository.GetAsync(
             cancellationToken,
-            filter: n => n.EventId.HasValue &&
-                         eventIds.Contains(n.EventId.Value) ||
-                         n.ReceiverUserId == request.UserId,
+            filter: n => (n.EventId.HasValue &&
+                          eventIds.Contains(n.EventId.Value))
+                         || n.ReceiverUserId == request.UserId
+                         || (n.CondominiumId.HasValue &&
+                             !n.EventId.HasValue &&
+                             n.ReceiverUserId == null &&
+                             condosId.Contains(n.CondominiumId.Value)),
             includes: [n => n.LevelOfPriority, n => n.NotificationUsers]
         );
 
