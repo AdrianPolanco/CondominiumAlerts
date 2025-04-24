@@ -5,31 +5,48 @@ using LightResults;
 
 namespace CondominiumAlerts.Features.Features.Notifications.MarkAsRead;
 
-public class MarkAsReadNotificationsCommandHandler: ICommandHandler<MarkAsReadNotificationsCommand, Result<MarkAsReadNotificationCommandResponse>>
+public class MarkAsReadNotificationsCommandHandler : ICommandHandler<MarkAsReadNotificationsCommand, Result<MarkAsReadNotificationCommandResponse>>
 {
-    private readonly IRepository<Notification, Guid> _repository;
+    private readonly IRepository<Notification, Guid> _notificationRepository;
+    private readonly IRepository<NotificationUser, Guid> _notificationUserRepository;
 
-    public MarkAsReadNotificationsCommandHandler(IRepository<Notification, Guid> repository)
+    public MarkAsReadNotificationsCommandHandler(IRepository<Notification, Guid> notificationRepository, IRepository<NotificationUser, Guid> notificationUserRepository)
     {
-        _repository = repository;
+        _notificationRepository = notificationRepository;
+        _notificationUserRepository = notificationUserRepository;
     }
-    
+
     public async Task<Result<MarkAsReadNotificationCommandResponse>> Handle(MarkAsReadNotificationsCommand request, CancellationToken cancellationToken)
     {
-        var readNotifications = await _repository.GetAsync(
+        var readNotificationsIds = new List<Guid>();
+        var notis = await _notificationUserRepository.GetAsync(
+
             cancellationToken,
-            filter: n => request.NotificationIds.Contains(n.Id)
+            filter: n => request.NotificationIds.Contains(n.NotificationId)
         );
-        
-        readNotifications = readNotifications.Select(n =>
-        {
-            n.Read = true;
-            return n;
-        }).ToList();
-        
-        readNotifications = await _repository.BulkUpdateAsync(readNotifications, cancellationToken);
-        
-        var readNotificationsIds = readNotifications.Select(n => n.Id).ToList();
+        notis.ForEach(n => n.Read = true);
+
+        readNotificationsIds.AddRange(
+            (await _notificationUserRepository.BulkUpdateAsync(
+                notis,
+                cancellationToken
+            )).ConvertAll(n => n.NotificationId)
+        );
+
+        var notisUsers = await _notificationUserRepository.BulkInsertAsync(
+            (from noti in request.NotificationIds.Except(readNotificationsIds)
+             select new NotificationUser()
+             {
+                 Id = Guid.NewGuid(),
+                 NotificationId = noti,
+                 UserId = request.UserId,
+                 Read = true
+             }).ToList(),
+            cancellationToken
+        );
+        readNotificationsIds.AddRange(
+            notisUsers.Select(x => x.NotificationId)
+        );
 
         return Result<MarkAsReadNotificationCommandResponse>.Ok(new(readNotificationsIds));
     }
