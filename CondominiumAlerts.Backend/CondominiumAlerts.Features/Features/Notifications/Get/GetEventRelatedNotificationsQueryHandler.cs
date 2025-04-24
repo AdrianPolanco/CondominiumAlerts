@@ -26,7 +26,7 @@ public class GetEventRelatedNotificationsQueryHandler: IQueryHandler<GetEventRel
             filter: e => e.Suscribers.Any(u => u.Id == request.RequesterId),
             includes: [e => e.Suscribers]
         );
-        
+
         var eventIds = eventsSubscribedByUser
             .Select(e => e.Id)
             .ToHashSet(); // HashSet mejora rendimiento en búsquedas
@@ -36,30 +36,32 @@ public class GetEventRelatedNotificationsQueryHandler: IQueryHandler<GetEventRel
             filter: n => n.EventId.HasValue &&
                          eventIds.Contains(n.EventId.Value) ||
                          n.ReceiverUserId == request.UserId,
-            includes: [n => n.LevelOfPriority!, n => n.NotificationUsers!]
+            includes: [n => n.LevelOfPriority, n => n.NotificationUsers]
         );
 
         notifications = notifications.OrderByDescending(n => n.CreatedAt).ToList();
 
-        var response = new GetEventRelatedNotificationsQueryResponse(
-            notifications.ConvertAll(x => new NotificationDto()
-            {
-                Id = x.Id,
-                Title = x.Title,
-                CondominiumId = x.CondominiumId,
-                CreatedAt = x.CreatedAt,
-                Description = x.Description,
-                Read = x.NotificationUsers
-                        ?.FirstOrDefault(x => x.UserId == request.UserId)
+        List<NotificationDto> notiRes = notifications.ConvertAll(x => new NotificationDto()
+        {
+            Id = x.Id,
+            Title = x.Title,
+            CondominiumId = x.CondominiumId,
+            CreatedAt = x.CreatedAt,
+            Description = x.Description,
+            Read = x.NotificationUsers
+                        ?.FirstOrDefault(n => n.UserId == request.UserId)
                         ?.Read ?? false,
-                LevelOfPriority = x.LevelOfPriority is null ? null
+            LevelOfPriority = x.LevelOfPriority is null ? null
                     : new LevelOfPriorityDto()
                     {
                         Id = x.LevelOfPriority.Id,
                         Priority = x.LevelOfPriority.Priority,
                         Title = x.Title
                     }
-            })
+        });
+
+        var response = new GetEventRelatedNotificationsQueryResponse(
+            notiRes
         );
 
         return Result.Ok<GetEventRelatedNotificationsQueryResponse>(response);

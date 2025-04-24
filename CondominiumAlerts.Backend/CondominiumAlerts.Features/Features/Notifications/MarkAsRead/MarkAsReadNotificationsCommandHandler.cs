@@ -20,9 +20,9 @@ public class MarkAsReadNotificationsCommandHandler : ICommandHandler<MarkAsReadN
     {
         var readNotificationsIds = new List<Guid>();
         var notis = await _notificationUserRepository.GetAsync(
-
             cancellationToken,
             filter: n => request.NotificationIds.Contains(n.NotificationId)
+                      && request.UserId == n.UserId
         );
         notis.ForEach(n => n.Read = true);
 
@@ -44,6 +44,7 @@ public class MarkAsReadNotificationsCommandHandler : ICommandHandler<MarkAsReadN
              }).ToList(),
             cancellationToken
         );
+
         readNotificationsIds.AddRange(
             notisUsers.Select(x => x.NotificationId)
         );
