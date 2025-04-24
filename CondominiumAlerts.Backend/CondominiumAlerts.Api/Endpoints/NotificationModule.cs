@@ -10,52 +10,64 @@ using LightResults;
 
 namespace CondominiumAlerts.Api.Endpoints
 {
-    public class NotificationModule : ICarterModule
+    public class NotificationsModule: ICarterModule
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            app.MapHub<NotificationHub>("/hubs/notifications");
-
             app.MapGet("/notifications/user/{userId}",
-                async (ISender sender,
-                       string userId,
-                       ClaimsPrincipal claims
-            ) =>
-           {
-               var requesterId = claims.FindFirst("user_id")?.Value;
+                async (string userId, ISender sender, CancellationToken cancellationToken,
+                    ClaimsPrincipal claims) =>
+                {
+                    
+                    var requesterId = claims.FindFirst("user_id")?.Value;
 
-               if (requesterId is null)
-               {
-                   return Results.BadRequest(new
-                   {
-                       Success = false,
-                       Data = new
-                       {
-                           Message = "No se proporcionó un token válido."
-                       }
-                   });
-               }
-               Result<List<NotificationDto>> result
-                   = await sender.Send(
-                       new GetNotificationsOfUserQuery(userId, requesterId)
-                   );
+                    if (requesterId is null)
+                    {
+                        var response = new
+                        {
+                            Success = false,
+                            Data = new
+                            {
+                                Message = "No se proporcionó un token válido."
+                            }
+                        };
 
-               if (!result.IsSuccess) return Results.BadRequest(result);
+                        return Results.BadRequest(response);
+                    }
 
-               var response = new
-               {
-                   IsSuccess = result.IsSuccess,
-                   Data = result.Value,
-               };
-               return Results.Ok(response);
+                    var query = new GetEventRelatedNotificationsQuery(userId, requesterId);
 
-           }).RequireAuthorization();
+                    var result = await sender.Send(query, cancellationToken);
 
+                    if (!result.IsSuccess)
+                    {
+                        var response = new
+                        {
+                            Success = false,
+                            Data = new
+                            {
+                                Message = result.Error.Message
+                            }
+                        };
+
+                        return Results.Unauthorized();
+                    }
+
+                    var successResponse = new
+                    {
+                        IsSuccess = true,
+                        Data = result.Value
+                    };
+
+                    return Results.Ok(successResponse);
+                }
+            ).RequireAuthorization();
+            
             app.MapPut("/notifications/read",
                 async (List<Guid> NotificationsIds, ISender sender, CancellationToken cancellationToken,
                     ClaimsPrincipal claims) =>
                 {
-
+                    
                     var requesterId = claims.FindFirst("user_id")?.Value;
 
                     if (requesterId is null)

@@ -150,7 +150,7 @@ export class UserOptionsComponent {
       takeUntil(this.destroy$)
     ).subscribe((res) => {
       if (res.isSuccess) {
-        this.notifications = res.data;
+        this.notifications = res.data.notifications;
       }
     });
   }
@@ -195,7 +195,7 @@ export class UserOptionsComponent {
 
     this.notificationService.get().subscribe({
       next: (res) => {
-        this.notifications = res.data;
+        this.notifications = res.data.notifications;
         console.log("NOTIFICACIONES", this.notifications)
       },
       error: (err) => {

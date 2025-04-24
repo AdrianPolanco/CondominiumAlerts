@@ -24,7 +24,7 @@ public class CreatePostHandler : ICommandHandler<CreatePostCommand, Result<Creat
     private readonly IRepository<User, string> _userRepository;
     private readonly ILogger<CreatePostHandler> _logger;
     private readonly IValidator<CreatePostCommand> _validator;
-    private readonly INotificationService _notificationService;
+   // private readonly INotificationService _notificationService;
     private readonly IRepository<LevelOfPriority, Guid> _levelOfPriorityRepository;
 
     public CreatePostHandler(Cloudinary cloudinary,
@@ -32,7 +32,7 @@ public class CreatePostHandler : ICommandHandler<CreatePostCommand, Result<Creat
                             IRepository<User, string> userRepository,
                             ILogger<CreatePostHandler> logger,
                             IValidator<CreatePostCommand> validator,
-                            INotificationService notificationService,
+                            //INotificationService notificationService,
                             IRepository<LevelOfPriority, Guid> levelOfPriorityRepository)
     {
         _cloudinary = cloudinary;
@@ -40,7 +40,7 @@ public class CreatePostHandler : ICommandHandler<CreatePostCommand, Result<Creat
         _userRepository = userRepository;
         _logger = logger;
         _validator = validator;
-        _notificationService = notificationService;
+       //_notificationService = notificationService;
         _levelOfPriorityRepository = levelOfPriorityRepository;
     }
 
@@ -106,7 +106,7 @@ public class CreatePostHandler : ICommandHandler<CreatePostCommand, Result<Creat
 
 
         var lvlOfPriority = await _levelOfPriorityRepository.GetByIdAsync(request.LevelOfPriorityId, cancellationToken);
-        if (lvlOfPriority?.Priority >= 7)
+       /* if (lvlOfPriority?.Priority >= 7)
         {
             await _notificationService.Notify(new Notification
             {
@@ -118,7 +118,7 @@ public class CreatePostHandler : ICommandHandler<CreatePostCommand, Result<Creat
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             }, posts.CondominiumId.ToString(), cancellationToken);
-        }
+        }*/
 
         return new CreatePostResponse()
         {
