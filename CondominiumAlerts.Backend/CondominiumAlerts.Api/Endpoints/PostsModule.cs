@@ -11,6 +11,8 @@ namespace CondominiumAlerts.Api.Endpoints
 {
     public class PostsModule : ICarterModule
     {
+        private const string mainPath = "/posts";
+
         public void AddRoutes(IEndpointRouteBuilder app)
         {
             // Endpoint para obtener todos los posts de un condominio
@@ -82,25 +84,31 @@ namespace CondominiumAlerts.Api.Endpoints
                }
             ).DisableAntiforgery();
 
-            // eliminar un post
-            app.MapDelete("/posts/{id}",
-               async (ISender sender, Guid id, CancellationToken cancellationToken) =>
-               {
-                   var command = new DeletePostCommand { Id = id };
-                   Result<DeletePostResponse> result = await sender.Send(command, cancellationToken);
+            // Endpoint para eliminar un post
+            app.MapDelete(GetEndpointPattern("/delete"), async (ISender sender, [FromBody] DeletePostCommand request, CancellationToken cancellationToken) =>
+            {
+                Result<DeletePostResponse> result = await sender.Send(request, cancellationToken);
 
-                   if (!result.IsSuccess)
-                       return Results.BadRequest(result);
+                if (result.IsFailed)
+                {
+                    return Results.BadRequest(result);
+                }
 
-                   var response = new
-                   {
-                       result.IsSuccess,
-                       Data = result.Value
-                   };
+                var response = new
+                {
+                    IsSuccess = result.IsSuccess,
+                    Data = result.Value,
+                };
 
-                   return Results.Ok(response);
-               }
-            ).DisableAntiforgery();
+                return Results.Ok(response);
+            });
         }
+
+        #region private Methods 
+        private string GetEndpointPattern(string name = "")
+        {
+            return mainPath + name;
+        }
+        #endregion
     }
 }

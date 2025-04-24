@@ -46,3 +46,17 @@ export interface UpdatePostResponse {
   levelOfPriorityId: string;
   updatedAt: string;
 }
+
+export interface DeletePostResponse {
+  id: string;
+  title: string;
+  priorityId: string;
+  description: string;
+  condominiumId?: string;
+  updatedAt: string;
+}
+
+export interface DeletePostCommand {
+  id: string;
+  condominiumId: string;
+}

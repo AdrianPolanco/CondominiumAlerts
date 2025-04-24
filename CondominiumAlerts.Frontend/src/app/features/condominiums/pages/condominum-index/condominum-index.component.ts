@@ -26,11 +26,14 @@ import { BackArrowComponent } from '../../../../shared/components/back-arrow/bac
 import { CondominiumsLayoutComponent } from '../../../../shared/components/condominiums-layout/condominiums-layout.component';
 import { MessageService } from 'primeng/api';
 import { Toast } from 'primeng/toast';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { ConfirmationService } from 'primeng/api';
 @Component({
   selector: 'app-condominium-index',
   standalone: true,
   imports: [
     NgFor,
+    ConfirmDialogModule,
     TimeAgoPipe,
     CommonModule,
     FormsModule,
@@ -40,6 +43,7 @@ import { Toast } from 'primeng/toast';
       CondominiumsLayoutComponent, 
       Toast
   ],
+  providers: [ConfirmationService],
   templateUrl: './condominum-index.component.html',
   styleUrls: ['./condominum-index.component.css'],
 })
@@ -47,6 +51,8 @@ export class CondominumIndexComponent implements OnInit {
   priorityLevels: priorityDto[] = [];
   @Input() postId!: string;
 
+  displayModal: boolean = false; // modal de delete
+  postToDelete: any = null;  
   comments: { [postId: string]: getCommentByPostResponse[] } = {};
   showComments: { [postId: string]: boolean } = {};
   newComments: { [postId: string]: { text: string; imageFile?: File; currentImageUrl: string; } } = {};
@@ -93,7 +99,9 @@ export class CondominumIndexComponent implements OnInit {
     private priorityService: PriorityLevelService,
     private commentService: CommetService,
     private authenticationService: AuthenticationService,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private confirmationService: ConfirmationService,
+
   )
   {
     this.postForm = {
@@ -503,5 +511,42 @@ destroy$ = new Subject<void>;
       fileInput.value = '';
     }
   }
+
+
+  confirmDelete(postId: string): void {
+    this.confirmationService.confirm({
+      message: '¿Estás seguro de que deseas eliminar esta publicación?',
+      header: 'Confirmar eliminación',
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Sí',
+      rejectLabel: 'No',
+      accept: () => {
+        this.postService.deletePost({
+          id: postId,
+          condominiumId: this.condominiumId!,
+        }).subscribe({
+          next: () => {
+            this.loadPosts(); 
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Post Eliminado',
+              detail: 'El post ha sido eliminado exitosamente.',
+              life: 3000
+            });
+          },
+          error: (err) => {
+            console.error('Error al eliminar el post:', err);
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: 'Hubo un error al eliminar el post.',
+              life: 3000
+            });
+          }
+        });
+      }
+    });
+  }
+
 
 }

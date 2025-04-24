@@ -8,7 +8,9 @@ import {
   CreatePostsResponse,
   UpdatePostCommand,
   UpdatePostResponse,
-  PostFormData
+  PostFormData,
+  DeletePostCommand,
+  DeletePostResponse
 } from '../models/posts.model';
 import { AuthService } from '../../../core/auth/services/auth.service';
 
@@ -83,5 +85,12 @@ export class PostService {
     });
 
     return this.http.put<UpdatePostResponse>(`${this.apiUrl}/${postId}`, fb);
+  }
+
+  deletePost(command: DeletePostCommand): Observable<DeletePostResponse> {
+    const url = `${this.apiUrl}/delete`;
+    return this.http.delete<DeletePostResponse>(url, {
+      body: command
+    });
   }
 }
