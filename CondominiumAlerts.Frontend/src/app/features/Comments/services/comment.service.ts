@@ -9,6 +9,8 @@ import { getCommentByPostCommand } from '../../Comments/models/getCommentByPost.
 import { getCommentByPostResponse } from '../../Comments/models/getCommentByPost.Reponse'
 import { UpdateCommentResponse } from '../../Comments/models/updateComment.Response'
 import { UpdateCommentCommand } from '../../Comments/models/updateComment.Command'
+import { DeleteCommentCommand } from '../../Comments/models/deletecomment.Command'
+import { DeleteCommentResponse } from '../../Comments/models/deleteComment.Response'
 import { AuthService } from '../../../core/auth/services/auth.service';
 
 @Injectable({
@@ -60,5 +62,11 @@ export class CommetService
     );
   }
 
-
+  //Delete comments
+  deleteComment(command: DeleteCommentCommand): Observable<DeleteCommentResponse> {
+    const url = `${this.apiUrl}/delete`;
+    return this.http.delete<DeleteCommentResponse>(url, {
+      body: command
+    });
+  }
 }

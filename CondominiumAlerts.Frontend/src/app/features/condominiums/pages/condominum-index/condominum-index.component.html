@@ -152,10 +152,20 @@
                       </span>
                       <button
                         *ngIf="isCurrentUserComment(comment.userId)"
-                        class="text-gray-300 hover:text-white ml-2"
+                        class="text-gray-300 hover:text-white mr-1"
                         (click)="editComment(comment.id, publication.id)"
                       >
-                        <i class="pi pi-pencil mr-1"></i> Editar
+                        <i class="pi pi-pencil mr-1"></i>
+                      </button>
+
+                      <button
+                        *ngIf="isCurrentUserComment(comment.userId)"
+                        class="text-primary-500 hover:text-white"
+                        (click)="
+                          confirmDeleteComment(comment.id, publication.id)
+                        "
+                      >
+                        <i class="pi pi-trash mr-1"></i>
                       </button>
                     </div>
 

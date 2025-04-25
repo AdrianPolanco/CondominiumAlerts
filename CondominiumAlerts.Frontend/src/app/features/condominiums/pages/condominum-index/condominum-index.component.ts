@@ -32,6 +32,7 @@ import { MessageService } from 'primeng/api';
 import { Toast } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
+import { DeleteCommentCommand } from '../../../Comments/models/deletecomment.Command'
 
 @Component({
   selector: 'app-condominium-index',
@@ -626,4 +627,45 @@ export class CondominumIndexComponent implements OnInit {
       },
     });
   }
+
+  confirmDeleteComment(commentId: string, postId: string): void {
+    this.confirmationService.confirm({
+      message: '¿Estás seguro de que deseas eliminar este comentario?',
+      header: 'Confirmar eliminación',
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Sí',
+      rejectLabel: 'No',
+      accept: () => {
+        const command: DeleteCommentCommand = {
+          id: commentId,
+          postId: postId
+        };
+
+        this.commentService.deleteComment(command).subscribe({
+          next: () => {
+            if (this.comments[postId]) {
+              this.comments[postId] = this.comments[postId].filter(c => c.id !== commentId);
+            }
+
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Comentario Eliminado',  
+              detail: 'El comentario ha sido eliminado exitosamente.',
+              life: 3000
+            });
+          },
+          error: (err) => {
+            console.error('Error al eliminar el comentario:', err);
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: 'Hubo un error al eliminar el comentario.',
+              life: 3000
+            });
+          }
+        });
+      }
+    });
+  }
+
 }
