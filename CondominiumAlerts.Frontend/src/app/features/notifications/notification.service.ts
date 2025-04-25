@@ -61,7 +61,6 @@ export class NotificationService implements OnDestroy {
         await this.hubConnection.start()
             .catch(err => console.error('Error establishing SignalR connection:', err));
 
-        console.log("HELLO");
         this.authenticationService.userData$
             .pipe(takeUntil(this.destroy$))
             .subscribe(_ => {
