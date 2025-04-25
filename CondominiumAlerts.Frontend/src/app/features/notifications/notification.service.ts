@@ -54,7 +54,7 @@ export class NotificationService implements OnDestroy {
             })
             .configureLogging(LogLevel.Information)
             .withAutomaticReconnect()
-            .build();
+            .build()
 
         this.hubConnection.on("ReceiveNotification", (notification: CondominiumNotification) => {
             // Update local notifications
