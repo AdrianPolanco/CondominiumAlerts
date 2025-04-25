@@ -110,12 +110,32 @@ public class EventNotificationJob : IInvocable
             var notificationsToCreate = startedEventsNotifications.Concat(endedEventsNotifications).ToList();
             await Task.Delay(RandomNumberGenerator.GetInt32(100, 10000));
 
-            var notisCreated = await _notificationRepository.GetAsync(
+            var notisCreated = (await _notificationRepository.GetAsync(
                 default,
-                filter: n => notificationsToCreate.Select(x => x.Description).Contains(n.Description)
-            );
+                filter: n => notificationsToCreate
+                             .Select(x => x.CondominiumId)
+                             .Contains(n.CondominiumId)
+                             && notificationsToCreate
+                             .Select(x => x.EventId)
+                             .Contains(n.EventId)
+                             && notificationsToCreate
+                             .Select(x => x.Description)
+                             .Contains(n.Description)
+                )
+            ).Select(x => new
+            {
+                x.CondominiumId,
+                x.EventId,
+                x.Description
+            }).ToList();
+
             await _notificationRepository.BulkInsertAsync(
-                notificationsToCreate.ExceptBy(notisCreated.Select(x => x.Id), x => x.Id).ToList(), default
+                notificationsToCreate.Where(x1 =>
+                !notisCreated.Any(x2 =>
+                    x2.CondominiumId == x1.CondominiumId &&
+                    x2.EventId == x1.EventId &&
+                    x2.Description == x1.Description
+                )).ToList(), default
             );
         }
         catch (Exception ex)

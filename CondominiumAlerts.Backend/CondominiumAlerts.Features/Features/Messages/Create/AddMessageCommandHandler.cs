@@ -34,8 +34,8 @@ namespace CondominiumAlerts.Features.Features.Messages.Create
                 await _notificationService.Notify(new Notification
                 {
                     Id = Guid.NewGuid(),
-                    Title = "New Message",
-                    Description = $"New message from {messageWithCreatorUser.CreatorUser?.Name}",
+                    Title = "Nuevo mensaje",
+                    Description = $"Nuevo mensaje de {messageWithCreatorUser.CreatorUser?.Name}",
                     CondominiumId = message.CondominiumId.Value,
                     CreatedAt = DateTime.UtcNow,
                     ReceiverUserId = request.ReceiverUserId // Only notify specific user if it's a direct message
