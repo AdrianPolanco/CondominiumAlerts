@@ -1,4 +1,5 @@
-﻿using CondominiumAlerts.Domain.Aggregates.Entities;
+﻿using System.Security.Cryptography;
+using CondominiumAlerts.Domain.Aggregates.Entities;
 using CondominiumAlerts.Domain.Repositories;
 using Coravel.Invocable;
 using Microsoft.AspNetCore.SignalR;
@@ -14,7 +15,6 @@ public class EventNotificationJob : IInvocable
     private readonly IHubContext<EventHub> _hubContext;
     private readonly ILogger<EventNotificationJob> _logger;
     private readonly ScheduledEventsService _scheduledEventsService;
-    private readonly static Random _rand = new();
 
     public EventNotificationJob(
         IRepository<Event, Guid> eventRepository,
@@ -108,7 +108,7 @@ public class EventNotificationJob : IInvocable
         try
         {
             var notificationsToCreate = startedEventsNotifications.Concat(endedEventsNotifications).ToList();
-            await Task.Delay(_rand.Next(100, 800));
+            await Task.Delay(RandomNumberGenerator.GetInt32(100, 10000));
 
             var notisCreated = await _notificationRepository.GetAsync(
                 default,
