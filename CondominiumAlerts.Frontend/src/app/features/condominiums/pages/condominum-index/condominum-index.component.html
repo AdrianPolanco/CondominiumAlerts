@@ -1,174 +1,254 @@
 <shared-condominiums-layout>
-  <div class="flex-1 bg-gray-900 p-5">
-    <div class="flex justify-between mb-6">
-      <shared-back-arrow url="/condominiums" />
-
-      <div class="flex flex-col justify-center md:items-center space-y-2 md:flex-row md:space-x-2">
-
-        <div class="flex flex-col justify-center gap-2 md:flex-row md:items-center">
-
-          <p-button label="Nuevo post"
-                    icon="pi pi-address-book"
-                    iconPos="left"
-                    styleClass="bg-primary text-primary-contrast px-4 py-2 rounded-md w-full flex items-center hover:bg-primary-contrast hover:text-primary"
-                    (onClick)="openPostModal()" />
-
-          <p-button label="Nuevo nivel de prioridad"
-                    icon="pi pi-plus"
-                    iconPos="left"
-                    styleClass="bg-primary-contrast text-primary-700 px-4 py-2 rounded-md flex items-center hover:bg-primary-emphasis-alt hover:text-primary-contrast"
-                    (onClick)="goToLevels()" />
-        
-        <p-button label="Obtener enlace"
-                  icon="pi pi-link"
-                  iconPos="left"
-                  styleClass="bg-primary-contrast w-full text-primary-700 px-4 py-2 rounded-md flex items-center hover:bg-primary-emphasis-alt hover:text-primary-contrast"
-                  (onClick)="getLink()" /></div>
+  <!-- Contenedor principal flex -->
+  <div class="flex h-full aside-users">
+    <!-- Barra lateral (NUEVO) -->
+    <div
+      class="w-64 bg-gray-800 p-4 hidden md:block overflow-y-auto border-r border-gray-700"
+    >
+      <h3 class="text-lg font-semibold text-white mb-4 flex items-center">
+        <i class="pi pi-users mr-2"></i>
+        Miembros
+      </h3>
+      <div class="space-y-3">
+        <div
+          *ngFor="let user of users"
+          class="flex items-center gap-3 p-2 hover:bg-gray-700 rounded-lg"
+        >
+          <img
+            onerror="this.src='/images/default-profile-pic.png'"
+            [src]="user.profilePictureUrl || 'assets/default-user.png'"
+            class="w-10 h-10 rounded-full border-2 border-gray-600"
+          />
+          <div>
+            <p class="text-white font-medium">{{ user.fullName }}</p>
+            <p class="text-gray-400 text-xs">{{ user.email }}</p>
+          </div>
+        </div>
       </div>
     </div>
+    <div class="flex-1 bg-gray-900 p-5 content">
+      <div class="flex justify-between mb-6">
+        <shared-back-arrow url="/condominiums" />
 
-    <h2 class="text-xl md:text-4xl font-semibold mb-4 text-white">
-      <i class="pi pi-pen-to-square mr-2 text-lg md:text-3xl"></i>
-      Publicaciones
-    </h2>
+        <div
+          class="flex flex-col justify-center md:items-center space-y-2 md:flex-row md:space-x-2"
+        >
+          <div
+            class="flex flex-col justify-center gap-2 md:flex-row md:items-center"
+          >
+            <p-button
+              label="Nuevo post"
+              icon="pi pi-address-book"
+              iconPos="left"
+              styleClass="w-full px-4 py-2"
+              (onClick)="openPostModal()"
+            />
 
-    <!-- Publicaciones -->
-    <div class="space-y-4">
-      <div *ngFor="let publication of publications"
-           class="bg-gray-800 p-6 rounded-lg shadow-lg">
-        <div class="flex items-center justify-between mb-4">
-          <h3 class="text-xl font-bold text-primary-500">
-            {{ publication.title }}
-          </h3>
-          <div class="flex items-center">
-            <span class="text-sm text-gray-400 mr-2">
-              {{
-              publication.time
-              }}
-            </span>
-            <button *ngIf="isCurrentUserPost(publication.userId)"
-                    class="text-gray-300 hover:text-white ml-2"
-                    (click)="editPost(publication.id)">
-              <i class="pi pi-pencil mr-1"></i> Editar
-            </button>
-            <button *ngIf="isCurrentUserPost(publication.userId)"
-                    class="text-primary-500 hover:text-white ml-2"
-                    (click)="confirmDelete(publication.id)">
-              <i class="pi pi-trash mr-1"></i> Eliminar
-            </button>
+            <p-button
+              label="Nuevo nivel de prioridad"
+              icon="pi pi-plus"
+              iconPos="left"
+              variant="outlined"
+              styleClass="w-full px-4 py-2"
+              (onClick)="goToLevels()"
+            />
 
+            <p-button
+              label="Obtener enlace"
+              icon="pi pi-link"
+              iconPos="left"
+              variant="outlined"
+              styleClass="w-full px-4 py-2"
+              (onClick)="getLink()"
+            />
           </div>
         </div>
-        <p class="text-gray-300 mb-4">{{ publication.description }}</p>
+      </div>
 
-        <div *ngIf="publication.imageUrl"
-             class="w-full mb-4 rounded-lg overflow-hidden max-h-[400px] flex justify-center bg-transparent">
-          <img [src]="publication.imageUrl"
-               alt="Publicación"
-               class="w-full h-auto object-contain rounded-lg" />
-        </div>
+      <h2 class="text-xl md:text-4xl font-semibold mb-4 text-white">
+        <i class="pi pi-pen-to-square mr-2 text-lg md:text-3xl"></i>
+        Publicaciones
+      </h2>
 
-        <button class="text-gray-300 hover:text-white ml-2"
-                (click)="toggleComments(publication.id)">
-          <i class="pi pi-comments mr-1"></i> Comentarios
-        </button>
+      <!-- Publicaciones -->
+      <div class="space-y-4">
+        <div
+          *ngFor="let publication of publications"
+          class="bg-gray-800 p-6 rounded-lg shadow-lg"
+        >
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-xl font-bold text-primary-500">
+              {{ publication.title }}
+            </h3>
+            <div class="flex items-center">
+              <span class="text-sm text-gray-400 mr-2">
+                {{ publication.time }}
+              </span>
+              <button
+                *ngIf="isCurrentUserPost(publication.userId)"
+                class="text-gray-300 hover:text-white ml-2"
+                (click)="editPost(publication.id)"
+              >
+                <i class="pi pi-pencil mr-1"></i> Editar
+              </button>
+              <button
+                *ngIf="isCurrentUserPost(publication.userId)"
+                class="text-primary-500 hover:text-white ml-2"
+                (click)="confirmDelete(publication.id)"
+              >
+                <i class="pi pi-trash mr-1"></i> Eliminar
+              </button>
+            </div>
+          </div>
+          <p class="text-gray-300 mb-4">{{ publication.description }}</p>
 
-        <div *ngIf="showComments[publication.id]" class="mt-4 space-y-4">
-          <div *ngIf="showComments[publication.id]"
-               class="mt-3 pl-2 border-l-2 border-gray-200 dark:border-gray-600">
-            <!-- Lista de comentarios -->
-            <div *ngIf="comments[publication.id]?.length; else noComments"
-                 class="space-y-8">
-              <div *ngFor="let comment of comments[publication.id]"
-                   class="flex items-start gap-2">
-                <img [src]="comment.userProfilePicture"
-                     alt="Foto de perfil"
-                     class="w-6 h-6 rounded-full object-cover mt-1" />
+          <div
+            *ngIf="publication.imageUrl"
+            class="w-full mb-4 rounded-lg overflow-hidden max-h-[400px] flex justify-center bg-transparent"
+          >
+            <img
+              [src]="publication.imageUrl"
+              alt="Publicación"
+              class="w-full h-auto object-contain rounded-lg"
+            />
+          </div>
 
-                <!-- Contenido del comentario -->
-                <div class="flex-1 relative">
-                  <div class="flex items-baseline gap-2">
-                    <span class="text-sm font-medium text-gray-100 dark:text-white">{{ comment.username }}</span>
-                    <span class="text-xs text-gray-200 dark:text-gray-400">
-                      {{ comment.createdAt | timeAgo }}
-                    </span>
-                    <button *ngIf="isCurrentUserComment(comment.userId)"
-                            class="text-gray-300 hover:text-white ml-2"
-                            (click)="editComment(comment.id, publication.id)">
-                      <i class="pi pi-pencil mr-1"></i> Editar
-                    </button>
+          <button
+            class="text-gray-300 hover:text-white ml-2"
+            (click)="toggleComments(publication.id)"
+          >
+            <i class="pi pi-comments mr-1"></i> Comentarios
+          </button>
+
+          <div *ngIf="showComments[publication.id]" class="mt-4 space-y-4">
+            <div
+              *ngIf="showComments[publication.id]"
+              class="mt-3 pl-2 border-l-2 border-gray-200 dark:border-gray-600"
+            >
+              <!-- Lista de comentarios -->
+              <div
+                *ngIf="comments[publication.id]?.length; else noComments"
+                class="space-y-8"
+              >
+                <div
+                  *ngFor="let comment of comments[publication.id]"
+                  class="flex items-start gap-2"
+                >
+                  <img
+                    [src]="comment.userProfilePicture"
+                    alt="Foto de perfil"
+                    class="w-6 h-6 rounded-full object-cover mt-1"
+                  />
+
+                  <!-- Contenido del comentario -->
+                  <div class="flex-1">
+                    <div class="flex items-baseline gap-2">
+                      <span
+                        class="text-sm font-medium text-gray-100 dark:text-white"
+                        >{{ comment.username }}</span
+                      >
+                      <span class="text-xs text-gray-200 dark:text-gray-400">
+                        {{ comment.createdAt | timeAgo }}
+                      </span>
+                      <button
+                        *ngIf="isCurrentUserComment(comment.userId)"
+                        class="text-gray-300 hover:text-white mr-1"
+                        (click)="editComment(comment.id, publication.id)"
+                      >
+                        <i class="pi pi-pencil mr-1"></i>
+                      </button>
+
+                      <button
+                        *ngIf="isCurrentUserComment(comment.userId)"
+                        class="text-primary-500 hover:text-white"
+                        (click)="
+                          confirmDeleteComment(comment.id, publication.id)
+                        "
+                      >
+                        <i class="pi pi-trash mr-1"></i>
+                      </button>
+                    </div>
+
+                    <p class="text-sm text-gray-100 mt-0">
+                      {{ comment.text }}
+                    </p>
+
+                    <div *ngIf="comment.imageUrl" class="mt-1">
+                      <img
+                        [src]="comment.imageUrl"
+                        alt="Imagen del comentario"
+                        class="max-w-[200px] rounded border border-gray-200 dark:border-gray-600"
+                      />
+                    </div>
                   </div>
+                </div>
+              </div>
 
-                  <p class="text-sm text-gray-100 mt-0">
-                    {{ comment.text }}
-                  </p>
+              <ng-template #noComments>
+                <p class="text-gray-400 italic text-xs py-1">
+                  No hay comentarios todavía.
+                </p>
+              </ng-template>
+            </div>
 
-                  <div *ngIf="comment.imageUrl" class="mt-1">
-                    <img [src]="comment.imageUrl"
-                         alt="Imagen del comentario"
-                         class="max-w-[200px] rounded border border-gray-200 dark:border-gray-600" />
-                  </div>
+            <form (ngSubmit)="submitComment(publication.id)" class="mt-4">
+              <textarea
+                [(ngModel)]="newComments[publication.id].text"
+                name="text"
+                placeholder="Escribe un comentario..."
+                class="w-full p-2 rounded bg-gray-800 text-white border border-gray-500 focus:outline-none focus:border-gray-100"
+                required
+              ></textarea>
 
-                  <button *ngIf="isCurrentUserComment(comment.userId)"
-                          class="absolute bottom-0 right-0 text-primary-500 hover:text-white m-2"
-                          (click)="confirmDeleteComment(comment.id, publication.id)">
-                    <i class="pi pi-trash mr-1"></i> Eliminar
-                  </button>
+              <div class="form-group">
+                <label class="block mb-1 text-gray-100 font-semibold"
+                  >Imagen</label
+                >
+                <div
+                  *ngIf="newComments[publication.id].currentImageUrl"
+                  class="mb-2"
+                >
+                  <img
+                    [src]="newComments[publication.id].currentImageUrl"
+                    alt="Vista previa"
+                    class="rounded-md max-h-64 object-contain"
+                  />
                 </div>
 
-              </div>
-            </div>
+                <div class="flex items-center space-x-2 mt-2">
+                  <label
+                    class="flex items-center justify-center px-4 py-2 bg-white border border-gray-300 text-black rounded-md cursor-pointer hover:bg-gray-50 transition-colors text-sm"
+                  >
+                    <span class="mr-1">+</span> Subir imagen
+                    <input
+                      type="file"
+                      (change)="onCommentFileSelected($event, publication.id)"
+                      accept="image/*"
+                      class="hidden"
+                    />
+                  </label>
 
-            <ng-template #noComments>
-              <p class="text-gray-400 italic text-xs py-1">
-                No hay comentarios todavía.
-              </p>
-            </ng-template>
+                  <button
+                    type="submit"
+                    class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded text-sm"
+                  >
+                    Comentar
+                  </button>
+                </div>
+              </div>
+            </form>
           </div>
-
-          <form (ngSubmit)="submitComment(publication.id)" class="mt-4">
-            <textarea [(ngModel)]="newComments[publication.id].text"
-                      name="text"
-                      placeholder="Escribe un comentario..."
-                      class="w-full p-2 rounded bg-gray-800 text-white border border-gray-500 focus:outline-none focus:border-gray-100"
-                      required></textarea>
-
-            <div class="form-group">
-              <label class="block mb-1 text-gray-100 font-semibold">Imagen</label>
-              <div *ngIf="newComments[publication.id].currentImageUrl" class="mb-2">
-                <img [src]="newComments[publication.id].currentImageUrl"
-                     alt="Vista previa"
-                     class="rounded-md max-h-64 object-contain" />
-              </div>
-
-              <div class="flex items-center space-x-2 mt-2">
-                <label class="flex items-center justify-center px-4 py-2 bg-white border border-gray-300 text-black rounded-md cursor-pointer hover:bg-gray-50 transition-colors text-sm">
-                  <span class="mr-1">+</span> Subir imagen
-                  <input type="file"
-                         (change)="onCommentFileSelected($event, publication.id)"
-                         accept="image/*"
-                         class="hidden" />
-                </label>
-
-                <button type="submit"
-                        class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded text-sm">
-                  Comentar
-                </button>
-
-              </div>
-
-            </div>
-
-
-          </form>
         </div>
       </div>
     </div>
   </div>
+  <!-- Cierra flex-1 -->
 
   <!-- Modal para crear/editar posts -->
   <div class="modal" *ngIf="showPostModal">
-    <div class="modal-content bg-gray-800 text-white rounded-xl shadow-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+    <div
+      class="modal-content bg-gray-800 text-white rounded-xl shadow-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+    >
       <h2 class="text-2xl font-bold mb-6 border-b border-gray-700 pb-2">
         {{ editingPost ? "Editar Publicación" : "Nueva Publicación" }}
       </h2>
@@ -176,38 +256,53 @@
       <form (ngSubmit)="savePost()" #postFormRef="ngForm" class="space-y-5">
         <div class="form-group">
           <label class="block mb-1 text-sm font-semibold">Título</label>
-          <input type="text"
-                 [(ngModel)]="postForm.title"
-                 name="title"
-                 #title="ngModel"
-                 required
-                 class="w-full p-3 rounded-md bg-gray-900 text-white border border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary" />
-          <small *ngIf="title.invalid && (title.touched || postFormRef.submitted)"
-                 class="text-red-400 text-sm">
+          <input
+            type="text"
+            [(ngModel)]="postForm.title"
+            name="title"
+            #title="ngModel"
+            required
+            class="w-full p-3 rounded-md bg-gray-900 text-white border border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary"
+          />
+          <small
+            *ngIf="title.invalid && (title.touched || postFormRef.submitted)"
+            class="text-red-400 text-sm"
+          >
             El título es obligatorio.
           </small>
         </div>
 
         <div class="form-group">
           <label class="block mb-1 text-sm font-semibold">Descripción</label>
-          <textarea [(ngModel)]="postForm.description"
-                    name="description"
-                    #description="ngModel"
-                    rows="4"
-                    required
-                    class="w-full p-3 rounded-md bg-gray-900 text-white border border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary"></textarea>
-          <small *ngIf="description.invalid && (description.touched || postFormRef.submitted)"
-                 class="text-red-400 text-sm">
+          <textarea
+            [(ngModel)]="postForm.description"
+            name="description"
+            #description="ngModel"
+            rows="4"
+            required
+            class="w-full p-3 rounded-md bg-gray-900 text-white border border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary"
+          ></textarea>
+          <small
+            *ngIf="
+              description.invalid &&
+              (description.touched || postFormRef.submitted)
+            "
+            class="text-red-400 text-sm"
+          >
             La descripción es obligatoria.
           </small>
         </div>
 
         <div class="form-group">
-          <label class="block mb-1 text-sm font-semibold">Nivel de Prioridad</label>
-          <select [(ngModel)]="postForm.levelOfPriorityId"
-                  name="levelOfPriorityId"
-                  class="w-full p-3 rounded-md bg-gray-900 text-white border border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary"
-                  required>
+          <label class="block mb-1 text-sm font-semibold"
+            >Nivel de Prioridad</label
+          >
+          <select
+            [(ngModel)]="postForm.levelOfPriorityId"
+            name="levelOfPriorityId"
+            class="w-full p-3 rounded-md bg-gray-900 text-white border border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary"
+            required
+          >
             <option value="" disabled selected>Selecciona un nivel</option>
             <option *ngFor="let level of priorityLevels" [value]="level.id">
               {{ level.title }} (Prioridad: {{ level.priority }})
@@ -218,35 +313,53 @@
         <div class="form-group">
           <label class="block mb-1 text-sm font-semibold">Imagen</label>
           <div *ngIf="postForm.currentImageUrl" class="mb-2">
-            <img [src]="postForm.currentImageUrl"
-                 alt="Vista previa"
-                 class="rounded-md max-h-64 object-contain" />
+            <img
+              [src]="postForm.currentImageUrl"
+              alt="Vista previa"
+              class="rounded-md max-h-64 object-contain"
+            />
           </div>
 
-          <label class="flex items-center justify-center px-4 py-2 bg-white border border-gray-300 text-black rounded-md cursor-pointer hover:bg-gray-50 transition-colors">
+          <label
+            class="flex items-center justify-center px-4 py-2 bg-white border border-gray-300 text-black rounded-md cursor-pointer hover:bg-gray-50 transition-colors"
+          >
             <span class="mr-1">+</span> Subir imagen
-            <input type="file"
-                   (change)="onFileSelected($event)"
-                   accept="image/*"
-                   class="hidden" />
+            <input
+              type="file"
+              (change)="onFileSelected($event)"
+              accept="image/*"
+              class="hidden"
+            />
           </label>
 
-          <small *ngIf="editingPost && !postForm.imageFile"
-                 class="text-xs text-gray-500">
+          <small
+            *ngIf="editingPost && !postForm.imageFile"
+            class="text-xs text-gray-500"
+          >
             Dejar en blanco para mantener la imagen actual
           </small>
         </div>
 
-        <div class="flex justify-end space-x-3 pt-4 border-t border-gray-700 mt-6">
-          <button type="button"
-                  (click)="closePostModal()"
-                  class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-md">
+        <div
+          class="flex justify-end space-x-3 pt-4 border-t border-gray-700 mt-6"
+        >
+          <button
+            type="button"
+            (click)="closePostModal()"
+            class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-md"
+          >
             Cancelar
           </button>
-          <button type="submit"
-                  [disabled]="!postForm.title || !postForm.description || !postForm.levelOfPriorityId"
-                  class="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-md font-semibold disabled:opacity-50"
-                  [ngClass]="{ 'opacity-50 cursor-not-allowed': postFormRef.invalid }">
+          <button
+            type="submit"
+            [disabled]="
+              !postForm.title ||
+              !postForm.description ||
+              !postForm.levelOfPriorityId
+            "
+            class="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-md font-semibold disabled:opacity-50"
+            [ngClass]="{ 'opacity-50 cursor-not-allowed': postFormRef.invalid }"
+          >
             {{ editingPost ? "Actualizar" : "Publicar" }}
           </button>
         </div>
@@ -256,5 +369,7 @@
 
   <p-toast></p-toast>
   <p-confirmDialog></p-confirmDialog>
-  <shared-chats-drawer (onCondominiumSelected)="onCondominiumSelected()"></shared-chats-drawer>
+  <shared-chats-drawer
+    (onCondominiumSelected)="onCondominiumSelected()"
+  ></shared-chats-drawer>
 </shared-condominiums-layout>

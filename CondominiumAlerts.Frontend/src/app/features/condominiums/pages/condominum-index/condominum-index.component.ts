@@ -5,17 +5,21 @@ import { PostService } from '../../../posts/services/post.service';
 import { GetCondominiumsUsersResponse } from '../../../users/models/user.model';
 import { UserService } from '../../../users/services/user.service';
 import { CondominiumService } from '../../services/condominium.service';
-import { GetCondominiumResponse } from "../../models/getCondominium.response";
+import { GetCondominiumResponse } from '../../models/getCondominium.response';
 import { ButtonModule } from 'primeng/button';
 import { AuthService } from '../../../../core/auth/services/auth.service';
 import { FormsModule } from '@angular/forms';
 import { PriorityLevelService } from '../../../services/priorityLevel.service';
 import { priorityDto } from '../../../priority-levels/models/priorityDto';
 import { CommetService } from '../../../Comments/services/comment.service';
-import { AddCommentCommand } from '../../../Comments/models/AddComment.Command'
-import { getCommentByPostCommand } from '../../../Comments/models/getCommentByPost.Command'
-import { getCommentByPostResponse } from '../../../Comments/models/getCommentByPost.Reponse'
-import { CreatePostsResponse, UpdatePostCommand, PostFormData } from '../../../posts/models/posts.model';
+import { AddCommentCommand } from '../../../Comments/models/AddComment.Command';
+import { getCommentByPostCommand } from '../../../Comments/models/getCommentByPost.Command';
+import { getCommentByPostResponse } from '../../../Comments/models/getCommentByPost.Reponse';
+import {
+  CreatePostsResponse,
+  UpdatePostCommand,
+  PostFormData,
+} from '../../../posts/models/posts.model';
 import { TimeAgoPipe } from '../../../../shared/pipes/time-ago.pipe';
 import { getCondominiumTokenResponse } from '../../models/getCondominiumToken.response';
 import { AuthenticationService } from '../../../../core/services/authentication.service';
@@ -28,10 +32,7 @@ import { MessageService } from 'primeng/api';
 import { Toast } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
-import { UpdateCommentResponse } from '../../../Comments/models/updateComment.Response'
-import { UpdateCommentCommand } from '../../../Comments/models/updateComment.Command'
 import { DeleteCommentCommand } from '../../../Comments/models/deletecomment.Command'
-import { DeleteCommentResponse } from '../../../Comments/models/deleteComment.Response'
 
 @Component({
   selector: 'app-condominium-index',
@@ -42,11 +43,11 @@ import { DeleteCommentResponse } from '../../../Comments/models/deleteComment.Re
     TimeAgoPipe,
     CommonModule,
     FormsModule,
-      ButtonModule,
-      ChatsDrawerComponent,
-      BackArrowComponent,
-      CondominiumsLayoutComponent, 
-      Toast
+    ButtonModule,
+    ChatsDrawerComponent,
+    BackArrowComponent,
+    CondominiumsLayoutComponent,
+    Toast,
   ],
   providers: [ConfirmationService],
   templateUrl: './condominum-index.component.html',
@@ -58,17 +59,17 @@ export class CondominumIndexComponent implements OnInit {
 
   editingComments: { [postId: string]: string | null } = {};
   displayModal: boolean = false; // modal de delete
-  postToDelete: any = null;  
+  postToDelete: any = null;
   comments: { [postId: string]: getCommentByPostResponse[] } = {};
   showComments: { [postId: string]: boolean } = {};
   newComments: {
-  [postId: string]: {
-    text: string;
-    currentImageUrl: string;
-    imageFile: File | null;
-    commentId?: string; // ← esto te permite saber si estás editando o no
-  };
-} = {};
+    [postId: string]: {
+      text: string;
+      currentImageUrl: string;
+      imageFile: File | null;
+      commentId?: string; // ← esto te permite saber si estás editando o no
+    };
+  } = {};
 
   users: GetCondominiumsUsersResponse[] = [
     {
@@ -114,10 +115,8 @@ export class CondominumIndexComponent implements OnInit {
     private commentService: CommetService,
     private authenticationService: AuthenticationService,
     private messageService: MessageService,
-    private confirmationService: ConfirmationService,
-
-  )
-  {
+    private confirmationService: ConfirmationService
+  ) {
     this.postForm = {
       title: '',
       description: '',
@@ -125,17 +124,19 @@ export class CondominumIndexComponent implements OnInit {
       currentImageUrl: '',
       levelOfPriorityId: '',
       condominiumId: '',
-      userId: this.authService.currentUser?.uid ?? null
+      userId: this.authService.currentUser?.uid ?? null,
     };
-this.authenticationService.userData$.pipe(takeUntil(this.destroy$)).subscribe((userData) => {
-      if(userData?.data) {
-        this.user = userData?.data
-      };
-    })
+    this.authenticationService.userData$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((userData) => {
+        if (userData?.data) {
+          this.user = userData?.data;
+        }
+      });
   }
 
   ngOnInit(): void {
-    this.condominiumId = this.route.snapshot.paramMap.get("condominiumId");
+    this.condominiumId = this.route.snapshot.paramMap.get('condominiumId');
     console.log('Condominium ID:', this.condominiumId);
 
     if (!this.condominiumId) {
@@ -150,55 +151,60 @@ this.authenticationService.userData$.pipe(takeUntil(this.destroy$)).subscribe((u
     this.loadComments(this.postId);
     this.loadPriorityLevels();
   }
-  user: User  | null= null
-destroy$ = new Subject<void>;
-  getLink(): void{
-
-    let url = `${window.location.origin}/condominium/joinWithToken/`
-    if(this.currentToken != null && this.currentToken.token && new Date(this.currentToken?.expirDate) > new Date() ){
-     // console.log("not server response")
-      url += encodeURIComponent(this.currentToken.token) 
-   //   console.log(url)
-      this.copyToClipBoard(url)
+  user: User | null = null;
+  destroy$ = new Subject<void>();
+  getLink(): void {
+    let url = `${window.location.origin}/condominium/joinWithToken/`;
+    if (
+      this.currentToken != null &&
+      this.currentToken.token &&
+      new Date(this.currentToken?.expirDate) > new Date()
+    ) {
+      // console.log("not server response")
+      url += encodeURIComponent(this.currentToken.token);
+      //   console.log(url)
+      this.copyToClipBoard(url);
 
       return;
     }
 
-    this.condominiumService.getCondominiumToken({
-      UserId: this.user?.id === undefined ? "": this.user.id,
-      condominiumId: this.condominiumId ?? ""
-
-    }).subscribe({
-      next:  (result) => {
-        this.currentToken = result.data
-        url += encodeURIComponent(this.currentToken.token)
-      //  console.log(this.currentToken)     
-    //    console.log(url)
-        this.copyToClipBoard(url)
-      },
-      error: (err)=>{
-      //  console.error(err)
-      }
-    })
+    this.condominiumService
+      .getCondominiumToken({
+        UserId: this.user?.id === undefined ? '' : this.user.id,
+        condominiumId: this.condominiumId ?? '',
+      })
+      .subscribe({
+        next: (result) => {
+          this.currentToken = result.data;
+          url += encodeURIComponent(this.currentToken.token);
+          //  console.log(this.currentToken)
+          //    console.log(url)
+          this.copyToClipBoard(url);
+        },
+        error: (err) => {
+          //  console.error(err)
+        },
+      });
   }
   //TODO: When changing to  https remove this code and use the modern approach (await navigator.clipboard.writeText(text))
-  copyToClipBoard(value:string){
-    const textArea = document.createElement('textarea')
+  copyToClipBoard(value: string) {
+    const textArea = document.createElement('textarea');
     textArea.value = value;
-    textArea.style.position = 'fixed'
-    document.body.appendChild(textArea)
+    textArea.style.position = 'fixed';
+    document.body.appendChild(textArea);
     textArea.focus();
     textArea.select();
     document.execCommand('copy');
-    document.body.removeChild(textArea)
+    document.body.removeChild(textArea);
     this.messageService.add({
       severity: 'success',
       summary: 'Enlace copiado',
-      detail: 'El enlace para unirse al condominio ha sido copiado al portapapeles',
-      life: 3000
+      detail:
+        'El enlace para unirse al condominio ha sido copiado al portapapeles',
+      life: 3000,
     });
   }
-  
+
   toggleComments(postId: string): void {
     this.showComments[postId] = !this.showComments[postId];
     console.log('Toggle comments para post:', postId);
@@ -206,7 +212,11 @@ destroy$ = new Subject<void>;
       this.loadComments(postId);
     }
     if (!this.newComments[postId]) {
-      this.newComments[postId] = { text: '', imageFile: null, currentImageUrl: ''};
+      this.newComments[postId] = {
+        text: '',
+        imageFile: null,
+        currentImageUrl: '',
+      };
     }
   }
 
@@ -224,22 +234,29 @@ destroy$ = new Subject<void>;
       error: (err) => {
         console.error('Error al cargar comentarios:', err);
         this.comments[postId] = [];
-      }
+      },
     });
   }
 
   initializeNewComments(postId: string): void {
     if (!this.newComments[postId]) {
-      this.newComments[postId] = { text: '', imageFile: null, currentImageUrl: '' };
+      this.newComments[postId] = {
+        text: '',
+        imageFile: null,
+        currentImageUrl: '',
+      };
     }
   }
-
 
   onCommentFileSelected(event: Event, postId: string): void {
     const input = event.target as HTMLInputElement;
 
     if (!this.newComments[postId]) {
-      this.newComments[postId] = { text: '', imageFile: null, currentImageUrl: '' };
+      this.newComments[postId] = {
+        text: '',
+        imageFile: null,
+        currentImageUrl: '',
+      };
     }
 
     // Limpiar la vista previa anterior si existe
@@ -268,7 +285,7 @@ destroy$ = new Subject<void>;
       text: '',
       imageFile: null,
       currentImageUrl: '',
-      commentId: undefined
+      commentId: undefined,
     };
   }
 
@@ -276,10 +293,9 @@ destroy$ = new Subject<void>;
     this.newComments[postId] = {
       text: '',
       imageFile: null,
-      currentImageUrl: ''
+      currentImageUrl: '',
     };
   }
-
 
   submitComment(postId: string): void {
     const comment = this.newComments[postId];
@@ -288,32 +304,31 @@ destroy$ = new Subject<void>;
 
     if (comment.commentId) {
       // Editar comentario existente
-      this.commentService.updateComment(comment.commentId, {
-        text: comment.text,
-        imageFile: comment.imageFile || undefined
-      }).subscribe(() => {
-        this.loadComments(postId);
-        this.cancelEditComment(postId);
-      });
+      this.commentService
+        .updateComment(comment.commentId, {
+          text: comment.text,
+          imageFile: comment.imageFile || undefined,
+        })
+        .subscribe(() => {
+          this.loadComments(postId);
+          this.cancelEditComment(postId);
+        });
     } else {
       // Nuevo comentario
-      this.commentService.createComment(
-        {
-          text: comment.text,
-          ImageFile: comment.imageFile || undefined
-        },
-        postId
-      ).subscribe(() => {
-        this.loadComments(postId);
-        this.resetNewComment(postId);
-      });
+      this.commentService
+        .createComment(
+          {
+            text: comment.text,
+            ImageFile: comment.imageFile || undefined,
+          },
+          postId
+        )
+        .subscribe(() => {
+          this.loadComments(postId);
+          this.resetNewComment(postId);
+        });
     }
   }
-
-
-
-
-
 
   onCondominiumSelected(): void {
     this.router.navigate(['/condominium/chat']);
@@ -329,7 +344,7 @@ destroy$ = new Subject<void>;
       const query = {
         condominiumId: this.condominiumId,
         pageNumber: 1,
-        pageSize: 100
+        pageSize: 100,
       };
 
       this.priorityService.getPriorityLevels(query).subscribe({
@@ -340,11 +355,10 @@ destroy$ = new Subject<void>;
         error: (err) => {
           console.error('Error al cargar niveles de prioridad', err);
           reject(err);
-        }
+        },
       });
     });
   }
-
 
   goToCreatePosts(): void {
     console.log('Creating a new post');
@@ -360,7 +374,7 @@ destroy$ = new Subject<void>;
 
   isCurrentUserComment(commentUserId: string): boolean {
     const currentUserId = this.authService.currentUser?.uid;
-    console.log(currentUserId)
+    console.log(currentUserId);
     return currentUserId === commentUserId;
   }
 
@@ -372,9 +386,13 @@ destroy$ = new Subject<void>;
         console.log('Publicaciones recibidas:', data);
         this.publications = data;
 
-        this.publications.forEach(publication => {
+        this.publications.forEach((publication) => {
           this.showComments[publication.id] = false; // Inicialmente ocultos
-          this.newComments[publication.id] = { text: '', imageFile: null, currentImageUrl: '' };
+          this.newComments[publication.id] = {
+            text: '',
+            imageFile: null,
+            currentImageUrl: '',
+          };
           this.loadComments(publication.id); // Cargar comentarios en segundo plano
         });
       },
@@ -387,28 +405,33 @@ destroy$ = new Subject<void>;
   loadUsers(): void {
     if (!this.condominiumId) return;
 
-    this.userService.getCondominiumsUsers({ condominiumId: this.condominiumId }).subscribe({
-      next: (result) => {
-        this.users = result;
-      },
-      error: (err) => {
-        console.log('Error al cargar usuarios:', err);
-      },
-    });
+    this.userService
+      .getCondominiumsUsers({ condominiumId: this.condominiumId })
+      .subscribe({
+        next: (users) => {
+          this.users = users;
+          console.log(users);
+        },
+        error: (err) => {
+          console.error('Error al cargar usuarios:', err);
+        },
+      });
   }
 
   getCondominiumData(): void {
     if (!this.condominiumId) return;
 
-    this.condominiumService.get({ condominiumId: this.condominiumId }).subscribe({
-      next: (result) => {
-        this.condominium = result;
-        console.log('Datos del condominio:', this.condominium);
-      },
-      error: (err) => {
-        console.error('Error al cargar datos del condominio:', err);
-      },
-    });
+    this.condominiumService
+      .get({ condominiumId: this.condominiumId })
+      .subscribe({
+        next: (result) => {
+          this.condominium = result;
+          console.log('Datos del condominio:', this.condominium);
+        },
+        error: (err) => {
+          console.error('Error al cargar datos del condominio:', err);
+        },
+      });
   }
 
   goHome(): void {
@@ -422,7 +445,7 @@ destroy$ = new Subject<void>;
   }
 
   editComment(commentId: string, postId: string): void {
-    const comment = this.comments[postId].find(c => c.id === commentId);
+    const comment = this.comments[postId].find((c) => c.id === commentId);
     if (!comment) return;
 
     this.editingComments[postId] = comment.id;
@@ -430,11 +453,9 @@ destroy$ = new Subject<void>;
       text: comment.text,
       currentImageUrl: comment.imageUrl || '',
       imageFile: null,
-      commentId: comment.id
+      commentId: comment.id,
     };
   }
-
-
 
   async openPostModal(postId?: string) {
     this.showPostModal = true;
@@ -453,17 +474,16 @@ destroy$ = new Subject<void>;
             title: post.title,
             description: post.description,
             currentImageUrl: post.imageUrl,
-            levelOfPriorityId: post.levelOfPriorityId
+            levelOfPriorityId: post.levelOfPriorityId,
           };
         },
-        error: (err) => console.error('Error al cargar post', err)
+        error: (err) => console.error('Error al cargar post', err),
       });
     } else {
       this.editingPost = null;
       this.resetPostForm();
     }
   }
-    
 
   resetPostForm() {
     this.postForm = {
@@ -473,7 +493,7 @@ destroy$ = new Subject<void>;
       currentImageUrl: '',
       levelOfPriorityId: '',
       condominiumId: this.condominiumId || '',
-      userId: this.authService.currentUser?.uid || ''
+      userId: this.authService.currentUser?.uid || '',
     };
   }
 
@@ -503,13 +523,12 @@ destroy$ = new Subject<void>;
     if (!this.condominiumId) return;
 
     if (this.editingPost) {
-
       // Edicion de post
       const updateData: UpdatePostCommand = {
         title: this.postForm.title,
         description: this.postForm.description,
         levelOfPriorityId: this.postForm.levelOfPriorityId,
-        imageFile: this.postForm.imageFile || undefined
+        imageFile: this.postForm.imageFile || undefined,
       };
 
       this.postService.updatePost(this.editingPost.id, updateData).subscribe({
@@ -517,10 +536,9 @@ destroy$ = new Subject<void>;
           this.loadPosts();
           this.closePostModal();
         },
-        error: (err) => console.error('Error al actualizar', err)
+        error: (err) => console.error('Error al actualizar', err),
       });
     } else {
-
       // Crear post
       if (!this.condominiumId) return;
 
@@ -538,7 +556,7 @@ destroy$ = new Subject<void>;
         },
         error: (err) => {
           console.error('Error al crear post:', err);
-        }
+        },
       });
     }
   }
@@ -561,10 +579,12 @@ destroy$ = new Subject<void>;
     this.newComments[postId] = {
       text: '',
       imageFile: null,
-      currentImageUrl: ''
+      currentImageUrl: '',
     };
 
-    const fileInput = document.querySelector(`input[type="file"][data-post-id="${postId}"]`) as HTMLInputElement;
+    const fileInput = document.querySelector(
+      `input[type="file"][data-post-id="${postId}"]`
+    ) as HTMLInputElement;
     if (fileInput) {
       fileInput.value = '';
     }
@@ -579,30 +599,32 @@ destroy$ = new Subject<void>;
       acceptLabel: 'Sí',
       rejectLabel: 'No',
       accept: () => {
-        this.postService.deletePost({
-          id: postId,
-          condominiumId: this.condominiumId!,
-        }).subscribe({
-          next: () => {
-            this.loadPosts(); 
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Post Eliminado',
-              detail: 'El post ha sido eliminado exitosamente.',
-              life: 3000
-            });
-          },
-          error: (err) => {
-            console.error('Error al eliminar el post:', err);
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: 'Hubo un error al eliminar el post.',
-              life: 3000
-            });
-          }
-        });
-      }
+        this.postService
+          .deletePost({
+            id: postId,
+            condominiumId: this.condominiumId!,
+          })
+          .subscribe({
+            next: () => {
+              this.loadPosts();
+              this.messageService.add({
+                severity: 'success',
+                summary: 'Post Eliminado',
+                detail: 'El post ha sido eliminado exitosamente.',
+                life: 3000,
+              });
+            },
+            error: (err) => {
+              console.error('Error al eliminar el post:', err);
+              this.messageService.add({
+                severity: 'error',
+                summary: 'Error',
+                detail: 'Hubo un error al eliminar el post.',
+                life: 3000,
+              });
+            },
+          });
+      },
     });
   }
 
@@ -627,7 +649,7 @@ destroy$ = new Subject<void>;
 
             this.messageService.add({
               severity: 'success',
-              summary: 'Comentario Eliminado',
+              summary: 'Comentario Eliminado',  
               detail: 'El comentario ha sido eliminado exitosamente.',
               life: 3000
             });

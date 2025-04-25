@@ -5,6 +5,7 @@ import {
   GetCondominiumsUsersResponse,
 } from '../models/user.model';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators'; 
 
 @Injectable({
   providedIn: 'root',
@@ -24,10 +25,15 @@ export class UserService {
 
   getCondominiumsUsers(
     cmd: GetCondominiumsUsersCommand
-  ): Observable<Array<GetCondominiumsUsersResponse>> {
-    return this.hhtpClient.get<Array<GetCondominiumsUsersResponse>>(
+  ): Observable<GetCondominiumsUsersResponse[]> {
+    return this.hhtpClient.get<any>(
       '/api/user/GetCondominiumUsers',
       { params: { condominiumId: cmd.condominiumId } }
+    ).pipe(
+      map(response => {
+        console.log('Respuesta completa de usuarios:', response);
+        return response.data || [];
+      })
     );
   }
 }
