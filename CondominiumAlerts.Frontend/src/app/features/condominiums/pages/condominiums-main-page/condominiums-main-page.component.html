@@ -21,7 +21,7 @@
   >
     <div
       class="w-full max-w-[17rem] min-w-[10rem] aspect-square flex flex-col justify-center items-center bg-primary-200 dark:bg-red-400 rounded-lg p-4 cursor-pointer hover:bg-primary-300 transition"
-      (click)="goToCreateCondominium()"
+      (click)="goToggleCreateCondominiumModal()"
     >
       <h3 class="text-lg font-semibold text-center">Crea un condominio</h3>
       <i class="pi pi-plus-circle text-xl mt-4"></i>
@@ -104,6 +104,9 @@
     </div>
   </div>
 </div>
+<p-dialog [(visible)]="isCreateModalOpen" [modal]="true">
+  <app-condominium-page></app-condominium-page>
+</p-dialog>
 
 <shared-chats-drawer
   (onCondominiumSelected)="onCondominiumSelected()"
