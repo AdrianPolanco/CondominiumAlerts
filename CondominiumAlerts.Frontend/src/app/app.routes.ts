@@ -35,6 +35,7 @@ export const routes: Routes = [
       import('../app/core/auth/layout/auth-layout/auth-layout.component').then(
         (c) => c.AuthLayoutComponent
       ),
+    canActivate: [authGuard],
     children: [
       {
         path: 'condominiums',
@@ -46,13 +47,14 @@ export const routes: Routes = [
               import(
                 './features/condominiums/pages/condominiums-main-page/condominiums-main-page.component'
               ).then((c) => c.CondominiumsMainPageComponent),
-          }
+          },
         ],
       },
     ],
   },
   {
-  path: 'condominium/chat',
+    path: 'condominium/chat',
+    canActivate: [authGuard],
     loadComponent: () =>
       import(
         './features/condominiums/pages/condominium-chat/condominium-chat.component'
@@ -60,6 +62,7 @@ export const routes: Routes = [
   },
   {
     path: 'condominium/index/:condominiumId',
+    canActivate: [authGuard],
     loadComponent: () =>
       import(
         './features/condominiums/pages/condominum-index/condominum-index.component'
@@ -67,19 +70,26 @@ export const routes: Routes = [
   },
   {
     path: 'priority-levels/index/:condominiumId',
+    canActivate: [authGuard],
     loadComponent: () =>
-      import('./features/priority-levels/pages/index/index.component')
-        .then((c) => c.IndexComponent)
+      import('./features/priority-levels/pages/index/index.component').then(
+        (c) => c.IndexComponent
+      ),
   },
   {
     path: 'posts/edit/:condominiumId/:postId',
+    canActivate: [authGuard],
     loadComponent: () =>
-      import('./features/posts/pages/edit-post-page/edit-post-page.component')
-        .then(c => c.EditPostPageComponent)
-  },{
+      import(
+        './features/posts/pages/edit-post-page/edit-post-page.component'
+      ).then((c) => c.EditPostPageComponent),
+  },
+  {
     path: 'condominium/joinWithToken/:token',
+    canActivate: [authGuard],
     loadComponent: () =>
-      import('./features/condominiums/pages/joinwith-token/joinwith-token.component')
-    .then(c => c.JoinwithTokenComponent)
+      import(
+        './features/condominiums/pages/joinwith-token/joinwith-token.component'
+      ).then((c) => c.JoinwithTokenComponent),
   },
 ];
