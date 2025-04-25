@@ -348,7 +348,7 @@ destroy$ = new Subject<void>;
       next: (users) => {
         this.users = users
  
-      },
+  },
       error: (err) => {
         console.error('Error al cargar usuarios:', err);
       }
