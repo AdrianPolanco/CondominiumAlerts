@@ -112,15 +112,21 @@ public class EventNotificationJob : IInvocable
 
             var notisCreated = (await _notificationRepository.GetAsync(
                 default,
-                filter: n => notificationsToCreate.Any(
-                    x => x.CondominiumId == n.CondominiumId
-                         && x.EventId == n.EventId
-                         && n.Description == x.Description
+                filter: n => notificationsToCreate
+                             .Select(x => x.CondominiumId)
+                             .Contains(n.CondominiumId)
+                             && notificationsToCreate
+                             .Select(x => x.EventId)
+                             .Contains(n.EventId)
+                             && notificationsToCreate
+                             .Select(x => x.Description)
+                             .Contains(n.Description)
                 )
-            )).Select(x => new {
-                    x.CondominiumId,
-                    x.EventId,
-                    x.Description
+            ).Select(x => new
+            {
+                x.CondominiumId,
+                x.EventId,
+                x.Description
             }).ToList();
 
             await _notificationRepository.BulkInsertAsync(
