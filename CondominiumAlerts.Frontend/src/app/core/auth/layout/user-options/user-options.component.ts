@@ -209,6 +209,7 @@ export class UserOptionsComponent {
                 console.error('Error al cargar notificaciones', err);
             }
         });
+        this.onNotificationsClosed();
     }
 
     profileFormSettings = signal<SharedForm>({
