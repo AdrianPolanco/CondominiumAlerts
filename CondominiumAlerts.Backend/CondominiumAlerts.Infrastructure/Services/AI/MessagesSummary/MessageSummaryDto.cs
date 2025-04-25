@@ -9,4 +9,6 @@ public record MessageSummaryDto(
     Condominium Condominium,
     string CreatorUserId,
     User CreatorUser,
+    string CreatorUsername,
+    string CreatorUserFullname,
     DateTime CreatedAt);

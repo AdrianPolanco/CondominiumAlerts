@@ -5,6 +5,7 @@ using CondominiumAlerts.Infrastructure.Services;
 using CondominiumAlerts.Infrastructure.Services.AI.MessagesSummary;
 using LightResults;
 using Mapster;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 using Message = CondominiumAlerts.Domain.Aggregates.Entities.Message;
@@ -67,12 +68,27 @@ public class CreateSummaryCommandHandler : ICommandHandler<CreateSummaryCommand,
         
         if (cancellationToken.IsCancellationRequested)
         {
-            _summaryStatusService.SetSummaryStatus(request.Condominium.Id.ToString(), SummaryStatus.Cancelled);
+            await _summaryStatusService.SetSummaryStatus(request.Condominium.Id.ToString(), SummaryStatus.Cancelled);
             _logger.LogInformation(cancellationMessage);
             return Result<CreateSummaryCommandResponse>.Fail(cancellationMessage);
         }
 
-        var summary = await _aiService.GenerateSummary(messagesDto, request.TriggeredByUser, request.Condominium, cancellationToken);
+        var messagesDtoWithUserInfo = messagesDto.Select(m =>
+        {
+            return new MessageSummaryDto(
+                Id: m.Id,
+                Text: m.Text,
+                CondominiumId: m.CondominiumId,
+                Condominium: m.Condominium,
+                CreatorUserId: m.CreatorUserId,
+                CreatorUser: m.CreatorUser,
+                CreatorUsername: m.CreatorUser.Username,
+                CreatorUserFullname: $"{m.CreatorUser.Name} {m.CreatorUser.Lastname}",
+                CreatedAt: m.CreatedAt
+            );
+        }).ToList();
+
+        var summary = await _aiService.GenerateSummary(messagesDtoWithUserInfo, request.TriggeredByUser, request.Condominium, cancellationToken);
         
         if(summary is null)
         {
@@ -81,17 +97,6 @@ public class CreateSummaryCommandHandler : ICommandHandler<CreateSummaryCommand,
         }
         var response = new CreateSummaryCommandResponse(summary);
 
-      /* var testSummary = new Summary()
-       {
-           CondominiumId = request.Condominium.Id,
-           Condominium = request.Condominium,
-           Content = "ESTE ES UN MENSAJE DE PRUEBA PARA SIGNALR",
-           CreatedAt = DateTime.UtcNow,
-           Id = Guid.NewGuid(),
-           TriggeredBy = request.TriggeredByUser.Id,
-           User = request.TriggeredByUser
-       };
-       var response = new CreateSummaryCommandResponse(testSummary);*/
        
         var successMessage = $"Resumen solicitado exitosamente. CondominiumId: {request.Condominium.Id}, UserId: {request.TriggeredByUser}, Mensajes: {messages.Count}";
         _logger.LogInformation(successMessage);

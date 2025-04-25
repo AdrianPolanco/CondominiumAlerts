@@ -75,14 +75,7 @@ export class PostService {
     if (cmd.imageFile) {
       fb.append('imageFile', cmd.imageFile);
     }
-
-    console.log('Actualizando post ID:', postId);
-    console.log('Datos enviados:', {
-      title: cmd.title,
-      description: cmd.description,
-      levelOfPriorityId: cmd.levelOfPriorityId,
-      hasImage: !!cmd.imageFile
-    });
+    fb.append('removeImage', String(cmd.removeImage)); 
 
     return this.http.put<UpdatePostResponse>(`${this.apiUrl}/${postId}`, fb);
   }

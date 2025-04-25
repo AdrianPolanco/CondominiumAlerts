@@ -54,6 +54,7 @@ export class CommetService
     if (cmd.imageFile) {
       formData.append('imageFile', cmd.imageFile);
     }
+    formData.append('removeImage', String(cmd.removeImage));
 
     return this.http.put(
       `${this.apiUrl}/${commentId}`, 
