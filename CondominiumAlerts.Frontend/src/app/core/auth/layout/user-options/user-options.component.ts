@@ -64,14 +64,6 @@ export class UserOptionsComponent {
             this.router.navigate(['/condominiums'])
           }
         },
-
-        {
-            label: "Modo oscuro",
-            icon: 'pi pi-home',
-            command: () => {
-              this.router.navigate(['/condominiums'])
-            }
-          },
         {
           label: 'Cerrar sesión',
           icon: 'pi pi-sign-out',
