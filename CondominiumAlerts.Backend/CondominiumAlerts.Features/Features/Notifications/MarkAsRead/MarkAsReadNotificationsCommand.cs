@@ -3,4 +3,4 @@ using LightResults;
 
 namespace CondominiumAlerts.Features.Features.Notifications.MarkAsRead;
 
-public record MarkAsReadNotificationsCommand(List<Guid> NotificationIds): ICommand<Result<MarkAsReadNotificationCommandResponse>>;
+public record MarkAsReadNotificationsCommand(string UserId, List<Guid> NotificationIds): ICommand<Result<MarkAsReadNotificationCommandResponse>>;

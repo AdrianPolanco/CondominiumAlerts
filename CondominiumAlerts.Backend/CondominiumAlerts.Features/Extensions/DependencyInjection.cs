@@ -10,6 +10,7 @@ using LightResults;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using CondominiumAlerts.Domain.Interfaces;
+using CondominiumAlerts.Features.Features.Notifications;
 
 namespace CondominiumAlerts.Features.Extensions;
 
@@ -30,6 +31,8 @@ public static class DependencyInjection
 
         services.AddTransient<EmailConfirmationJob>();
         services.AddTransient<MessagesSummarizationJob>();
+
+        services.AddScoped<INotificationService, NotificationService>();
 
         services.AddScoped<BasicUpdateUserStrategy>();
         services.AddScoped<IUpdateUserStrategy>(sp =>

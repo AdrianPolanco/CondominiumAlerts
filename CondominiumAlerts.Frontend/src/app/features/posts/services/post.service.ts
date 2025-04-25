@@ -18,7 +18,7 @@ import { AuthService } from '../../../core/auth/services/auth.service';
   providedIn: 'root',
 })
 export class PostService {
-  private apiUrl = `${environment.backBaseUrl}/posts`;
+  private apiUrl = `api/posts`;
 
   constructor(
     private http: HttpClient,

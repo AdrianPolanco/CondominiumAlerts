@@ -14,11 +14,11 @@ namespace CondominiumAlerts.Api.Endpoints
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
+            app.MapHub<NotificationHub>("/hubs/notification");
             app.MapGet("/notifications/user/{userId}",
                 async (string userId, ISender sender, CancellationToken cancellationToken,
                     ClaimsPrincipal claims) =>
                 {
-                    
                     var requesterId = claims.FindFirst("user_id")?.Value;
 
                     if (requesterId is null)
@@ -84,7 +84,7 @@ namespace CondominiumAlerts.Api.Endpoints
                         return Results.BadRequest(response);
                     }
 
-                    var query = new MarkAsReadNotificationsCommand(NotificationsIds);
+                    var query = new MarkAsReadNotificationsCommand(requesterId, NotificationsIds);
 
                     var result = await sender.Send(query, cancellationToken);
 

@@ -31,7 +31,6 @@ export class EventService implements OnDestroy {
     this.authenticationService.userData$.pipe(takeUntil(this.destroy$)).subscribe(user => {
       console.log("USER FROM EVENT SERVICE", user)
       if (user?.data) this.user = user?.data!
-      this.loadInitialNotifications();
     });
     this.authenticationService.userToken$.pipe(takeUntil(this.destroy$)).subscribe(token => {
       console.log("TOKEN FROM EVENT SERVICE", token)

@@ -6,9 +6,9 @@ namespace CondominiumAlerts.Domain.Aggregates.Entities
     {
         public Guid Id { get; set; }
 
-        public bool IsSeen { get; set; }
+        public bool Read { get; set; }
 
-        public Guid UserId { get; set; }
+        public string UserId { get; set; } = string.Empty;
 
         public Guid NotificationId { get; set; }
 

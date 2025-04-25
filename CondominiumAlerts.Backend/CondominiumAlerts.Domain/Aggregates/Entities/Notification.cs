@@ -17,9 +17,9 @@ public sealed class Notification : IEntity<Guid>
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
 
+    public IReadOnlyCollection<NotificationUser>? NotificationUsers { get; set; }
     public User? ReceiverUser { get; set; }
     public Condominium? Condominium { get; set; }
     public LevelOfPriority? LevelOfPriority { get; set; }
     public Event? Event { get; set; }
-    public bool Read { get; set; } = false;
 }
