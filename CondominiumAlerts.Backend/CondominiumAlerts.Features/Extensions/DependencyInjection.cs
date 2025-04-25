@@ -1,31 +1,15 @@
 using System.Reflection;
 using CondominiumAlerts.CrossCutting.Behaviors;
-using CondominiumAlerts.Domain.Aggregates.ValueObjects;
-using CondominiumAlerts.Features.Features.Condominiums.Add;
-using CondominiumAlerts.Features.Features.Condominiums.Get;
-using CondominiumAlerts.Features.Features.Condominiums.GetCondominiumsJoinedByUser;
-using CondominiumAlerts.Features.Features.Condominiums.Join;
 using CondominiumAlerts.Features.Features.Condominiums.Summaries;
 using CondominiumAlerts.Features.Features.Events;
-using CondominiumAlerts.Features.Features.Posts.Create;
 using CondominiumAlerts.Features.Features.Posts.Get;
-using CondominiumAlerts.Features.Features.Posts.Update;
-using CondominiumAlerts.Features.Features.Users.GetCondominiumsUsers;
-using CondominiumAlerts.Features.Features.PriorityLevels.Add;
-using CondominiumAlerts.Features.Features.PriorityLevels.Delete;
-using CondominiumAlerts.Features.Features.PriorityLevels.Get;
-using CondominiumAlerts.Features.Features.PriorityLevels.GetById;
-using CondominiumAlerts.Features.Features.PriorityLevels.Update;
 using CondominiumAlerts.Features.Features.Users.Register;
 using CondominiumAlerts.Features.Features.Users.Update;
-using CondominiumAlerts.Features.Validators.Posts;
 using FluentValidation;
 using LightResults;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
-using CondominiumAlerts.Features.Features.Notifications;
 using CondominiumAlerts.Domain.Interfaces;
-using CondominiumAlerts.Features.Features.Comment.Add;
 
 namespace CondominiumAlerts.Features.Extensions;
 
@@ -39,7 +23,7 @@ public static class DependencyInjection
             config.AddOpenBehavior(typeof(LoggingBehavior<,>));
             //config.AddOpenBehavior(typeof(ValidationBehavior<,>));
         });
-        services.AddScoped<INotificationService, NotificationService>();
+
         services.AddScoped<IRequestHandler<GetPostsCommand, Result<List<GetPostsResponse>>>, GetPostsHandler>();
 
         AddValidators(services);

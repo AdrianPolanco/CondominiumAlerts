@@ -29,6 +29,9 @@ import { Toast } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
 import { map } from 'rxjs/operators';
+import { UpdateCommentResponse } from '../../../Comments/models/updateComment.Response'
+import { UpdateCommentCommand } from '../../../Comments/models/updateComment.Command'
+
 @Component({
   selector: 'app-condominium-index',
   standalone: true,
@@ -52,11 +55,20 @@ export class CondominumIndexComponent implements OnInit {
   priorityLevels: priorityDto[] = [];
   @Input() postId!: string;
 
+  editingComments: { [postId: string]: string | null } = {};
   displayModal: boolean = false; // modal de delete
   postToDelete: any = null;  
   comments: { [postId: string]: getCommentByPostResponse[] } = {};
   showComments: { [postId: string]: boolean } = {};
-  newComments: { [postId: string]: { text: string; imageFile?: File; currentImageUrl: string; } } = {};
+  newComments: {
+  [postId: string]: {
+    text: string;
+    currentImageUrl: string;
+    imageFile: File | null;
+    commentId?: string; // ← esto te permite saber si estás editando o no
+  };
+} = {};
+
   users: GetCondominiumsUsersResponse[] = [
     {
       id: 'dddddfsdfdfs',
@@ -193,7 +205,7 @@ destroy$ = new Subject<void>;
       this.loadComments(postId);
     }
     if (!this.newComments[postId]) {
-      this.newComments[postId] = { text: '', imageFile: undefined, currentImageUrl: ''};
+      this.newComments[postId] = { text: '', imageFile: null, currentImageUrl: ''};
     }
   }
 
@@ -217,7 +229,7 @@ destroy$ = new Subject<void>;
 
   initializeNewComments(postId: string): void {
     if (!this.newComments[postId]) {
-      this.newComments[postId] = { text: '', imageFile: undefined, currentImageUrl: '' };
+      this.newComments[postId] = { text: '', imageFile: null, currentImageUrl: '' };
     }
   }
 
@@ -226,7 +238,7 @@ destroy$ = new Subject<void>;
     const input = event.target as HTMLInputElement;
 
     if (!this.newComments[postId]) {
-      this.newComments[postId] = { text: '', imageFile: undefined, currentImageUrl: '' };
+      this.newComments[postId] = { text: '', imageFile: null, currentImageUrl: '' };
     }
 
     // Limpiar la vista previa anterior si existe
@@ -244,37 +256,61 @@ destroy$ = new Subject<void>;
       };
       reader.readAsDataURL(file);
     } else {
-      this.newComments[postId].imageFile = undefined;
+      this.newComments[postId].imageFile = null;
       this.newComments[postId].currentImageUrl = '';
     }
   }
 
+  cancelEditComment(postId: string): void {
+    this.editingComments[postId] = null;
+    this.newComments[postId] = {
+      text: '',
+      imageFile: null,
+      currentImageUrl: '',
+      commentId: undefined
+    };
+  }
+
+  resetNewComment(postId: string): void {
+    this.newComments[postId] = {
+      text: '',
+      imageFile: null,
+      currentImageUrl: ''
+    };
+  }
+
 
   submitComment(postId: string): void {
-    const commentData = this.newComments[postId];
+    const comment = this.newComments[postId];
 
-    // Validar que haya texto en el comentario
-    if (!commentData.text || !commentData.text.trim()) {
-      return;
-    }
+    if (!comment) return;
 
-    const command: AddCommentCommand = {
-      text: commentData.text,
-      ImageFile: commentData.imageFile
-    };
-
-    this.commentService.createComment(command, postId).subscribe({
-      next: () => {
-        // Resetear completamente el formulario de comentario
-        this.resetCommentForm(postId);
-        // Recargar los comentarios
+    if (comment.commentId) {
+      // Editar comentario existente
+      this.commentService.updateComment(comment.commentId, {
+        text: comment.text,
+        imageFile: comment.imageFile || undefined
+      }).subscribe(() => {
         this.loadComments(postId);
-      },
-      error: (err) => {
-        console.error('Error al enviar comentario:', err);
-      }
-    });
+        this.cancelEditComment(postId);
+      });
+    } else {
+      // Nuevo comentario
+      this.commentService.createComment(
+        {
+          text: comment.text,
+          ImageFile: comment.imageFile || undefined
+        },
+        postId
+      ).subscribe(() => {
+        this.loadComments(postId);
+        this.resetNewComment(postId);
+      });
+    }
   }
+
+
+
 
 
 
@@ -321,6 +357,12 @@ destroy$ = new Subject<void>;
     return currentUserId === userId;
   }
 
+  isCurrentUserComment(commentUserId: string): boolean {
+    const currentUserId = this.authService.currentUser?.uid;
+    console.log(currentUserId)
+    return currentUserId === commentUserId;
+  }
+
   loadPosts(): void {
     if (!this.condominiumId) return;
 
@@ -331,7 +373,7 @@ destroy$ = new Subject<void>;
 
         this.publications.forEach(publication => {
           this.showComments[publication.id] = false; // Inicialmente ocultos
-          this.newComments[publication.id] = { text: '', imageFile: undefined, currentImageUrl: '' };
+          this.newComments[publication.id] = { text: '', imageFile: null, currentImageUrl: '' };
           this.loadComments(publication.id); // Cargar comentarios en segundo plano
         });
       },
@@ -378,6 +420,20 @@ destroy$ = new Subject<void>;
       this.router.navigate(['/priority-levels/index', this.condominiumId]);
     }
   }
+
+  editComment(commentId: string, postId: string): void {
+    const comment = this.comments[postId].find(c => c.id === commentId);
+    if (!comment) return;
+
+    this.editingComments[postId] = comment.id;
+    this.newComments[postId] = {
+      text: comment.text,
+      currentImageUrl: comment.imageUrl || '',
+      imageFile: null,
+      commentId: comment.id
+    };
+  }
+
 
 
   async openPostModal(postId?: string) {
@@ -504,7 +560,7 @@ destroy$ = new Subject<void>;
 
     this.newComments[postId] = {
       text: '',
-      imageFile: undefined,
+      imageFile: null,
       currentImageUrl: ''
     };
 

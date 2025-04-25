@@ -1,89 +1,78 @@
-    <header class="card">
-        <p-toolbar styleClass="rounded-none">
-        <ng-template #start>
-            <img
-                (click)="onLogoClicked()"
-                src="/images/condominiumAlertsLogo-removebg.png"
-                alt="Condominium Alerts"
-                height="40"
-                width="40"
-                class="cursor-pointer"
-            />
-        </ng-template>
-        <ng-template #end>
-            <nav class="flex gap-4 items-center">
-              @if(unreadCount() > 0){
-                <i class="pi pi-bell" pBadge [value]="unreadCount()" style="font-size: 1.2rem" (click)="showNotificationsDialog()"></i>
-              }@else{
-                <i class="pi pi-bell" style="font-size: 1.2rem" (click)="showNotificationsDialog()"></i>
-              }
-            <p-menu #menu [model]="menuItems()" [popup]="true" />
-            <button (click)="menu.toggle($event)" class="flex justify-center items-center">
-                @if(userData?.profilePictureUrl){
-                  <p-avatar [image]="userData?.profilePictureUrl" class="mr-2" size="large" shape="circle" />
-                }@else{
-                  <p-avatar icon="pi pi-user" class="mr-2" size="large" shape="circle" />
-                }
-            </button>
-            </nav>
-        </ng-template>
-        </p-toolbar>
-    </header>
-    <p-dialog [(visible)]="visible" [modal]="true" [style]="{ width: '25rem' }">
-        <h1 class="text-center text-3xl mb-5">Mi perfil</h1>
-        <div class="flex justify-center items-center w-full rounded-full">
-          <p-image [preview]="true">
-            <ng-template pTemplate="image">
-              <img [src]="imageUrl() || 'images/default-profile-pic.png'" alt="Profile" class="rounded-full w-[100px] h-[100px] object-cover" />
-            </ng-template>
-          </p-image>          
-        </div>
-        @if(visible()){
-          <shared-form
-            [formSettingsInput]="profileFormSettings()"
-            (onFormCreated)="onFormCreated($event)"
-            (onFormSubmitted)="onSubmit($event)">
-          </shared-form>
+<header class="card">
+  <p-toolbar styleClass="rounded-none">
+    <ng-template #start>
+      <img
+        (click)="onLogoClicked()"
+        ngSrc="images/condominiumAlertsLogo-removebg.png"
+        alt="Condominium Alerts"
+        height="40"
+        width="40"
+        class="cursor-pointer"
+      />
+    </ng-template>
+    <ng-template #end>
+      <nav class="flex gap-4 items-center">
+        @if(unreadNotificationsCount > 0){
+
+          <i class="pi pi-bell" pBadge [value]="unreadNotificationsCount" style="font-size: 1.2rem" (click)="showNotificationsDialog()"></i>
+        }@else{
+          <i class="pi pi-bell" style="font-size: 1.2rem" (click)="showNotificationsDialog()"></i>
         }
-    </p-dialog>
-<p-dialog 
-  header="Notificaciones" 
-  [(visible)]="showNotificationsDialog" 
-  [style]="{ width: '90vw', maxWidth: '500px' }"
-  [modal]="true"
-  [dismissableMask]="true">
-  
-  <div class="notifications-container">
-    <div *ngFor="let notification of notifications()" class="notification-item">
-      <div class="notification-header">
-        <span class="notification-title">{{ notification.title }}</span>
-        <span class="notification-time">{{ notification.createdAt | date:'short' }}</span>
-      </div>
-      <div *ngIf="notification.description" class="notification-description">
-        {{ notification.description }}
-      </div>
-      @if(notification.levelOfPriority != null) {
-      <div class="notification-priority" [ngClass]="{
-        'priority-high': notification.levelOfPriority.priority >= 7,
-        'priority-medium': notification.levelOfPriority.priority >= 4 && notification.levelOfPriority.priority < 7,
-        'priority-low': notification.levelOfPriority.priority < 4
-      }">
-        {{ notification.levelOfPriority.title }}
-      </div>
-      }
-    </div>
-    
-    <div *ngIf="notifications().length === 0" class="no-notifications">
-      No hay notificaciones
-    </div>
+        <p-menu #menu [model]="menuItems" [popup]="true" />
+        <button (click)="menu.toggle($event)" class="flex justify-center items-center">
+          @if(userData?.profilePictureUrl){
+            <p-avatar [image]="userData?.profilePictureUrl" class="mr-2" size="large" shape="circle" />
+          }@else{
+            <p-avatar icon="pi pi-user" class="mr-2" size="large" shape="circle" />
+          }
+        </button>
+      </nav>
+    </ng-template>
+  </p-toolbar>
+</header>
+<p-dialog [(visible)]="visible" [modal]="true" [style]="{ width: '25rem' }">
+  <h1 class="text-center text-3xl mb-5">Mi perfil</h1>
+  <div class="flex justify-center items-center w-full rounded-full">
+    <p-image [preview]="true">
+      <ng-template pTemplate="image">
+        <img [src]="imageUrl() || 'images/default-profile-pic.png'" alt="Profile" class="rounded-full w-[100px] h-[100px] object-cover" />
+      </ng-template>
+    </p-image>
   </div>
-  
-  <ng-template pTemplate="footer">
-    <button 
-      pButton 
-      label="Cerrar" 
-      class="p-button-text"
-      (click)="showNotificationsDialog.set(false)">
-    </button>
-  </ng-template>
+  @if(visible()){
+    <shared-form
+      [formSettingsInput]="profileFormSettings()"
+      (onFormCreated)="onFormCreated($event)"
+      (onFormSubmitted)="onSubmit($event)">
+    </shared-form>
+  }
+</p-dialog>
+<p-dialog
+  header="Notificaciones"
+  [modal]="true"
+  [(visible)]="showNotifications"
+  [style]="{ width: '50rem' }"
+  [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }"
+  [maximizable]="true"
+  (onHide)="onNotificationsClosed()"
+>
+  <div class="w-50 p-5">
+    @if(notifications.length){
+      <div *ngFor="let notification of notifications" class="mb-3 p-3 rounded"
+           [ngClass]="{ 'bg-white': notification.read, 'bg-gray-100': !notification.read }">
+        <div class="flex justify-end">
+                <span class="text-xs text-gray-400 justify-end">
+                  {{ notification.createdAt | timeAgo }}
+                </span>
+        </div>
+        <div class="flex items-center space-x-2">
+          <i class="pi pi-bell text-primary"></i>
+          <p class="text-sm">{{ notification.title }}</p>
+        </div>
+        <span class="text-xs text-gray-400">{{ notification.description }}</span>
+      </div>
+    }@else{
+      <h1 class="text-center text-xl mb-5">No tienes notificaciones</h1>
+    }
+  </div>
 </p-dialog>

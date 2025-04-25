@@ -21,28 +21,29 @@
       <div class="flex justify-between mb-6">
         <shared-back-arrow url="/condominiums" />
 
-        <div class="flex space-x-2">
+      <div class="flex flex-col justify-center md:items-center space-y-2 md:flex-row md:space-x-2">
 
-          <div class="flex space-x-2">
-            <button class="bg-primary hover:bg-primary-emphasis text-white px-4 py-2 rounded-md flex items-center"
-                    (click)="openPostModal()">
-              <i class="pi pi-plus mr-2"></i>
-              Nuevo post
-            </button>
+        <div class="flex flex-col justify-center gap-2 md:flex-row md:items-center">
 
-            <p-button label="Nuevo nivel de prioridad"
-                      icon="pi pi-plus"
-                      iconPos="left"
-                      styleClass="bg-primary-contrast text-primary-700 px-4 py-2 rounded-md flex items-center hover:bg-primary-emphasis-alt hover:text-primary-contrast"
-                      (onClick)="goToLevels()" />
-          </div>
-          <p-button label="Obtener enlace"
-                    icon="pi pi-link"
+          <p-button label="Nuevo post"
+                    icon="pi pi-address-book"
+                    iconPos="left"
+                    styleClass="bg-primary text-primary-contrast px-4 py-2 rounded-md w-full flex items-center hover:bg-primary-contrast hover:text-primary"
+                    (onClick)="openPostModal()" />
+
+          <p-button label="Nuevo nivel de prioridad"
+                    icon="pi pi-plus"
                     iconPos="left"
                     styleClass="bg-primary-contrast text-primary-700 px-4 py-2 rounded-md flex items-center hover:bg-primary-emphasis-alt hover:text-primary-contrast"
-                    (onClick)="getLink()" />
-        </div>
+                    (onClick)="goToLevels()" />
+        
+        <p-button label="Obtener enlace"
+                  icon="pi pi-link"
+                  iconPos="left"
+                  styleClass="bg-primary-contrast w-full text-primary-700 px-4 py-2 rounded-md flex items-center hover:bg-primary-emphasis-alt hover:text-primary-contrast"
+                  (onClick)="getLink()" /></div>
       </div>
+    </div>
 
       <h2 class="text-xl md:text-4xl font-semibold mb-4 text-white">
         <i class="pi pi-pen-to-square mr-2 text-lg md:text-3xl"></i>
@@ -61,21 +62,22 @@
               <span class="text-sm text-gray-400 mr-2">
                 {{
               publication.time
-                }}
-              </span>
-              <button *ngIf="isCurrentUserPost(publication.userId)"
-                      class="text-gray-300 hover:text-white ml-2"
-                      (click)="editPost(publication.id)">
-                <i class="pi pi-pencil mr-1"></i> Editar
-              </button>
-              <button *ngIf="isCurrentUserPost(publication.userId)"
-                      class="text-red-500 hover:text-white ml-2"
-                      (click)="confirmDelete(publication.id)">
-                <i class="pi pi-trash mr-1"></i> Eliminar
-              </button>
-            </div>
+              }}
+            </span>
+            <button *ngIf="isCurrentUserPost(publication.userId)"
+                    class="text-gray-300 hover:text-white ml-2"
+                    (click)="editPost(publication.id)">
+              <i class="pi pi-pencil mr-1"></i> Editar
+            </button>
+            <button *ngIf="isCurrentUserPost(publication.userId)"
+                    class="text-primary-500 hover:text-white ml-2"
+                    (click)="confirmDelete(publication.id)">
+              <i class="pi pi-trash mr-1"></i> Eliminar
+            </button>
+
           </div>
-          <p class="text-gray-300 mb-4">{{ publication.description }}</p>
+        </div>
+        <p class="text-gray-300 mb-4">{{ publication.description }}</p>
 
           <div *ngIf="publication.imageUrl"
                class="w-full mb-4 rounded-lg overflow-hidden max-h-[400px] flex justify-center bg-transparent">
@@ -108,9 +110,14 @@
                       <span class="text-xs text-gray-200 dark:text-gray-400">
                         {{
                          comment.createdAt | timeAgo
-                        }}
-                      </span>
-                    </div>
+                      }}
+                    </span>
+                    <button *ngIf="isCurrentUserComment(comment.userId)"
+                            class="text-gray-300 hover:text-white ml-2"
+                            (click)="editComment(comment.id, publication.id)">
+                      <i class="pi pi-pencil mr-1"></i> Editar
+                    </button>
+                  </div>
 
                     <p class="text-sm text-gray-100 mt-0">
                       {{ comment.text }}
@@ -253,8 +260,9 @@
             Cancelar
           </button>
           <button type="submit"
-                  [disabled]="!postForm.title || !postForm.description"
-                  class="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-md font-semibold">
+                  [disabled]="!postForm.title || !postForm.description || !postForm.levelOfPriorityId"
+                  class="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-md font-semibold disabled:opacity-50"
+                  [ngClass]="{ 'opacity-50 cursor-not-allowed': postFormRef.invalid }">
             {{ editingPost ? "Actualizar" : "Publicar" }}
           </button>
         </div>
