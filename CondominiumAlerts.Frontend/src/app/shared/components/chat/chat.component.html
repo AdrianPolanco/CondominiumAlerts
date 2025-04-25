@@ -1,5 +1,5 @@
 <section class="chat">
-  <header class="chat-header bg-gray-50 dark:bg-gray-700  p-4">
+  <header class="chat-header bg-gray-50 dark:bg-gray-700  p-4 flex flex-col gap-2 min-[522px]:flex-row">
     <div class="text-xl">
       @if(this.options()?.type == 'condominium'){
         <div class="flex items-center gap-2">
@@ -20,7 +20,7 @@
       }
     </div>
 
-    <div class="flex items-center gap-2">
+    <div class="flex items-center gap-2 self-end">
     @if(wasLastMessageToday() && show === "chat"){
       @if(summaryStatus() !== null && summarizing()){
         @switch (summaryStatus()) {

@@ -21,7 +21,7 @@ public class AiService : IAiService
     
     public async Task<Summary?> GenerateSummary(List<MessageSummaryDto> messages, User user, Condominium condominium, CancellationToken cancellationToken)
     {
-        var formattedMessages = messages.Select(m => $"[{m.CreatedAt:yyyy-MM-dd HH:mm:ss}] {m.CreatorUserId} - {m.Text}").ToList();
+        var formattedMessages = messages.Select(m => $"[{m.CreatedAt:yyyy-MM-dd HH:mm:ss}] {m.CreatorUserFullname} - {m.CreatorUsername} - {m.Text}").ToList();
 
         var requestBody = new
         {

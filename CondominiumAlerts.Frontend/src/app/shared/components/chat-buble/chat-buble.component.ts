@@ -7,7 +7,7 @@ import {
   OnDestroy,
   OnInit,
 } from '@angular/core';
-import { NgClass } from '@angular/common';
+import { NgClass, NgIf } from '@angular/common';
 import { ChatMessageDto } from '../../../core/models/chatMessage.dto';
 import { AuthenticationService } from '../../../core/services/authentication.service';
 import { Subject, takeUntil } from 'rxjs';
@@ -17,7 +17,7 @@ import { DateEsPipe } from "../../pipes/date-es.pipe";
 
 @Component({
   selector: 'app-chat-buble',
-  imports: [NgClass, DateEsPipe],
+  imports: [NgClass, DateEsPipe, NgIf],
   templateUrl: './chat-buble.component.html',
   styleUrl: './chat-buble.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
