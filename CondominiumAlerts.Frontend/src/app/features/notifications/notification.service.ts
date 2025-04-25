@@ -8,6 +8,7 @@ import { CondominiumNotification } from '../events/types/condominiumNotification
 import { CondominiumEvent } from '../events/event.type';
 import { CondominiumService } from '../condominiums/services/condominium.service';
 import { HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
+import { environment } from '../../../enviroments/environment';
 
 @AutoUnsubscribe()
 @Injectable({
@@ -25,7 +26,7 @@ export class NotificationService implements OnDestroy {
     constructor(
         private readonly authenticationService: AuthenticationService,
         private readonly httpClient: HttpClient,
-        private readonly condominiumService: CondominiumService
+        private readonly condominiumService: CondominiumService,
     ) {
         this.authenticationService.userData$
             .pipe(takeUntil(this.destroy$))
@@ -40,6 +41,7 @@ export class NotificationService implements OnDestroy {
             .pipe(takeUntil(this.destroy$))
             .subscribe(token => {
                 this.token = token;
+                console.log(this.token);
                 if (token) this.initSignalRConnection();
             });
     }
@@ -47,11 +49,12 @@ export class NotificationService implements OnDestroy {
 
     private async initSignalRConnection() {
         this.hubConnection = new HubConnectionBuilder()
-            .withUrl('/api/hubs/notification', {
+            .withUrl(environment.backBaseUrl + '/hubs/notification', {
                 accessTokenFactory: () => this.token || ''
             })
             .configureLogging(LogLevel.Information)
-            .build();
+            .withAutomaticReconnect()
+            .build()
 
         this.hubConnection.on("ReceiveNotification", (notification: CondominiumNotification) => {
             // Update local notifications
@@ -61,7 +64,6 @@ export class NotificationService implements OnDestroy {
         await this.hubConnection.start()
             .catch(err => console.error('Error establishing SignalR connection:', err));
 
-        console.log("HELLO");
         this.authenticationService.userData$
             .pipe(takeUntil(this.destroy$))
             .subscribe(_ => {

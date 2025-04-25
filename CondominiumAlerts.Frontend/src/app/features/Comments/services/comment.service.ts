@@ -7,7 +7,6 @@ import { AddCommentCommand } from '../../Comments/models/AddComment.Command'
 import { AddCommentResponse } from '../../Comments/models/AddComment.Response'
 import { getCommentByPostCommand } from '../../Comments/models/getCommentByPost.Command'
 import { getCommentByPostResponse } from '../../Comments/models/getCommentByPost.Reponse'
-import { UpdateCommentResponse } from '../../Comments/models/updateComment.Response'
 import { UpdateCommentCommand } from '../../Comments/models/updateComment.Command'
 import { DeleteCommentResponse } from '../../Comments/models/deleteComment.Response'
 import { AuthService } from '../../../core/auth/services/auth.service';

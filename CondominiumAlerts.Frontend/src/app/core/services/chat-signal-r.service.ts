@@ -9,6 +9,7 @@ import {
 import { AuthService } from '../auth/services/auth.service';
 import { Subject } from 'rxjs';
 import { ChatMessageDto } from '../models/chatMessage.dto';
+import { environment } from '../../../enviroments/environment';
 @Injectable({
   providedIn: 'root',
 })
@@ -19,7 +20,7 @@ export class ChatSignalRService {
 
   constructor(private authService: AuthService) {
     this.hubConnection = new HubConnectionBuilder()
-      .withUrl('/api/hubs/chat', {
+      .withUrl(environment.backBaseUrl + '/hubs/chat', {
         accessTokenFactory: () => this.authService.getUserToken(),
         transport: HttpTransportType.ServerSentEvents,
       })
