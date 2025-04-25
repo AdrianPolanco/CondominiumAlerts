@@ -29,7 +29,7 @@ namespace CondominiumAlerts.Features.Features.Comment.Update
 
         public async Task<Result<UpdateCommentResponse>> Handle(UpdateCommentCommand request, CancellationToken cancellationToken)
         {
-            var validation = _validator.Validate(request); // Fix: This now works because _validator is of type IValidator<UpdateCommentCommand>
+            var validation = _validator.Validate(request);
             if (!validation.IsValid)
             {
                 IEnumerable<string> errors = validation.Errors.Select(e => e.ErrorMessage);
@@ -48,7 +48,11 @@ namespace CondominiumAlerts.Features.Features.Comment.Update
             existingComment.UpdatedAt = DateTime.UtcNow;
 
             string imageUrl = existingComment.ImageUrl;
-            if (request.ImageFile != null && request.ImageFile.Length > 0)
+            if (request.RemoveImage)
+            {
+                existingComment.ImageUrl = null;
+            }
+            else if (request.ImageFile != null && request.ImageFile.Length > 0)
             {
                 var uploadResult = await _cloudinary.UploadAsync(new ImageUploadParams()
                 {

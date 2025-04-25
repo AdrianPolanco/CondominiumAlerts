@@ -36,6 +36,7 @@ export interface UpdatePostCommand {
   description: string;
   imageFile?: File;
   levelOfPriorityId: string;
+  removeImage?: boolean;
 }
 
 export interface UpdatePostResponse {

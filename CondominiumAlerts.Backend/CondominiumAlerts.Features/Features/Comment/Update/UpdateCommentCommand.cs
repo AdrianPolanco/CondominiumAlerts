@@ -9,5 +9,6 @@ namespace CondominiumAlerts.Features.Features.Comment.Update
         public Guid Id { get; set; }
         public string Text { get; set; } = string.Empty!;
         public IFormFile ImageFile { get; set; }
+        public bool RemoveImage { get; set; }
     }
 }
