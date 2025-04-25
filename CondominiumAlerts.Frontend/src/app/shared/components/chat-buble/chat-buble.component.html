@@ -22,11 +22,19 @@
             'bg-primary-700 text-white': isCurrentUser(),
             'bg-gray-100 text-gray-700': !isCurrentUser()
           }"
-          class="rounded px-3.5 py-2 justify-start items-center gap-3 inline-flex"
+          class="rounded px-3.5 py-2 justify-start {{ message()?.mediaUrl === null ? 'items-center' : 'flex-col'}} gap-3 inline-flex"
         >
           <h5 class="text-sm font-normal leading-snug">
             {{ message()?.text }}
           </h5>
+
+          <!-- Imagen si existe -->
+          <img
+            *ngIf="message()?.mediaUrl"
+            [src]="message()?.mediaUrl"
+            alt="Imagen del mensaje"
+            class="max-w-[300px] rounded mt-2 border border-gray-300 dark:border-gray-600 shadow"
+          />
         </div>
         <div class="justify-end items-center inline-flex mb-2.5">
           <h6 class="text-gray-500 text-xs font-normal leading-4 py-1">
