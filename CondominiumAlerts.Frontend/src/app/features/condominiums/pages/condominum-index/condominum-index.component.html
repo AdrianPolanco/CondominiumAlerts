@@ -1,4 +1,22 @@
 <shared-condominiums-layout>
+  <!-- Contenedor principal flex -->
+  <div class="flex h-full">
+    <!-- Barra lateral (NUEVO) -->
+    <div class="w-64 bg-gray-800 p-4 hidden md:block overflow-y-auto border-r border-gray-700">
+      <h3 class="text-lg font-semibold text-white mb-4 flex items-center">
+        <i class="pi pi-users mr-2"></i>
+        Miembros
+      </h3>
+      <div class="space-y-3">
+        <div *ngFor="let user of users" class="flex items-center gap-3 p-2 hover:bg-gray-700 rounded-lg">
+          <img [src]="user.profilePictureUrl || 'assets/default-user.png'" class="w-10 h-10 rounded-full border-2 border-gray-600">
+          <div>
+            <p class="text-white font-medium">{{ user.fullName }}</p>
+            <p class="text-gray-400 text-xs">{{ user.email }}</p>
+          </div>
+        </div>  
+      </div>
+    </div>
   <div class="flex-1 bg-gray-900 p-5">
     <div class="flex justify-between mb-6">
       <shared-back-arrow url="/condominiums" />
@@ -154,6 +172,8 @@
       </div>
     </div>
   </div>
+  </div> <!-- Cierra flex-1 -->
+  
 
   <!-- Modal para crear/editar posts -->
   <div class="modal" *ngIf="showPostModal">

@@ -28,6 +28,7 @@ import { MessageService } from 'primeng/api';
 import { Toast } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
+import { map } from 'rxjs/operators';
 @Component({
   selector: 'app-condominium-index',
   standalone: true,
@@ -344,12 +345,13 @@ destroy$ = new Subject<void>;
     if (!this.condominiumId) return;
 
     this.userService.getCondominiumsUsers({ condominiumId: this.condominiumId }).subscribe({
-      next: (result) => {
-        this.users = result;
+      next: (users) => {
+        this.users = users
+ 
       },
       error: (err) => {
-        console.log('Error al cargar usuarios:', err);
-      },
+        console.error('Error al cargar usuarios:', err);
+      }
     });
   }
 

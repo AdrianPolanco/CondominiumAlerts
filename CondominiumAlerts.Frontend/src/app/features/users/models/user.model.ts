@@ -9,10 +9,10 @@ export interface GetCondominiumsUsersCommand{
   }
   
   export interface GetCondominiumsUsersResponse{
-    id: string,
-    profilePictureUrl: string,
-    fullName: string,
-    email: string,
+    id: string;
+    fullName: string;    // Contendrá el nombre real (que viene de profilePictureUrl)
+    email: string;       // Contendrá el email (que viene de fullName)
+    profilePictureUrl: string;
   }
 
 
