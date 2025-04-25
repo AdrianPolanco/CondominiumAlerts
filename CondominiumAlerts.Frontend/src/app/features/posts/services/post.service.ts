@@ -87,6 +87,7 @@ export class PostService {
     return this.http.put<UpdatePostResponse>(`${this.apiUrl}/${postId}`, fb);
   }
 
+  //Delete post
   deletePost(command: DeletePostCommand): Observable<DeletePostResponse> {
     const url = `${this.apiUrl}/delete`;
     return this.http.delete<DeletePostResponse>(url, {

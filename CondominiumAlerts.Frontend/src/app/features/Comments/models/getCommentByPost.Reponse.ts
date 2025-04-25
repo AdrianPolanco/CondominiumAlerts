@@ -4,7 +4,7 @@ export interface getCommentByPostResponse
   text: string;
   imageUrl?: string;
   postid: string;
-  userid: string;
+  userId: string;
   userProfilePicture: string;
   username: string;
   createdAt: string;

@@ -48,12 +48,22 @@
   }
 }
 
-.form-group input, .form-group textarea {
+.form-group input,
+.form-group textarea {
   transition: all 0.3s ease;
 }
 
-  .form-group input:focus, .form-group textarea:focus {
-    outline: none;
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
-  }
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+}
 
+.aside-users {
+  height: calc(100vh - 74px);
+}
+
+.content {
+  max-height: calc(100vh - 74px);
+  overflow-y: scroll;
+}

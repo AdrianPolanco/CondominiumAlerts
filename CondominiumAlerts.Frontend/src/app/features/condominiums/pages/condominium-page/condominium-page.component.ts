@@ -41,7 +41,7 @@ export class CondominiumPageComponent {
   condominiumFormFields = signal<SharedFormField[]>([
     {
       name: 'name',
-      label: 'Name',
+      label: 'Nombre',
       type: 'text',
       validators: [Validators.required],
       errorMessages: {
@@ -50,7 +50,7 @@ export class CondominiumPageComponent {
     },
     {
       name: 'address',
-      label: 'Address',
+      label: 'Dirección',
       type: 'text',
       validators: [Validators.required],
       errorMessages: {

@@ -4,13 +4,16 @@ using LightResults;
 using MediatR;
 using CondominiumAlerts.Features.Features.Comment.Add;
 using CondominiumAlerts.Features.Features.Comment.GetCommentByPost;
+using CondominiumAlerts.Features.Features.Comment.Update;
+using CondominiumAlerts.Features.Features.Posts.Delete;
+using CondominiumAlerts.Features.Features.Comment.Delete;
 
 
 namespace CondominiumAlerts.Api.Endpoints
 {
     public class CommentModule : ICarterModule
     {
-
+        private const string mainPath = "/comment";
         public void AddRoutes(IEndpointRouteBuilder app)
         {
             app.MapGet("/comment", async (ISender sender, [FromQuery] Guid postId, CancellationToken cancellationToken) =>
@@ -45,6 +48,50 @@ namespace CondominiumAlerts.Api.Endpoints
                    return Results.Ok(response);
                }
             ).DisableAntiforgery();
+
+            //Actualizar comentario
+            app.MapPut("/comment/{id}",
+               async (ISender sender, Guid id, [FromForm] UpdateCommentCommand command, CancellationToken cancellationToken) =>
+               {
+                   command.Id = id;
+                   Result<UpdateCommentResponse> result = await sender.Send(command, cancellationToken);
+                   if (!result.IsSuccess) return Results.BadRequest(result);
+
+                   var response = new
+                   {
+                       result.IsSuccess,
+                       Data = result.Value
+                   };
+                   return Results.Ok(response);
+               }
+            ).DisableAntiforgery();
+
+            // Endpoint para eliminar un post
+            app.MapDelete(GetEndpointPattern("/delete"), async (ISender sender, [FromBody] DeleteCommentCommand request, CancellationToken cancellationToken) =>
+            {
+                Result<DeleteCommentResponse> result = await sender.Send(request, cancellationToken);
+
+                if (result.IsFailed)
+                {
+                    return Results.BadRequest(result);
+                }
+
+                var response = new
+                {
+                    IsSuccess = result.IsSuccess,
+                    Data = result.Value,
+                };
+
+                return Results.Ok(response);
+            });
         }
+
+        #region private Methods 
+        private string GetEndpointPattern(string name = "")
+        {
+            return mainPath + name;
+        }
+        #endregion
     }
 }
+
