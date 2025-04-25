@@ -32,7 +32,7 @@ import { MessageService } from 'primeng/api';
 import { Toast } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
-import { DeleteCommentCommand } from '../../../Comments/models/deletecomment.Command'
+import { DeleteCommentCommand } from '../../../Comments/models/deleteComment.Command'
 
 @Component({
   selector: 'app-condominium-index',
@@ -303,11 +303,23 @@ export class CondominumIndexComponent implements OnInit {
     if (!comment) return;
 
     if (comment.commentId) {
+      // Validación: debe tener texto o imagen
+      if (!comment.text.trim() && !comment.imageFile && !comment.currentImageUrl) {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'El comentario no puede estar vacio',
+          life: 3000
+        });
+        return;
+      }
+      const removeImage = !comment.imageFile && comment.currentImageUrl === '';
       // Editar comentario existente
       this.commentService
         .updateComment(comment.commentId, {
           text: comment.text,
           imageFile: comment.imageFile || undefined,
+          removeImage: removeImage
         })
         .subscribe(() => {
           this.loadComments(postId);
@@ -374,7 +386,6 @@ export class CondominumIndexComponent implements OnInit {
 
   isCurrentUserComment(commentUserId: string): boolean {
     const currentUserId = this.authService.currentUser?.uid;
-    console.log(currentUserId);
     return currentUserId === commentUserId;
   }
 
@@ -387,13 +398,13 @@ export class CondominumIndexComponent implements OnInit {
         this.publications = data;
 
         this.publications.forEach((publication) => {
-          this.showComments[publication.id] = false; // Inicialmente ocultos
+          this.showComments[publication.id] = false; 
           this.newComments[publication.id] = {
             text: '',
             imageFile: null,
             currentImageUrl: '',
           };
-          this.loadComments(publication.id); // Cargar comentarios en segundo plano
+          this.loadComments(publication.id); 
         });
       },
       error: (err) => {
@@ -523,12 +534,15 @@ export class CondominumIndexComponent implements OnInit {
     if (!this.condominiumId) return;
 
     if (this.editingPost) {
+
+      const removeImage = !this.postForm.imageFile && !!this.editingPost?.imageUrl; 
       // Edicion de post
       const updateData: UpdatePostCommand = {
         title: this.postForm.title,
         description: this.postForm.description,
         levelOfPriorityId: this.postForm.levelOfPriorityId,
         imageFile: this.postForm.imageFile || undefined,
+        removeImage: removeImage, 
       };
 
       this.postService.updatePost(this.editingPost.id, updateData).subscribe({
@@ -666,6 +680,25 @@ export class CondominumIndexComponent implements OnInit {
         });
       }
     });
+  }
+
+  removePostImage() {
+    this.postForm.currentImageUrl = '';
+    this.postForm.imageFile = null;
+  }
+
+  removeCommentImage(postId: string): void {
+    if (!this.newComments[postId]) return;
+
+    if (this.newComments[postId].currentImageUrl) {
+      URL.revokeObjectURL(this.newComments[postId].currentImageUrl);
+    }
+
+    this.newComments[postId] = {
+      ...this.newComments[postId],
+      currentImageUrl: '',
+      imageFile: null
+    }
   }
 
 }

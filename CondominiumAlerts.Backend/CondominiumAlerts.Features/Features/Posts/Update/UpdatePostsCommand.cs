@@ -11,5 +11,6 @@ namespace CondominiumAlerts.Features.Features.Posts.Update
         public string Description { get; set; }
         public IFormFile? ImageFile { get; set; }
         public Guid LevelOfPriorityId { get; set; }
+        public bool RemoveImage { get; set; }
     }
 }

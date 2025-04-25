@@ -56,7 +56,11 @@ namespace CondominiumAlerts.Features.Features.Posts.Update
             existingPost.UpdatedAt = DateTime.UtcNow;
 
             string imageUrl = existingPost.ImageUrl;
-            if (request.ImageFile != null && request.ImageFile.Length > 0)
+            if (request.RemoveImage)
+            {
+                existingPost.ImageUrl = null;
+            }
+            else if (request.ImageFile != null && request.ImageFile.Length > 0)
             {
                 var uploadResult = await _cloudinary.UploadAsync(new ImageUploadParams()
                 {

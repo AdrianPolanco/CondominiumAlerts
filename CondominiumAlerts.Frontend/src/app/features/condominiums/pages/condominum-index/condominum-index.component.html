@@ -204,15 +204,18 @@
                 <label class="block mb-1 text-gray-100 font-semibold"
                   >Imagen</label
                 >
-                <div
-                  *ngIf="newComments[publication.id].currentImageUrl"
-                  class="mb-2"
-                >
-                  <img
-                    [src]="newComments[publication.id].currentImageUrl"
-                    alt="Vista previa"
-                    class="rounded-md max-h-64 object-contain"
-                  />
+                <div *ngIf="newComments[publication.id].currentImageUrl" class="mb-2 flex items-center">
+                  <div class="mr-2">
+                    <img [src]="newComments[publication.id].currentImageUrl"
+                         alt="Vista previa"
+                         class="rounded-md max-h-32 object-cover" />
+                  </div>
+
+                  <button type="button"
+                          class="text-red-500 hover:text-red-700 focus:outline-none"
+                          (click)="removeCommentImage(publication.id)">
+                    <i class="pi pi-trash text-lg"></i>
+                  </button>
                 </div>
 
                 <div class="flex items-center space-x-2 mt-2">
@@ -312,30 +315,28 @@
 
         <div class="form-group">
           <label class="block mb-1 text-sm font-semibold">Imagen</label>
-          <div *ngIf="postForm.currentImageUrl" class="mb-2">
-            <img
-              [src]="postForm.currentImageUrl"
-              alt="Vista previa"
-              class="rounded-md max-h-64 object-contain"
-            />
+          <div *ngIf="postForm.currentImageUrl" class="relative mb-2 flex justify-center items-center">
+            <img [src]="postForm.currentImageUrl"
+                 alt="Vista previa"
+                 class="rounded-md max-h-64 object-contain" />
+
+            <button type="button"
+                    class="absolute top-2 right-2 text-primary-500 focus:outline-none"
+                    (click)="removePostImage()">
+              <i class="pi pi-trash text-primary-500 text-xl"></i>
+            </button>
           </div>
 
-          <label
-            class="flex items-center justify-center px-4 py-2 bg-white border border-gray-300 text-black rounded-md cursor-pointer hover:bg-gray-50 transition-colors"
-          >
+          <label class="flex items-center justify-center px-4 py-2 bg-white border border-gray-300 text-black rounded-md cursor-pointer hover:bg-gray-50 transition-colors">
             <span class="mr-1">+</span> Subir imagen
-            <input
-              type="file"
-              (change)="onFileSelected($event)"
-              accept="image/*"
-              class="hidden"
-            />
+            <input type="file"
+                   (change)="onFileSelected($event)"
+                   accept="image/*"
+                   class="hidden" />
           </label>
 
-          <small
-            *ngIf="editingPost && !postForm.imageFile"
-            class="text-xs text-gray-500"
-          >
+          <small *ngIf="editingPost && !postForm.imageFile"
+                 class="text-xs text-gray-500">
             Dejar en blanco para mantener la imagen actual
           </small>
         </div>
