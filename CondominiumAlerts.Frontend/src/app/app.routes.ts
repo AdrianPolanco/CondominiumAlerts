@@ -52,14 +52,6 @@ export const routes: Routes = [
     ],
   },
   {
-    path: 'condominium/create',
-    canActivate: [authGuard], // Add the authGuard here
-    loadComponent: () =>
-      import(
-        './features/condominiums/pages/condominium-page/condominium-page.component'
-      ).then((x) => x.CondominiumPageComponent),
-  },
-  {
   path: 'condominium/chat',
     loadComponent: () =>
       import(
