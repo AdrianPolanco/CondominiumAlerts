@@ -41,7 +41,6 @@ export class NotificationService implements OnDestroy {
             .pipe(takeUntil(this.destroy$))
             .subscribe(token => {
                 this.token = token;
-                console.log(this.token);
                 if (token) this.initSignalRConnection();
             });
     }
