@@ -32,7 +32,7 @@ import { MessageService } from 'primeng/api';
 import { Toast } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
-import { DeleteCommentCommand } from '../../../Comments/models/deletecomment.Command'
+import { DeleteCommentCommand } from '../../../Comments/models/deleteComment.Command';
 
 @Component({
   selector: 'app-condominium-index',
@@ -636,7 +636,7 @@ export class CondominumIndexComponent implements OnInit {
       acceptLabel: 'Sí',
       rejectLabel: 'No',
       accept: () => {
-        const command: DeleteCommentCommand = {
+          const command: DeleteCommentCommand = {
           id: commentId,
           postId: postId
         };

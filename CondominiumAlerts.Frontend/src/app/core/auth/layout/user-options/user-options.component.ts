@@ -15,11 +15,11 @@ import {interval, startWith, Subject, switchMap, takeUntil, tap} from 'rxjs';
 import {AutoUnsubscribe} from '../../../../shared/decorators/autounsuscribe.decorator';
 import {BadgeModule} from 'primeng/badge';
 import {Menu} from 'primeng/menu';
-import { MenuItem } from 'primeng/api';
-import { User } from '../auth-layout/user.type';
-import { EventService } from '../../../../features/events/services/event.service';
-import { CondominiumEvent } from '../../../../features/events/event.type';
-import {differenceInMinutes} from "date-fns"
+import {MenuItem} from 'primeng/api';
+import {User} from '../auth-layout/user.type';
+import {EventService} from '../../../../features/events/services/event.service';
+import {CondominiumEvent} from '../../../../features/events/event.type';
+import {differenceInMinutes} from "date-fns";
 import {CondominiumNotification} from '../../../../features/events/types/condominiumNotification.type';
 import {NotificationService} from '../../../../features/notifications/notification.service';
 import {TimeAgoPipe} from '../../../../shared/pipes/time-ago.pipe';
@@ -56,7 +56,6 @@ export class UserOptionsComponent {
             this.showForm();
           }
         },
-
         {
           label: "Mis condominios",
           icon: 'pi pi-home',
@@ -75,8 +74,9 @@ export class UserOptionsComponent {
       ]
     }
   ]
+  
   events: CondominiumEvent[] = [];
-  upcomingEvents: CondominiumEvent[] = []
+  upcomingEvents: CondominiumEvent[] = [];
   // Almacena los IDs de eventos a los que ya te has unido
   private joinedEventIds = new Set<string>();
 
@@ -101,8 +101,7 @@ export class UserOptionsComponent {
     interval(30000)
       .pipe(
         startWith(0), // Ejecuta inmediatamente al cargar el componente
-        takeUntil(this.destroy$)
-      )
+          takeUntil(this.destroy$))
       .subscribe(() => {
         this.refreshEventsAndJoinGroups();
       });
@@ -132,9 +131,11 @@ export class UserOptionsComponent {
   showNotifications = false;
   userProfileFormFields = signal<SharedFormField[]>([]);
   notifications: CondominiumNotification[] = [];
+  
   get unreadNotifications(): CondominiumNotification[] {
     return this.notifications.filter(n => !n.read);
   }
+  
   get unreadNotificationsCount(): number {
     return this.unreadNotifications.length;
   }
@@ -162,7 +163,6 @@ export class UserOptionsComponent {
     console.log('VALUE', value)
     this.authenticationService.editProfile(value, this.token).subscribe({
       next(response) {
-
         const status = response.isSuccess ? "success" : "error";
         console.log('RESPONSE SUCCESS', response)
         const message = "Perfil editado correctamente.";
