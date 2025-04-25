@@ -190,6 +190,11 @@ export class UserOptionsComponent {
     });
   }
 
+  isGoogleUser(): boolean {
+    console.log("URL DE LA IMAGEN", this.userData?.profilePictureUrl)
+    return this.userData?.profilePictureUrl?.includes('googleusercontent.com') ?? false;
+  }
+
   showNotificationsDialog(): void {
     this.showNotifications = true;
 
@@ -303,24 +308,29 @@ export class UserOptionsComponent {
           maxLength: 'El código postal no puede tener más de 6 caracteres.',
           pattern: 'El código postal debe ser un número.'
         }
-      },
-      {
-        name: 'profilePic',
-        label: 'Subir imagen',
-        type: 'file',
-        validators: [],
-        filetype: 'image/*',
-        onFileSelect: (event: any) => {
-          if (event.files.length > 0) {
-            const file = event.files[0];
-            this.formGroup().patchValue({
-              profilePic: file,
-            });
-            if(file) this.imageUrl.set(URL.createObjectURL(file));
-          }
-        }
       }
     ])
+
+    const isCurrentUserFromGoogle = this.isGoogleUser()
+
+    const photoFormField: SharedFormField = {
+      name: 'profilePic',
+      label: 'Subir imagen',
+      type: 'file',
+      validators: [],
+      filetype: 'image/*',
+      onFileSelect: (event: any) => {
+        if (event.files.length > 0) {
+          const file = event.files[0];
+          this.formGroup().patchValue({
+            profilePic: file,
+          });
+          if(file) this.imageUrl.set(URL.createObjectURL(file));
+        }
+      }
+    }
+
+    if(!isCurrentUserFromGoogle) this.userProfileFormFields.set([...this.userProfileFormFields(), photoFormField])
 
     this.profileFormSettings.set({
       ...this.profileFormSettings(),

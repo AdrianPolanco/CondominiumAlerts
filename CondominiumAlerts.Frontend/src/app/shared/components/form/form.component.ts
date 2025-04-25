@@ -119,7 +119,6 @@ export class FormComponent implements OnInit{
     this.formSettings.set(updatedSettings);
   }
 
-
   getErrorMessages(field: SharedFormField): string[] {
     const control = this.form().get(field.name);
     const messages: string[] = [];
