@@ -111,8 +111,8 @@ public class CreatePostHandler : ICommandHandler<CreatePostCommand, Result<Creat
             await _notificationService.Notify(new Notification
             {
                 Id = Guid.NewGuid(),
-                Title = "Nuevo Post creado",
-                Description = $"Nuevo post: {posts.Title}",
+                Title = "Nueva publicacion creado",
+                Description = $"Nueva publicacion: {posts.Title}",
                 CondominiumId = posts.CondominiumId,
                 LevelOfPriorityId = posts.LevelOfPriorityId,
                 CreatedAt = DateTime.UtcNow,
