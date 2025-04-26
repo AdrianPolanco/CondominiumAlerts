@@ -144,8 +144,7 @@ export class RegisterUserPageComponent {
     try{
       await this.userService.signUpWithGoogle();
     }catch (e) {
-       (e)
-    }
+       console.error(e);
   }
 
   async logOut() {
