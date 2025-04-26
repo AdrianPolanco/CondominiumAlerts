@@ -75,7 +75,7 @@ export class SingInComponent {
         email,
         password
       );
-  
+
       if (result.user) {
         // Confirmar que el usuario está verificado
         const user = result.user;
@@ -104,7 +104,6 @@ export class SingInComponent {
   async loginWithGoogle() {
     try {
       const user = await this.authenticationService.signUpWithGoogle();
-      console.log('Usuario logueado:', user);
       if (user) {
         this.router.navigateByUrl('/condominiums');
         return;

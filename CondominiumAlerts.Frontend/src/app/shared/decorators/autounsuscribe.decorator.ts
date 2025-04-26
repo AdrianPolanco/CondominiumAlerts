@@ -3,7 +3,7 @@ export function AutoUnsubscribe() {
     const original = constructor.prototype.ngOnDestroy;
 
     constructor.prototype.ngOnDestroy = function () {
-      console.log("AutoUnsubscribe");
+       ("AutoUnsubscribe");
       if (this.destroy$) {
         this.destroy$.next();
         this.destroy$.complete();

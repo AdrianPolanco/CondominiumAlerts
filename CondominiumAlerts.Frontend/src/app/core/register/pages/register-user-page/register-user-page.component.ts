@@ -120,7 +120,6 @@ export class RegisterUserPageComponent {
 
   onSubmit(value: any) {
     const request: RegisterUserRequest = this.userService.convertToRegisterUserRequest(value);
-    console.log("Request: ", request);
     const formComponent = this.formComponent();
     this.userService.registerUser(request).subscribe({
       next(response) {
@@ -133,9 +132,8 @@ export class RegisterUserPageComponent {
       },
       error(err) {
         const status = "error";
-        console.log(err)
+         (err)
         const message = err.error.Errors[0].Message;
-        console.log("Message: ", message);
         const feedback: Feedback = { status, message };
         formComponent?.resetForm(feedback);
       }
@@ -146,7 +144,7 @@ export class RegisterUserPageComponent {
     try{
       await this.userService.signUpWithGoogle();
     }catch (e) {
-      console.log(e)
+       (e)
     }
   }
 
@@ -154,7 +152,7 @@ export class RegisterUserPageComponent {
     try {
       await this.userService.logOut();
     } catch (e) {
-      console.log(e);
+       (e);
     }
   }
 }

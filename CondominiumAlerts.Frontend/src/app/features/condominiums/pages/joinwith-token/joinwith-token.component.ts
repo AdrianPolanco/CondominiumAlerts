@@ -33,8 +33,8 @@ export class JoinwithTokenComponent {
       this.authenticationService.userData$.pipe(takeUntil(this.destroy$)).subscribe((userData) => {
       if(userData?.data) {
           this.user = userData?.data
-            // console.log(userData)
-            // console.log(this.user)
+            //  (userData)
+            //  (this.user)
 
             this.condominiumService.join({
             userId: this.user?.id  === undefined ? "" : this.user.id,

@@ -5,7 +5,7 @@ import {
   GetCondominiumsUsersResponse,
 } from '../models/user.model';
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators'; 
+import { map } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
@@ -31,7 +31,6 @@ export class UserService {
       { params: { condominiumId: cmd.condominiumId } }
     ).pipe(
       map(response => {
-        console.log('Respuesta completa de usuarios:', response);
         return response.data || [];
       })
     );

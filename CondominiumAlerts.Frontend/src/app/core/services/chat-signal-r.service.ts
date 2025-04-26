@@ -38,7 +38,7 @@ export class ChatSignalRService {
       }
     } catch (error) {
       this.onHubConnected.next(false);
-      console.log(error);
+       (error);
     }
   }
 
@@ -74,7 +74,7 @@ export class ChatSignalRService {
         media
       );
     } catch (error) {
-      console.log(error);
+       (error);
     }
   }
 

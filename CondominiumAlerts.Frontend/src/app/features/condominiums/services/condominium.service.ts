@@ -21,8 +21,8 @@ import { getCondominiumTokenResponse } from '../models/getCondominiumToken.respo
 })
 export class CondominiumService implements OnDestroy{
 
-  constructor(private httpClient: HttpClient, 
-    private authenticationService: AuthenticationService) { 
+  constructor(private httpClient: HttpClient,
+    private authenticationService: AuthenticationService) {
       this.authenticationService.userToken$.pipe(takeUntil(this.destroy$)).subscribe((token) => {
         this.token = token;
       })
@@ -42,12 +42,6 @@ export class CondominiumService implements OnDestroy{
         fb.append('address', cmd.address);
         fb.append('imageFile',cmd.imageFile);
         fb.append('userId',cmd.userId);
-        console.log("data", {
-            name: fb.get('name'),
-            address: fb.get('address'),
-            imageFile: fb.get('imageFile'),
-            userId: fb.get('userId'),
-        })
         return this.httpClient.post<AddCondominiumResponse>(
             "/api/condominium",
             fb,
@@ -69,16 +63,16 @@ export class CondominiumService implements OnDestroy{
     }
 
     get(cmd: GetCondominiumCommand): Observable<GetCondominiumResponse>{
-      
+
       return this.httpClient.get<GetCondominiumResponse>(
         "/api/condominium/GetById", {params: {condominiumId: cmd.condominiumId}})
     }
- 
+
     getCondominiumsJoinedByUser(cmd: GetCondominiumsJoinedByUserCommand): Observable<{
           isSuccess:boolean,
           data: GetCondominiumsJoinedByUserResponse[]
         }>{
-      
+
       return this.httpClient.get<{
             isSuccess:boolean,
             data: GetCondominiumsJoinedByUserResponse[]

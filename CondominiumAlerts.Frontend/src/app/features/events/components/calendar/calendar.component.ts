@@ -105,9 +105,6 @@ export class CalendarComponent implements  OnInit, OnDestroy {
           end: formattedEnd,
         });
 
-        console.log("START DATE ONDATECLICK", formattedStart);
-        console.log("END DATE ONDATECLICK", formattedEnd);
-
         this.form.enable();
         this.isEditable = true;
         this.visible = true;
@@ -243,7 +240,6 @@ export class CalendarComponent implements  OnInit, OnDestroy {
 
   ngOnInit() {
     if(this.condominium?.id) this.eventService.get(this.condominium?.id).subscribe((res) => {
-      console.log("EVENTS", res)
       this.events = [...res.data];
       this.isLoading = false;
     });
@@ -257,7 +253,6 @@ export class CalendarComponent implements  OnInit, OnDestroy {
     this.eventService.addSubscription(eventId, this.condominium?.id!).pipe(takeUntil(this.destroy$)).subscribe(
       {
         next: res => {
-          console.log("EVENT SUBSCRIPTION", res);
           this.messageService.add({
             text: `Te has suscrito al evento ${event?.title}`,
             severity: 'success',
@@ -285,7 +280,6 @@ export class CalendarComponent implements  OnInit, OnDestroy {
     this.eventService.removeSubscription(eventId, this.condominium?.id!).pipe(takeUntil(this.destroy$)).subscribe(
       {
         next: res => {
-          console.log("EVENT UNSUBSCRIPTION", res);
           this.messageService.add({
             text: `Has cancelado la subscripción al evento ${event?.title}`,
             severity: 'success',
@@ -358,8 +352,6 @@ export class CalendarComponent implements  OnInit, OnDestroy {
     this.selectedEvent = selectedEvent;
     this.visible = true;
 
-    console.log("SELECTED EVENT", selectedEvent);
-
     // Asegúrate de que las fechas son objetos Date
     const startDate = selectedEvent.start ? new Date(selectedEvent.start) : null;
     const endDate = selectedEvent.end ? new Date(selectedEvent.end) : null;
@@ -410,7 +402,6 @@ export class CalendarComponent implements  OnInit, OnDestroy {
 
   saveEvent(){
     const formData = this.form.value;
-    console.log("FORM DATA", formData);
 
     if(this.modalMode === 'create') {
       const event: PartialEvent = {
