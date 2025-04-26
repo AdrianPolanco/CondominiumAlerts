@@ -370,7 +370,6 @@ export class CondominumIndexComponent implements OnInit {
   }
 
   goToCreatePosts(): void {
-     ('Creating a new post');
     if (this.condominiumId) {
       this.router.navigate([`/posts/create/${this.condominiumId}`]);
     }

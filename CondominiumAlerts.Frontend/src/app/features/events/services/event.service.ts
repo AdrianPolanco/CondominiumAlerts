@@ -67,7 +67,6 @@ export class EventService implements OnDestroy {
   joinEventGroup(eventId: string): void {
     if (!this.hubConnection) {
       this.initHubConnection().then(() => {
-         ('🔗 Conectado. Uniéndose al grupo...');
         this.testConnection()
         return this.invokeJoinGroup(eventId);
       })
@@ -129,7 +128,6 @@ export class EventService implements OnDestroy {
         .then(() => this.hubConnection?.stop())
         .then(() => {
           this.hubConnection = null;
-           ('🔌 Desconectado completamente del hub');
         })
         .catch(err => console.error('❌ Error al desconectarse del evento:', err));
     }

@@ -103,7 +103,6 @@ export class CondominiumPageComponent {
         this.router.navigate(['/condominium/index', response.data?.id]);
       },
       error: (err) => {
-         (err)
         formComponent?.resetForm({
           status: 'error',
           message: err.error?.message || 'Ha ocurrido un error mientras se creaba el condominio.',
