@@ -17,16 +17,16 @@ import { Subject, takeUntil } from 'rxjs';
     selector: 'app-condominium-page',
     templateUrl: './condominium-page.component.html',
     styleUrls: ['./condominium-page.component.css'],
-  imports: [FormComponent, ButtonDirective, ChatsDrawerComponent]
+  imports: [FormComponent, ButtonDirective]
 })
 export class CondominiumPageComponent {
 
     user: User|null = null
     destroy$ = new Subject<void>();
    constructor(private condominiumService: CondominiumService,
-     private router: Router,      
-      private authenticationService: AuthenticationService, 
-    ) { 
+     private router: Router,
+      private authenticationService: AuthenticationService,
+    ) {
       this.authenticationService.userData$.pipe(takeUntil(this.destroy$)).subscribe((userData) => {
         if(userData?.data) {
            this.user = userData?.data
@@ -69,7 +69,7 @@ export class CondominiumPageComponent {
           this.formGroup().patchValue({
             imageFile: file,
           });
-          console.log("Archivo seleccionado")
+           ("Archivo seleccionado")
         }
       }
     }
@@ -90,9 +90,8 @@ export class CondominiumPageComponent {
 
   onSubmit(value: AddCondominiumCommand) {
     const formComponent = this.formComponent();
-    console.log(this.user)
+     (this.user)
     value.userId = !this.user?.id ? "" : this.user.id
-    console.log(value)
     this.condominiumService.create(value).subscribe({
       next: (response) => {
         setTimeout( () =>{
@@ -104,7 +103,7 @@ export class CondominiumPageComponent {
         this.router.navigate(['/condominium/index', response.data?.id]);
       },
       error: (err) => {
-        console.log(err)
+         (err)
         formComponent?.resetForm({
           status: 'error',
           message: err.error?.message || 'Ha ocurrido un error mientras se creaba el condominio.',

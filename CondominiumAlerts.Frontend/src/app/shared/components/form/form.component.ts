@@ -68,8 +68,6 @@ export class FormComponent implements OnInit{
         });
       }
     });
-
-    console.log("FIELDS CREATED", this.fields());
   }
 
   isFileField(field: SharedFormField): field is SharedFormFieldFile {
@@ -122,9 +120,9 @@ export class FormComponent implements OnInit{
   getErrorMessages(field: SharedFormField): string[] {
     const control = this.form().get(field.name);
     const messages: string[] = [];
-  
+
     if (!control) return messages;
-  
+
     // Errores del control individual
     if (control.errors) {
       for (const error in control.errors) {
@@ -133,7 +131,7 @@ export class FormComponent implements OnInit{
         }
       }
     }
-  
+
     // Errores a nivel de formulario
     const formErrors = this.form().errors;
     if (formErrors) {
@@ -143,12 +141,12 @@ export class FormComponent implements OnInit{
         }
       }
     }
-  
+
     if (messages.length === 0) {
       messages.push('Error desconocido');
     }
-  
+
     return messages;
   }
-  
+
 }

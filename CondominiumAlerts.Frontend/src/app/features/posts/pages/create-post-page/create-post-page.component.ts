@@ -73,7 +73,6 @@ export class PostPageComponent implements OnInit {
 
   ngOnInit(): void {
     this.condominiumId = this.route.snapshot.paramMap.get('condominiumId');
-    console.log('Condominium ID:', this.condominiumId);
 
     if (!this.condominiumId) {
       console.error('No se encontró el condominiumId en la URL');
@@ -98,7 +97,6 @@ export class PostPageComponent implements OnInit {
     if (this.condominiumId) {
       this.postService.createPost(formData, this.condominiumId).subscribe({
         next: (response) => {
-          console.log('Post creado satisfactoriamente', response);
           this.router.navigate(['/condominium/index', this.condominiumId]);
         },
         error: (err) => {

@@ -30,7 +30,6 @@ export class PostService {
 
     return this.http.get<any>(this.apiUrl, { params }).pipe(
       map(response => {
-        console.log('Respuesta completa del backend:', response);
         return response.data;
       })
     );
@@ -75,7 +74,7 @@ export class PostService {
     if (cmd.imageFile) {
       fb.append('imageFile', cmd.imageFile);
     }
-    fb.append('removeImage', String(cmd.removeImage)); 
+    fb.append('removeImage', String(cmd.removeImage));
 
     return this.http.put<UpdatePostResponse>(`${this.apiUrl}/${postId}`, fb);
   }

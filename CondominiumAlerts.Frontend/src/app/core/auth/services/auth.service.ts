@@ -14,7 +14,7 @@ export class AuthService {
   constructor(private auth: Auth, private router: Router) {
     this.auth.onAuthStateChanged((user) => {
       if (user) {
-        console.log(user)
+         (user)
         this.uidSubject.next(user.uid);
         this.currentUser = {
           uid: user.uid,

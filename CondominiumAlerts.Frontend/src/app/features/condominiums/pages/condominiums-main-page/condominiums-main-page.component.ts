@@ -47,7 +47,7 @@ export class CondominiumsMainPageComponent implements OnDestroy{
     private router: Router,
     private authenticationService: AuthenticationService
   ) {
-    // console.log(this.authService.currentUser?.uid)
+    //  (this.authService.currentUser?.uid)
     this.form = this.fb.group({
       condominiumCode: ['', Validators.required],
       condominiumToken: [''],
@@ -65,23 +65,23 @@ export class CondominiumsMainPageComponent implements OnDestroy{
   condominiums: Array<GetCondominiumsJoinedByUserResponse> = [];
 
   joinCondominium() {
-    console.log('Joining a condominium...');
-    //  console.log(this.authService.currentUser?.uid);
+     ('Joining a condominium...');
+    //   (this.authService.currentUser?.uid);
     this.form.patchValue({
       userId: this.user?.id,
     });
 
     if (this.form.invalid) {
-      console.log('Form is invalid.');
+       ('Form is invalid.');
       this.errorText = "Favor introducir un codigo"
       return;
     }
     const formData = this.form.value;
-    //    console.log(formData);
+    //     (formData);
 
     this.condominiumService.join(formData).subscribe({
       next: (result) => {
-        // console.log('Joined successfully:', result);
+        //  ('Joined successfully:', result);
          this.isModalOpen = false;
          this.loadUserCondominiums()
       },
@@ -112,7 +112,7 @@ export class CondominiumsMainPageComponent implements OnDestroy{
     this.router.navigate(['']);
   }
   viewCondominium(condominium: GetCondominiumsJoinedByUserResponse) {
-    console.log(`Viewing condominium ID: ${condominium.id}`);
+     (`Viewing condominium ID: ${condominium.id}`);
     this.setCurrentCondominium(condominium)
     this.router.navigate(['/condominium/index', condominium.id]);
   }
@@ -133,7 +133,7 @@ export class CondominiumsMainPageComponent implements OnDestroy{
           this.condominiums = result.data;
         },
         error: (err) => {
-          console.log(err);
+           (err);
         },
       });
   }

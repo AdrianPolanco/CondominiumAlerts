@@ -119,9 +119,6 @@ export class NotificationService implements OnDestroy {
                 Authorization: `Bearer ${this.token}`
             }
         }).pipe(
-            tap((response) => {
-                console.log("NOTIFICATION RESPONSE", response)
-            }),
             catchError((error) => {
                 console.error('Error fetching notifications:', error);
                 return of<{ isSuccess: boolean, data: { notifications: CondominiumNotification[] } }>({ isSuccess: false, data: { notifications: [] } });

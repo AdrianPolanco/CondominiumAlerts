@@ -81,7 +81,7 @@ export class AuthenticationService implements OnDestroy {
         profilePictureUrl
       };
 
-      console.log(registerUserRequest);
+       (registerUserRequest);
       const token = await user.getIdToken();
       this.httpClient.post<RegisterUserResponse>(
         `/api/users/register/google/${user.uid}`,
@@ -93,7 +93,7 @@ export class AuthenticationService implements OnDestroy {
         }
       ).subscribe({
         next: (response) => {
-          console.log(response);
+           (response);
           this.router.navigate(['/condominiums']);
         },
         error: (error) => {
@@ -133,8 +133,6 @@ export class AuthenticationService implements OnDestroy {
           }
         })
       );
-
-      console.log("User data:", userData);
 
       this.userDataSubject.next(userData);
     } catch (error) {
@@ -183,7 +181,7 @@ export class AuthenticationService implements OnDestroy {
 
   editProfile(data: any, token: string | null) {
     const formData = this.convertToProfileRequest(data);
-    console.log({profile: formData, token})
+     ({profile: formData, token})
     if(!token) throw new Error("No hay token de usuario");
     return this.httpClient.put<EditProfileResponse>('/api/users/edit', formData, {
       headers: {

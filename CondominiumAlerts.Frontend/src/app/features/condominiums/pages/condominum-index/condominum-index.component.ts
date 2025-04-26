@@ -137,7 +137,6 @@ export class CondominumIndexComponent implements OnInit {
 
   ngOnInit(): void {
     this.condominiumId = this.route.snapshot.paramMap.get('condominiumId');
-    console.log('Condominium ID:', this.condominiumId);
 
     if (!this.condominiumId) {
       console.error('No se encontró el condominiumId en la URL');
@@ -160,9 +159,9 @@ export class CondominumIndexComponent implements OnInit {
       this.currentToken.token &&
       new Date(this.currentToken?.expirDate) > new Date()
     ) {
-      // console.log("not server response")
+      //  ("not server response")
       url += encodeURIComponent(this.currentToken.token);
-      //   console.log(url)
+      //    (url)
       this.copyToClipBoard(url);
 
       return;
@@ -177,8 +176,8 @@ export class CondominumIndexComponent implements OnInit {
         next: (result) => {
           this.currentToken = result.data;
           url += encodeURIComponent(this.currentToken.token);
-          //  console.log(this.currentToken)
-          //    console.log(url)
+          //   (this.currentToken)
+          //     (url)
           this.copyToClipBoard(url);
         },
         error: (err) => {
@@ -207,7 +206,6 @@ export class CondominumIndexComponent implements OnInit {
 
   toggleComments(postId: string): void {
     this.showComments[postId] = !this.showComments[postId];
-    console.log('Toggle comments para post:', postId);
     if (this.showComments[postId] && !this.comments[postId]) {
       this.loadComments(postId);
     }
@@ -229,7 +227,6 @@ export class CondominumIndexComponent implements OnInit {
       next: (comments) => {
         this.comments[postId] = comments?.data || [];
         this.initializeNewComments(postId);
-        console.log('Comentarios cargados:', this.comments[postId]);
       },
       error: (err) => {
         console.error('Error al cargar comentarios:', err);
@@ -373,7 +370,7 @@ export class CondominumIndexComponent implements OnInit {
   }
 
   goToCreatePosts(): void {
-    console.log('Creating a new post');
+     ('Creating a new post');
     if (this.condominiumId) {
       this.router.navigate([`/posts/create/${this.condominiumId}`]);
     }
@@ -394,17 +391,16 @@ export class CondominumIndexComponent implements OnInit {
 
     this.postService.getPosts(this.condominiumId).subscribe({
       next: (data) => {
-        console.log('Publicaciones recibidas:', data);
         this.publications = data;
 
         this.publications.forEach((publication) => {
-          this.showComments[publication.id] = false; 
+          this.showComments[publication.id] = false;
           this.newComments[publication.id] = {
             text: '',
             imageFile: null,
             currentImageUrl: '',
           };
-          this.loadComments(publication.id); 
+          this.loadComments(publication.id);
         });
       },
       error: (err) => {
@@ -421,7 +417,7 @@ export class CondominumIndexComponent implements OnInit {
       .subscribe({
         next: (users) => {
           this.users = users;
-          console.log(users);
+           (users);
         },
         error: (err) => {
           console.error('Error al cargar usuarios:', err);
@@ -437,7 +433,6 @@ export class CondominumIndexComponent implements OnInit {
       .subscribe({
         next: (result) => {
           this.condominium = result;
-          console.log('Datos del condominio:', this.condominium);
         },
         error: (err) => {
           console.error('Error al cargar datos del condominio:', err);
@@ -535,14 +530,14 @@ export class CondominumIndexComponent implements OnInit {
 
     if (this.editingPost) {
 
-      const removeImage = !this.postForm.imageFile && !!this.editingPost?.imageUrl; 
+      const removeImage = !this.postForm.imageFile && !!this.editingPost?.imageUrl;
       // Edicion de post
       const updateData: UpdatePostCommand = {
         title: this.postForm.title,
         description: this.postForm.description,
         levelOfPriorityId: this.postForm.levelOfPriorityId,
         imageFile: this.postForm.imageFile || undefined,
-        removeImage: removeImage, 
+        removeImage: removeImage,
       };
 
       this.postService.updatePost(this.editingPost.id, updateData).subscribe({
@@ -663,7 +658,7 @@ export class CondominumIndexComponent implements OnInit {
 
             this.messageService.add({
               severity: 'success',
-              summary: 'Comentario Eliminado',  
+              summary: 'Comentario Eliminado',
               detail: 'El comentario ha sido eliminado exitosamente.',
               life: 3000
             });

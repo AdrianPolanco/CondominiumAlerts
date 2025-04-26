@@ -117,7 +117,6 @@ export class EditPostPageComponent implements OnInit {
 
     this.postService.updatePost(this.postId, formData).subscribe({
       next: (response) => {
-        console.log('Post actualizado satisfactoriamente', response);
         this.router.navigate(['/condominium/index', this.condominiumId]);
       },
       error: (err) => {

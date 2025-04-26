@@ -81,7 +81,7 @@ export class CondominiumsLayoutComponent implements OnInit {
   }
 
   onCondominiumSelected(condominium: Pick<Condominium, 'id' | 'name' | 'imageUrl'| 'address'> | null): void {
-    console.log("ACTUALIZANDO CHAT OPTIONS")
+     ("ACTUALIZANDO CHAT OPTIONS")
     this.currentCondominium = condominium;
   }
 

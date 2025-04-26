@@ -29,11 +29,9 @@ export class EventService implements OnDestroy {
 
   constructor(private readonly httpClient: HttpClient, private readonly authenticationService: AuthenticationService) {
     this.authenticationService.userData$.pipe(takeUntil(this.destroy$)).subscribe(user => {
-      console.log("USER FROM EVENT SERVICE", user)
       if (user?.data) this.user = user?.data!
     });
     this.authenticationService.userToken$.pipe(takeUntil(this.destroy$)).subscribe(token => {
-      console.log("TOKEN FROM EVENT SERVICE", token)
       this.token = token;
     });
   }
@@ -58,7 +56,6 @@ export class EventService implements OnDestroy {
       .then(() => {
         this.isConnecting = false
         this.registerHandlers()
-        console.log('✅ Conectado al hub de eventos')
       })
       .catch(err => {
         console.error('❌ Error al conectar al hub:', err)
@@ -70,7 +67,7 @@ export class EventService implements OnDestroy {
   joinEventGroup(eventId: string): void {
     if (!this.hubConnection) {
       this.initHubConnection().then(() => {
-        console.log('🔗 Conectado. Uniéndose al grupo...');
+         ('🔗 Conectado. Uniéndose al grupo...');
         this.testConnection()
         return this.invokeJoinGroup(eventId);
       })
@@ -83,7 +80,7 @@ export class EventService implements OnDestroy {
   testConnection(): void {
     if (this.hubConnection && this.hubConnection.state === 'Connected') {
       this.hubConnection.invoke('Echo', 'Test message')
-        .then((response) => console.log('✅ Eco recibido:', response))
+        .then((response) => {})
         .catch(err => console.error('❌ Error en eco:', err));
     } else {
       console.error('❌ No hay conexión activa para probar');
@@ -92,30 +89,26 @@ export class EventService implements OnDestroy {
 
   private registerHandlers(){
     this.hubConnection?.on("EventStarted", (notification: CondominiumNotification) => {
-      console.log("Notificación: ", notification);
       const current = this.notificationBehaviorSubject.getValue();
-      console.log("Valor actual en notificationBehaviorSubject:", current, "tipo:", typeof current);
       this.notificationBehaviorSubject.next([...current, notification]);
 
       if (notification.condominiumId) {
         this.get(notification.condominiumId).subscribe({
-          next: () => console.log("✅ Eventos actualizados por EventStarted"),
+          next: () =>  ("✅ Eventos actualizados por EventStarted"),
           error: (err) => console.error("❌ Error actualizando eventos por EventStarted", err)
         });
       }
     });
 
     this.hubConnection?.on("EventFinished", (notification: CondominiumNotification) => {
-      console.log("Notificación: ", notification);
       const current = this.notificationBehaviorSubject.getValue();
-      console.log("Valor actual en notificationBehaviorSubject:", current, "tipo:", typeof current);
       this.notificationBehaviorSubject.next([...current, notification]);
     });
   }
 
   private invokeJoinGroup(eventId: string): void {
     this.hubConnection?.invoke('JoinGroup', eventId, this.user?.id)
-      .then(() => console.log(`🟢 Unido al grupo de evento ${eventId} a las ${new Date()}`))
+      .then(() =>  (`🟢 Unido al grupo de evento ${eventId} a las ${new Date()}`))
       .catch(err => console.error('❌ Error al unirse al grupo:', err));
   }
 
@@ -123,7 +116,7 @@ export class EventService implements OnDestroy {
   leaveEventGroup(eventId: string): void {
     if (this.hubConnection) {
       this.hubConnection.invoke('LeaveGroup', eventId, this.user?.id)
-        .then(() => console.log(`🟡 Saliste del grupo de evento ${eventId}`))
+        .then(() =>  (`🟡 Saliste del grupo de evento ${eventId}`))
         .catch(err => console.error('❌ Error al salir del grupo:', err));
     }
     this.disconnectFromEventHub(eventId);
@@ -136,7 +129,7 @@ export class EventService implements OnDestroy {
         .then(() => this.hubConnection?.stop())
         .then(() => {
           this.hubConnection = null;
-          console.log('🔌 Desconectado completamente del hub');
+           ('🔌 Desconectado completamente del hub');
         })
         .catch(err => console.error('❌ Error al desconectarse del evento:', err));
     }
@@ -145,7 +138,6 @@ export class EventService implements OnDestroy {
   private loadInitialNotifications(): void {
     this.notificationService.get().pipe(takeUntil(this.destroy$)).subscribe(response => {
       if (response.isSuccess) {
-        console.log("Notifications data received:", response.data)
         this.notificationBehaviorSubject.next(response.data.notifications);
       }
     });
@@ -153,7 +145,6 @@ export class EventService implements OnDestroy {
 
 
   get(condominiumId: string) {
-    console.log("USER FROM EVENT SERVICE", this.user)
     return this.httpClient.get<{ isSuccess: boolean, data: CondominiumEvent[] }>(`/api/events/${condominiumId}/user/${this.user?.id}`,
       {
         headers: {
@@ -201,7 +192,7 @@ export class EventService implements OnDestroy {
         if (res.isSuccess) {
           // Vuelve a obtener la lista de eventos actualizada desde el backend
           return this.get(condominiumId).pipe(
-            tap(() => console.log('Eventos actualizados tras creación')),
+            tap(() =>  ('Eventos actualizados tras creación')),
           );
         } else {
           return of({ isSuccess: false, data: [...this.eventsBehaviorSubject.getValue()] });
@@ -236,7 +227,7 @@ export class EventService implements OnDestroy {
         if (res.isSuccess) {
           // Vuelve a obtener la lista de eventos actualizada desde el backend
           return this.get(condominiumId).pipe(
-            tap(() => console.log('Eventos actualizados tras actualizacion')),
+            tap(() =>  ('Eventos actualizados tras actualizacion')),
           );
         } else {
           return of({ isSuccess: false, data: [...this.eventsBehaviorSubject.getValue()] });
@@ -257,10 +248,10 @@ export class EventService implements OnDestroy {
       }).pipe(
       switchMap(res => {
         if (res.isSuccess) {
-          console.log("CAYENDO EN EL EXITO")
+           ("CAYENDO EN EL EXITO")
           // Vuelve a obtener la lista de eventos actualizada desde el backend
           return this.get(condominiumId).pipe(
-            tap(() => console.log('Eventos actualizados tras eliminacion')),
+            tap(() =>  ('Eventos actualizados tras eliminacion')),
           );
         } else {
           return of({ isSuccess: false, data: [...this.eventsBehaviorSubject.getValue()] });
@@ -283,7 +274,7 @@ export class EventService implements OnDestroy {
           if (res.isSuccess) {
             // Vuelve a obtener la lista de eventos actualizada desde el backend
             return this.get(condominiumId).pipe(
-              tap(() => console.log('Eventos actualizados tras suscripción')),
+              tap(() =>  ('Eventos actualizados tras suscripción')),
             );
           } else {
             return of({ isSuccess: false, data: {events: []} });
@@ -303,7 +294,7 @@ export class EventService implements OnDestroy {
           if (res.isSuccess) {
             // Vuelve a obtener la lista de eventos actualizada desde el backend
             return this.get(condominiumId).pipe(
-              tap(() => console.log('Eventos actualizados tras desuscripción')),
+              tap(() =>  ('Eventos actualizados tras desuscripción')),
             );
           } else {
             return of({ isSuccess: false, data: {events: []} });

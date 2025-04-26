@@ -112,8 +112,6 @@ export class UserOptionsComponent {
             .pipe(takeUntil(this.destroy$)) // Se detiene cuando `destroy$` emite un valor en el @AutoUnsubscribe()
             .subscribe(userData => {
                 if (userData) this.userData = userData?.data;
-                console.log(this.userData)
-                console.log("TOKEN", this.token)
                 this.updateFormFields(); // <== Actualiza los valores del formulario
                 if (userData) this.formGroup().patchValue(this.mapUserDataToForm(userData.data));
             });
@@ -162,11 +160,9 @@ export class UserOptionsComponent {
         const formComponent = this.formComponent();
         const formGroup = this.formGroup();
         const visible = this.visible;
-        console.log('VALUE', value)
         this.authenticationService.editProfile(value, this.token).subscribe({
             next(response) {
                 const status = response.isSuccess ? "success" : "error";
-                console.log('RESPONSE SUCCESS', response)
                 const message = "Perfil editado correctamente.";
                 formGroup.reset(response.data)
 
@@ -183,9 +179,8 @@ export class UserOptionsComponent {
             },
             error(err) {
                 const status = "error";
-                console.log(err)
+                 (err)
                 const message = err.error.Errors[0].Message;
-                console.log("Message: ", message);
                 const feedback: Feedback = { status, message };
                 formComponent?.resetForm(feedback);
             }
@@ -193,7 +188,6 @@ export class UserOptionsComponent {
     }
 
     isGoogleUser(): boolean {
-        console.log("URL DE LA IMAGEN", this.userData?.profilePictureUrl)
         return this.userData?.profilePictureUrl?.includes('googleusercontent.com') ?? false;
     }
 
@@ -203,7 +197,6 @@ export class UserOptionsComponent {
         this.notificationService.get().subscribe({
             next: (res) => {
                 this.notifications = res.data.notifications;
-                console.log("NOTIFICACIONES", this.notifications)
             },
             error: (err) => {
                 console.error('Error al cargar notificaciones', err);
@@ -362,8 +355,6 @@ export class UserOptionsComponent {
                 const minutesUntilEnd = differenceInMinutes(new Date(event.end), new Date());
                 return (minutesUntilStart >= 0 && minutesUntilStart <= 15) || (minutesUntilEnd >= 0 && minutesUntilEnd <= 15);
             });
-
-            console.log("EVENTOS SUSCRITOS QUE EMPEZARAN PROXIMAMENTE: ", this.upcomingEvents)
 
             // Si el evento empezara en menos de 15 minutos, nos unimos a su grupo
             this.upcomingEvents.forEach(event => {
