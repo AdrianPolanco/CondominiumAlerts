@@ -81,7 +81,6 @@ export class AuthenticationService implements OnDestroy {
         profilePictureUrl
       };
 
-       (registerUserRequest);
       const token = await user.getIdToken();
       this.httpClient.post<RegisterUserResponse>(
         `/api/users/register/google/${user.uid}`,
