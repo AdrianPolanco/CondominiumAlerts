@@ -417,7 +417,6 @@ export class CondominumIndexComponent implements OnInit {
       .subscribe({
         next: (users) => {
           this.users = users;
-           (users);
         },
         error: (err) => {
           console.error('Error al cargar usuarios:', err);
