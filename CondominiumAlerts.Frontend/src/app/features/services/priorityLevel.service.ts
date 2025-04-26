@@ -33,7 +33,6 @@ export class PriorityLevelService {
   }
 
   postPriorityLevel(request: addPriorityLevelCommand): Observable<{ isSuccess: boolean,data:addPriorityLevelResponse}>{
- (request)
     return this.httpClient.post<{ isSuccess: boolean,data:addPriorityLevelResponse}>('/api/priorityLevels/add', request)
   }
 

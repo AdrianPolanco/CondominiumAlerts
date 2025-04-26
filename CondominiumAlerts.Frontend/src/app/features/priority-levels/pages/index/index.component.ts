@@ -69,7 +69,6 @@ export class IndexComponent {
             description: this.editingPriority.description!,
             condominiumId: this.editingPriority.condominiumId ?? '',
           };
-           (this.editingPriority);
         },
         error: (err) => console.error('Error fetching priority level', err),
       });

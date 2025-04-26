@@ -152,7 +152,7 @@ export class RegisterUserPageComponent {
     try {
       await this.userService.logOut();
     } catch (e) {
-       (e);
+      console.error(e);
     }
   }
 }

@@ -179,7 +179,6 @@ export class UserOptionsComponent {
             },
             error(err) {
                 const status = "error";
-                 (err)
                 const message = err.error.Errors[0].Message;
                 const feedback: Feedback = { status, message };
                 formComponent?.resetForm(feedback);

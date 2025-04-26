@@ -6,7 +6,7 @@ import {Auth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, idToken} 
 import {signOut} from 'firebase/auth';
 import {EditProfileResponse} from '../auth/layout/auth-layout/profile.type';
 import {Router} from '@angular/router';
-import {BehaviorSubject, delay, firstValueFrom, of, tap} from 'rxjs';
+import {BehaviorSubject, delay, firstValueFrom, tap} from 'rxjs';
 import {UserData} from '../auth/layout/auth-layout/user.type';
 
 
@@ -61,7 +61,7 @@ export class AuthenticationService implements OnDestroy {
       );
 
       if(doesUserExist.doesUserExist) {
-        this.router.navigate(['/condominiums']);
+        await this.router.navigate(['/condominiums']);
         return;
       }
 
@@ -93,7 +93,6 @@ export class AuthenticationService implements OnDestroy {
         }
       ).subscribe({
         next: (response) => {
-           (response);
           this.router.navigate(['/condominiums']);
         },
         error: (error) => {
