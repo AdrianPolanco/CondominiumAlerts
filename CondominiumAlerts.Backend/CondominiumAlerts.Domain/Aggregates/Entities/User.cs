@@ -15,6 +15,7 @@ public sealed class User : IAggregateRoot<string>
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
 
+    public IReadOnlyCollection<NotificationUser>? NotificationUsers { get; set; }
     public IReadOnlyCollection<Post>? Posts { get; set; }
     public IReadOnlyCollection<Comment>? Comments { get; set; }
     public IReadOnlyCollection<Message>? MessagesCreatedByUser { get; set; }

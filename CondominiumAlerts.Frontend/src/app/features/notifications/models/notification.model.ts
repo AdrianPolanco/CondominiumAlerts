@@ -3,7 +3,7 @@ export interface NotificationDto {
   title: string;
   description?: string;
   createdAt: Date;
-  levelOfPriority: LevelOfPriorityDto;
+  levelOfPriority?: LevelOfPriorityDto;
     condominiumId?: string;
 }
 

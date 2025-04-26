@@ -1,64 +1,137 @@
-import { Injectable } from '@angular/core';
-import {AuthenticationService} from '../../core/services/authentication.service';
-import {HttpClient} from '@angular/common/http';
-import {User} from '../../core/auth/layout/auth-layout/user.type';
-import {catchError, of, Subject, takeUntil, tap} from 'rxjs';
-import {AutoUnsubscribe} from '../../shared/decorators/autounsuscribe.decorator';
-import {CondominiumNotification} from '../events/types/condominiumNotification.type';
-import {CondominiumEvent} from '../events/event.type';
+import { Injectable, OnDestroy, OnInit } from '@angular/core';
+import { AuthenticationService } from '../../core/services/authentication.service';
+import { HttpClient } from '@angular/common/http';
+import { User } from '../../core/auth/layout/auth-layout/user.type';
+import { catchError, of, Subject, takeUntil, tap } from 'rxjs';
+import { AutoUnsubscribe } from '../../shared/decorators/autounsuscribe.decorator';
+import { CondominiumNotification } from '../events/types/condominiumNotification.type';
+import { CondominiumEvent } from '../events/event.type';
+import { CondominiumService } from '../condominiums/services/condominium.service';
+import { HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
+import { environment } from '../../../enviroments/environment';
 
 @AutoUnsubscribe()
 @Injectable({
-  providedIn: 'root'
+    providedIn: 'root'
 })
-export class NotificationService {
+export class NotificationService implements OnDestroy {
+    private readonly notificationReceived$ = new Subject<CondominiumNotification[]>();
+    public notifications$ = this.notificationReceived$.asObservable();
 
-  constructor(private readonly authenticationService: AuthenticationService, private readonly httpClient: HttpClient) {
-    this.authenticationService.userToken$.pipe(takeUntil(this.destroy$)).subscribe(token => {
-      console.log("TOKEN FROM NOTIFICATION SERVICE", token)
-      this.token = token;
-    });
+    private token: string | null = null;
+    private user: User | null = null;
+    private destroy$ = new Subject<void>();
+    private hubConnection?: signalR.HubConnection;
 
-    this.authenticationService.userData$.pipe(takeUntil(this.destroy$)).subscribe(user => {
-      console.log("USER FROM NOTIFICATION SERVICE", user)
-      if (user?.data) this.user = user?.data!
-    });
-  }
-  private token: string|null = null;
-  private user: User|null = null
-  private destroy$ = new Subject<void>();
+    constructor(
+        private readonly authenticationService: AuthenticationService,
+        private readonly httpClient: HttpClient,
+        private readonly condominiumService: CondominiumService,
+    ) {
+        this.authenticationService.userData$
+            .pipe(takeUntil(this.destroy$))
+            .subscribe(user => {
+                if (user?.data) {
+                    this.user = user.data;
+                    this.get().subscribe();
+                }
+            });
 
-  get(){
-    return this.httpClient.get<{ isSuccess: boolean, data: { notifications: CondominiumNotification[] }}>(`/api/notifications/user/${this.user?.id}`, {
-      headers: {
-        Authorization: `Bearer ${this.token}`
-      }
-    }).pipe(
-      tap((response) => {
-        console.log("NOTIFICATION RESPONSE", response)
-      }),
-      catchError((error) => {
-        console.error('Error fetching notifications:', error);
-        return of<{ isSuccess: boolean, data: { notifications: CondominiumNotification[] }}>({ isSuccess: false, data: { notifications:[]} });
-      })
-    )
-  }
+        this.authenticationService.userToken$
+            .pipe(takeUntil(this.destroy$))
+            .subscribe(token => {
+                this.token = token;
+                if (token) this.initSignalRConnection();
+            });
+    }
 
-  markAsRead(condominiumNotifications: CondominiumNotification[]){
-    const condominiumEventsIds = condominiumNotifications.map(event => event.id);
 
-    return this.httpClient.put<{ isSuccess: boolean, data: { notifications: CondominiumNotification[] }}>('/api/notifications/read', condominiumEventsIds, {
-      headers: {
-        Authorization: `Bearer ${this.token}`
-      }
-    }).pipe(
-      tap((response) => {
-        console.log("NOTIFICATION RESPONSE", response)
-      }),
-      catchError((error) => {
-        console.error('Error fetching notifications:', error);
-        return of<{ isSuccess: boolean, data: { notifications: CondominiumNotification[] }}>({ isSuccess: false, data: {notifications: []} });
-      })
-    )
-  }
+    private async initSignalRConnection() {
+        this.hubConnection = new HubConnectionBuilder()
+            .withUrl(environment.backBaseUrl + '/hubs/notification', {
+                accessTokenFactory: () => this.token || ''
+            })
+            .configureLogging(LogLevel.Information)
+            .withAutomaticReconnect()
+            .build()
+
+        this.hubConnection.on("ReceiveNotification", (notification: CondominiumNotification) => {
+            // Update local notifications
+            this.get().subscribe(); // Refresh notifications
+        });
+
+        await this.hubConnection.start()
+            .catch(err => console.error('Error establishing SignalR connection:', err));
+
+        this.authenticationService.userData$
+            .pipe(takeUntil(this.destroy$))
+            .subscribe(_ => {
+                if (this.hubConnection && this.user) {
+                    this.condominiumService.getCondominiumsJoinedByUser({
+                        userId: this.user.id
+                    }).pipe(
+                        takeUntil(this.destroy$)
+                    ).subscribe({
+                        next: value => {
+                            value.data.forEach(value => {
+                                this.joinNotificationGroup(
+                                    value.id
+                                );
+                            });
+                        }
+                    });
+
+                }
+            });
+
+    }
+
+    private joinNotificationGroup(condominiumId: string) {
+        if (this.hubConnection && this.user?.id) {
+            this.hubConnection.invoke('JoinGroup', condominiumId, this.user.id)
+                .catch(err => console.error('Error joining notification group:', err));
+        }
+    }
+
+    get() {
+        return this.httpClient.get<{ isSuccess: boolean, data: { notifications: CondominiumNotification[] } }>(`/api/notifications/user/${this.user?.id}`, {
+            headers: {
+                Authorization: `Bearer ${this.token}`
+            }
+        }).pipe(
+            tap(response => {
+                if (response.isSuccess) {
+                    this.notificationReceived$.next(response.data.notifications);
+                }
+            }),
+            catchError((error) => {
+                console.error('Error fetching notifications:', error);
+                return of<{ isSuccess: boolean, data: { notifications: CondominiumNotification[] } }>({ isSuccess: false, data: { notifications: [] } });
+            })
+        )
+    }
+
+    markAsRead(condominiumNotifications: CondominiumNotification[]) {
+        const condominiumEventsIds = condominiumNotifications.map(event => event.id);
+
+        return this.httpClient.put<{ isSuccess: boolean, data: { notifications: CondominiumNotification[] } }>('/api/notifications/read', condominiumEventsIds, {
+            headers: {
+                Authorization: `Bearer ${this.token}`
+            }
+        }).pipe(
+            tap((response) => {
+                console.log("NOTIFICATION RESPONSE", response)
+            }),
+            catchError((error) => {
+                console.error('Error fetching notifications:', error);
+                return of<{ isSuccess: boolean, data: { notifications: CondominiumNotification[] } }>({ isSuccess: false, data: { notifications: [] } });
+            })
+        )
+    }
+
+    ngOnDestroy() {
+        if (this.hubConnection) {
+            this.hubConnection.stop();
+        }
+    }
 }
